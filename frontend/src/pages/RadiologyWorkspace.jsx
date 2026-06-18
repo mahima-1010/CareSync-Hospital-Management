@@ -101,6 +101,10 @@ const RadiologyWorkspace = ({ onBack }) => {
   });
   const [incidents, setIncidents] = useState(() => { const s = localStorage.getItem('rad_incidents'); return s ? JSON.parse(s) : SAMPLE_INCIDENTS; });
   const [equipment, setEquipment] = useState(() => { const s = localStorage.getItem('rad_equipment'); return s ? JSON.parse(s) : SAMPLE_EQUIPMENT; });
+  const [isAddEquipModalOpen, setIsAddEquipModalOpen] = useState(false);
+  const [equipFormData, setEquipFormData] = useState({
+    name: '', type: '', manufacturer: '', model: '', serialNumber: '', installationDate: '', location: '', status: 'Operational'
+  });
   const [training, setTraining] = useState(() => { const s = localStorage.getItem('rad_training'); return s ? JSON.parse(s) : SAMPLE_TRAINING; });
   const [staffDirectory, setStaffDirectory] = useState(() => {
     const s = localStorage.getItem('rad_staff');
@@ -273,6 +277,10 @@ const RadiologyWorkspace = ({ onBack }) => {
       { id: 'cal5', equipment: 'Ultrasound - 4D', type: 'Output Power / B-Mode', calibrationDate: '2025-05-01', nextDue: '2026-05-01', agency: 'Philips Service', certificate: 'CERT/USG/2025/008', status: 'Valid' }
     ];
   });
+  const [isAddCalibModalOpen, setIsAddCalibModalOpen] = useState(false);
+  const [calibFormData, setCalibFormData] = useState({
+    equipment: '', type: '', calibrationDate: '', nextDue: '', agency: '', certificate: '', status: 'Valid', remarks: ''
+  });
   const [maintenanceRecords, setMaintenanceRecords] = useState(() => {
     const s = localStorage.getItem('rad_maintenance');
     return s ? JSON.parse(s) : [
@@ -282,6 +290,10 @@ const RadiologyWorkspace = ({ onBack }) => {
       { id: 'mnt4', equipment: 'Digital Mammography', type: 'Compression Pad Replacement', scheduledDate: '2025-05-10', completedDate: '2025-05-10', technician: 'GE Service', status: 'Completed', remarks: 'Routine maintenance' }
     ];
   });
+  const [isAddMaintenanceModalOpen, setIsAddMaintenanceModalOpen] = useState(false);
+  const [maintenanceFormData, setMaintenanceFormData] = useState({
+    equipment: '', type: '', scheduledDate: '', nextDue: '', technician: '', status: 'Scheduled', remarks: ''
+  });
   const [breakdownRecords, setBreakdownRecords] = useState(() => {
     const s = localStorage.getItem('rad_breakdown');
     return s ? JSON.parse(s) : [
@@ -290,6 +302,10 @@ const RadiologyWorkspace = ({ onBack }) => {
       { id: 'bd3', equipment: 'MRI - 1.5T', breakdownDate: '2025-05-28', reportedBy: 'Dr. Rajesh Kumar', faultDescription: 'Gradient coil overheating  scan aborted mid-sequence', actionTaken: 'Cooling system serviced; gradient coil checked', resolvedDate: '', downtimeHours: 4, status: 'Open' },
       { id: 'bd4', equipment: 'Ultrasound - 4D', breakdownDate: '2025-02-15', reportedBy: 'Ms. Lisa Thomas', faultDescription: 'Transducer cable fraying  intermittent signal loss', actionTaken: 'Transducer replaced', resolvedDate: '2025-02-15', downtimeHours: 2, status: 'Resolved' }
     ];
+  });
+  const [isAddBreakdownModalOpen, setIsAddBreakdownModalOpen] = useState(false);
+  const [breakdownFormData, setBreakdownFormData] = useState({
+    equipment: '', breakdownDate: '', faultDescription: '', reportedBy: '', severity: 'Medium', downtimeHours: '', status: 'Open', remarks: ''
   });
 
   const [capaItems, setCapaItems] = useState(() => {
@@ -349,6 +365,7 @@ const RadiologyWorkspace = ({ onBack }) => {
   useEffect(() => { localStorage.setItem('rad_policies', JSON.stringify(policies)); }, [policies]);
   useEffect(() => { localStorage.setItem('rad_incidents', JSON.stringify(incidents)); }, [incidents]);
   useEffect(() => { localStorage.setItem('rad_equipment', JSON.stringify(equipment)); }, [equipment]);
+  useEffect(() => { localStorage.setItem('rad_calibration', JSON.stringify(calibrationRecords)); }, [calibrationRecords]);
   useEffect(() => { localStorage.setItem('rad_training', JSON.stringify(training)); }, [training]);
   useEffect(() => { localStorage.setItem('rad_audit_templates', JSON.stringify(auditTemplates)); }, [auditTemplates]);
   useEffect(() => { localStorage.setItem('rad_audit_schedule', JSON.stringify(auditSchedule)); }, [auditSchedule]);
@@ -640,6 +657,132 @@ const RadiologyWorkspace = ({ onBack }) => {
     Word: <FileText className="w-4 h-4 text-blue-500" />,
     Image: <FileText className="w-4 h-4 text-purple-500" />
   };
+
+  // ── AERB Document Modal State ──────────────────────────────────────────────
+  const [isAddAerDocModalOpen, setIsAddAerDocModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedAerDoc, setSelectedAerDoc] = useState(null);
+  const [aerDocFormData, setAerDocFormData] = useState({
+    title: '', documentNo: '', issueDate: '', expiryDate: '', status: 'Valid', file: null
+  });
+
+  const handleUploadAerDoc = (e) => {
+    e.preventDefault();
+    const fileUrl = aerDocFormData.file ? URL.createObjectURL(aerDocFormData.file) : null;
+    const newDoc = {
+      id: `a${Date.now()}`,
+      title: aerDocFormData.title,
+      documentNo: aerDocFormData.documentNo,
+      issueDate: aerDocFormData.issueDate,
+      expiryDate: aerDocFormData.expiryDate,
+      status: aerDocFormData.status,
+      fileUrl
+    };
+    setAerDocs(prev => [...prev, newDoc]);
+    setAerDocFormData({ title: '', documentNo: '', issueDate: '', expiryDate: '', status: 'Valid', file: null });
+    setIsAddAerDocModalOpen(false);
+  };
+  // ──────────────────────────────────────────────────────────────────────────
+
+  const handleAddEquipment = (e) => {
+    e.preventDefault();
+    const newEquip = {
+      id: `e${Date.now()}`,
+      name: equipFormData.name,
+      type: equipFormData.type,
+      manufacturer: equipFormData.manufacturer,
+      model: equipFormData.model,
+      serialNumber: equipFormData.serialNumber,
+      installationDate: equipFormData.installationDate,
+      ppmDue: '',
+      calibrationDue: '',
+      location: equipFormData.location,
+      status: equipFormData.status
+    };
+    setEquipment(prev => [...prev, newEquip]);
+    setEquipFormData({ name: '', type: '', manufacturer: '', model: '', serialNumber: '', installationDate: '', location: '', status: 'Operational' });
+    setIsAddEquipModalOpen(false);
+  };
+  // ── Add Calibration Modal State ───────────────────────────────────────
+  const handleAddCalibration = (e) => {
+    e.preventDefault();
+    const newCalib = {
+      id: `cal${Date.now()}`,
+      equipment: calibFormData.equipment,
+      type: calibFormData.type,
+      calibrationDate: calibFormData.calibrationDate,
+      nextDue: calibFormData.nextDue,
+      agency: calibFormData.agency,
+      certificate: calibFormData.certificate,
+      status: calibFormData.status,
+      remarks: calibFormData.remarks
+    };
+    setCalibrationRecords(prev => [...prev, newCalib]);
+    setCalibFormData({ equipment: '', type: '', calibrationDate: '', nextDue: '', agency: '', certificate: '', status: 'Valid', remarks: '' });
+    setIsAddCalibModalOpen(false);
+  };
+  // ──────────────────────────────────────────────────────────────────────────
+  const [isAddAuditModalOpen, setIsAddAuditModalOpen] = useState(false);
+  const [auditFormData, setAuditFormData] = useState({
+    title: '', date: '', auditor: '', scope: '', findings: 0, status: 'Planned', remarks: ''
+  });
+
+  const handleAddAudit = (e) => {
+    e.preventDefault();
+    const newAudit = {
+      id: `ra${Date.now()}`,
+      title: auditFormData.title,
+      date: auditFormData.date,
+      auditor: auditFormData.auditor,
+      scope: auditFormData.scope,
+      findings: Number(auditFormData.findings),
+      status: auditFormData.status,
+      remarks: auditFormData.remarks,
+      score: 0
+    };
+    setRadSafetyAudits(prev => [...prev, newAudit]);
+    setAuditFormData({ title: '', date: '', auditor: '', scope: '', findings: 0, status: 'Planned', remarks: '' });
+    setIsAddAuditModalOpen(false);
+  };
+  // ── Maintenance Modal State ───────────────────────────────────────────
+  const handleAddMaintenance = (e) => {
+    e.preventDefault();
+    const newMaintenance = {
+      id: `mnt${Date.now()}`,
+      equipment: maintenanceFormData.equipment,
+      type: maintenanceFormData.type,
+      scheduledDate: maintenanceFormData.scheduledDate,
+      nextDue: maintenanceFormData.nextDue,
+      technician: maintenanceFormData.technician,
+      status: maintenanceFormData.status,
+      remarks: maintenanceFormData.remarks,
+      completedDate: ''
+    };
+    setMaintenanceRecords(prev => [...prev, newMaintenance]);
+    setMaintenanceFormData({ equipment: '', type: '', scheduledDate: '', nextDue: '', technician: '', status: 'Scheduled', remarks: '' });
+    setIsAddMaintenanceModalOpen(false);
+  };
+  // ── Breakdown Modal State ───────────────────────────────────────────────
+  const handleAddBreakdown = (e) => {
+    e.preventDefault();
+    const newBreakdown = {
+      id: `bd${Date.now()}`,
+      equipment: breakdownFormData.equipment,
+      breakdownDate: breakdownFormData.breakdownDate,
+      reportedBy: breakdownFormData.reportedBy,
+      faultDescription: breakdownFormData.faultDescription,
+      severity: breakdownFormData.severity,
+      downtimeHours: Number(breakdownFormData.downtimeHours) || 0,
+      status: breakdownFormData.status,
+      remarks: breakdownFormData.remarks,
+      actionTaken: '',
+      resolvedDate: ''
+    };
+    setBreakdownRecords(prev => [...prev, newBreakdown]);
+    setBreakdownFormData({ equipment: '', breakdownDate: '', faultDescription: '', reportedBy: '', severity: 'Medium', downtimeHours: '', status: 'Open', remarks: '' });
+    setIsAddBreakdownModalOpen(false);
+  };
+  // ──────────────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex gap-0 -m-6 min-h-[calc(100vh-4rem)]">
@@ -967,7 +1110,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">Radiation Safety Audits</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> New Audit</button>
+                    <button onClick={() => setIsAddAuditModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> New Audit</button>
                   </div>
                   <div className="space-y-3">
                     {radSafetyAudits.map(audit => (
@@ -991,7 +1134,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">AERB Compliance Documents</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Upload className="w-3 h-3" /> Upload Document</button>
+                    <button onClick={() => setIsAddAerDocModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Upload className="w-3 h-3" /> Upload Document</button>
                   </div>
                   <div className="space-y-3">
                     {aerDocs.map(doc => (
@@ -1006,7 +1149,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${doc.status === 'Valid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : doc.status === 'Expiring Soon' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>{doc.status}</span>
-                          <button className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => { setSelectedAerDoc(doc); setViewModalOpen(true); }} className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500"><Eye className="w-3.5 h-3.5" /></button>
                         </div>
                       </div>
                     ))}
@@ -1088,7 +1231,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">Equipment Inventory</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2"><Plus className="w-3.5 h-3.5" /> Add Equipment</button>
+                    <button onClick={() => setIsAddEquipModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2"><Plus className="w-3.5 h-3.5" /> Add Equipment</button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {equipment.map(eq => (
@@ -1097,8 +1240,9 @@ const RadiologyWorkspace = ({ onBack }) => {
                           <h4 className="text-xs font-bold text-slate-800">{eq.name}</h4>
                           <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${eq.status === 'Operational' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>{eq.status}</span>
                         </div>
-                        <p className="text-[9px] text-slate-500">Model: {eq.model}</p>
+                        <p className="text-[9px] text-slate-500">Model: {eq.model} {eq.manufacturer && `(${eq.manufacturer})`}</p>
                         <p className="text-[9px] text-slate-500">Location: {eq.location}</p>
+                        {eq.installationDate && <p className="text-[9px] text-slate-500">Installed: {eq.installationDate}</p>}
                         <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-[9px]">
                           <div><span className="text-slate-400">PPM Due:</span> <span className="font-bold text-slate-700">{eq.ppmDue}</span></div>
                           <div><span className="text-slate-400">Calibration:</span> <span className="font-bold text-slate-700">{eq.calibrationDue}</span></div>
@@ -1113,13 +1257,13 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">Calibration Register</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add Record</button>
+                    <button onClick={() => setIsAddCalibModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add Record</button>
                   </div>
                   <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-[10px]">
                         <thead className="bg-slate-50 border-b border-slate-200">
-                          <tr><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Equipment</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Type</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Calibration Date</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Next Due</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Agency</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Certificate No.</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Status</th></tr>
+                          <tr><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Equipment</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Type</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Calibration Date</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Next Due</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Agency</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Certificate No.</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Status</th><th className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">Remarks</th></tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                           {calibrationRecords.map(rec => (
@@ -1131,6 +1275,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                               <td className="px-4 py-3 text-slate-700">{rec.agency}</td>
                               <td className="px-4 py-3 text-slate-700 font-mono">{rec.certificate}</td>
                               <td className="px-4 py-3"><span className={`px-2 py-1 rounded-full text-[8px] font-bold ${rec.status === 'Valid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : rec.status === 'Due Soon' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>{rec.status}</span></td>
+                              <td className="px-4 py-3 text-slate-600 max-w-[200px] truncate">{rec.remarks}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -1144,7 +1289,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">Preventive Maintenance Register</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Schedule PPM</button>
+                    <button onClick={() => setIsAddMaintenanceModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Schedule PPM</button>
                   </div>
                   <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
@@ -1175,7 +1320,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-800">Breakdown Register</h3>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Report Breakdown</button>
+                    <button onClick={() => setIsAddBreakdownModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Report Breakdown</button>
                   </div>
                   <div className="space-y-3">
                     {breakdownRecords.map(bd => (
@@ -2418,6 +2563,537 @@ const RadiologyWorkspace = ({ onBack }) => {
             )}
           </div>
         )}
+
+        {/* ── Upload AERB Document Modal ─────────────────────────────────── */}
+        {isAddAerDocModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Upload className="w-4 h-4 text-sky-600" />
+                  Upload AERB Document
+                </h3>
+                <button
+                  onClick={() => setIsAddAerDocModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleUploadAerDoc} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Title</label>
+                  <input type="text" placeholder="Document Title" value={aerDocFormData.title}
+                    onChange={(e) => setAerDocFormData({ ...aerDocFormData, title: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Document Number</label>
+                  <input type="text" placeholder="e.g. AERB/RAD/2024/001" value={aerDocFormData.documentNo}
+                    onChange={(e) => setAerDocFormData({ ...aerDocFormData, documentNo: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Issue Date</label>
+                    <input type="date" value={aerDocFormData.issueDate}
+                      onChange={(e) => setAerDocFormData({ ...aerDocFormData, issueDate: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Expiry Date</label>
+                    <input type="date" value={aerDocFormData.expiryDate}
+                      onChange={(e) => setAerDocFormData({ ...aerDocFormData, expiryDate: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">File Upload</label>
+                  <input type="file" onChange={(e) => setAerDocFormData({ ...aerDocFormData, file: e.target.files[0] })}
+                    className="w-full text-[10px] text-slate-500" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                  <select value={aerDocFormData.status}
+                    onChange={(e) => setAerDocFormData({ ...aerDocFormData, status: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400">
+                    <option value="Valid">Valid</option>
+                    <option value="Expiring Soon">Expiring Soon</option>
+                    <option value="Expired">Expired</option>
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddAerDocModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Upload</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── View AERB Document Modal ───────────────────────────────────── */}
+        {viewModalOpen && selectedAerDoc && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-3xl rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-sky-600" />
+                  {selectedAerDoc.title}
+                </h3>
+                <button
+                  onClick={() => { setViewModalOpen(false); setSelectedAerDoc(null); }}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-[10px]">
+                <div><span className="font-bold text-slate-400 uppercase tracking-wider">Document No</span><p className="font-mono text-slate-700 mt-1">{selectedAerDoc.documentNo}</p></div>
+                <div><span className="font-bold text-slate-400 uppercase tracking-wider">Status</span><p className={`mt-1 inline-block px-2 py-0.5 rounded-full text-[9px] font-bold ${selectedAerDoc.status === 'Valid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : selectedAerDoc.status === 'Expiring Soon' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>{selectedAerDoc.status}</p></div>
+                <div><span className="font-bold text-slate-400 uppercase tracking-wider">Issue Date</span><p className="text-slate-700 mt-1">{selectedAerDoc.issueDate}</p></div>
+                <div><span className="font-bold text-slate-400 uppercase tracking-wider">Expiry Date</span><p className="text-slate-700 mt-1">{selectedAerDoc.expiryDate}</p></div>
+              </div>
+              <div className="min-h-[40vh] rounded-xl border border-slate-200 bg-slate-50 overflow-hidden">
+                {selectedAerDoc.fileUrl ? (
+                  <iframe src={selectedAerDoc.fileUrl} className="w-full h-[40vh]" title={selectedAerDoc.title} />
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[40vh] text-slate-400">
+                    <FileText className="w-12 h-12 mb-3 text-slate-300" />
+                    <p className="text-xs font-medium">No document preview available</p>
+                    <p className="text-[10px] mt-1">Upload a file to enable preview</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end pt-1">
+                <button onClick={() => { setViewModalOpen(false); setSelectedAerDoc(null); }}
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── New Radiation Safety Audit Modal ─────────────────────────── */}
+        {isAddAuditModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-sky-600" />
+                  New Radiation Safety Audit
+                </h3>
+                <button
+                  onClick={() => setIsAddAuditModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddAudit} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Audit Title</label>
+                  <input type="text" placeholder="e.g. Quarterly Radiation Safety Audit" value={auditFormData.title}
+                    onChange={(e) => setAuditFormData({ ...auditFormData, title: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Audit Date</label>
+                    <input type="date" value={auditFormData.date}
+                      onChange={(e) => setAuditFormData({ ...auditFormData, date: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                    <select value={auditFormData.status}
+                      onChange={(e) => setAuditFormData({ ...auditFormData, status: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400">
+                      <option value="Planned">Planned</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Auditor</label>
+                  <input type="text" placeholder="e.g. RSO / Dr. Mehta" value={auditFormData.auditor}
+                    onChange={(e) => setAuditFormData({ ...auditFormData, auditor: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Scope</label>
+                  <input type="text" placeholder="e.g. All imaging rooms" value={auditFormData.scope}
+                    onChange={(e) => setAuditFormData({ ...auditFormData, scope: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Findings Count</label>
+                  <input type="number" min="0" value={auditFormData.findings}
+                    onChange={(e) => setAuditFormData({ ...auditFormData, findings: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Remarks</label>
+                  <textarea rows={2} placeholder="Any additional remarks or observations..." value={auditFormData.remarks}
+                    onChange={(e) => setAuditFormData({ ...auditFormData, remarks: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400 resize-none" />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddAuditModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Save Audit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Add Equipment Modal ───────────────────────────────────────────── */}
+        {isAddEquipModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-sky-600" />
+                  Add Equipment
+                </h3>
+                <button
+                  onClick={() => setIsAddEquipModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddEquipment} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipment Name</label>
+                  <input type="text" placeholder="e.g. CT Scanner - 128 Slice" value={equipFormData.name}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipment Type</label>
+                  <input type="text" placeholder="e.g. CT Scanner" value={equipFormData.type}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, type: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Manufacturer</label>
+                  <input type="text" placeholder="e.g. Siemens" value={equipFormData.manufacturer}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, manufacturer: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Model Number</label>
+                    <input type="text" placeholder="e.g. SOMATOM Definition" value={equipFormData.model}
+                      onChange={(e) => setEquipFormData({ ...equipFormData, model: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Serial Number</label>
+                    <input type="text" placeholder="e.g. SN-12345" value={equipFormData.serialNumber}
+                      onChange={(e) => setEquipFormData({ ...equipFormData, serialNumber: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Installation Date</label>
+                  <input type="date" value={equipFormData.installationDate}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, installationDate: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Location</label>
+                  <input type="text" placeholder="e.g. Radiology Floor 1" value={equipFormData.location}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, location: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                  <select value={equipFormData.status}
+                    onChange={(e) => setEquipFormData({ ...equipFormData, status: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400">
+                    <option value="Operational">Operational</option>
+                    <option value="Under Maintenance">Under Maintenance</option>
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddEquipModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Save Equipment</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Add Calibration Record Modal ────────────────────────────────── */}
+        {isAddCalibModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-sky-600" />
+                  Add Calibration Record
+                </h3>
+                <button
+                  onClick={() => setIsAddCalibModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddCalibration} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipment</label>
+                  <select value={calibFormData.equipment}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, equipment: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required>
+                    <option value="">Select Equipment</option>
+                    {equipment.map(eq => (
+                      <option key={eq.id} value={eq.name}>{eq.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Calibration Type</label>
+                  <input type="text" placeholder="e.g. CTDI Phantom" value={calibFormData.type}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, type: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Calibration Date</label>
+                    <input type="date" value={calibFormData.calibrationDate}
+                      onChange={(e) => setCalibFormData({ ...calibFormData, calibrationDate: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Next Due Date</label>
+                    <input type="date" value={calibFormData.nextDue}
+                      onChange={(e) => setCalibFormData({ ...calibFormData, nextDue: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Calibration Agency</label>
+                  <input type="text" placeholder="e.g. AERB Approved Lab" value={calibFormData.agency}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, agency: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Certificate Number</label>
+                  <input type="text" placeholder="e.g. CERT/CT/2025/001" value={calibFormData.certificate}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, certificate: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                  <select value={calibFormData.status}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, status: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400">
+                    <option value="Valid">Valid</option>
+                    <option value="Due Soon">Due Soon</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Remarks</label>
+                  <textarea rows={2} placeholder="Any additional remarks..." value={calibFormData.remarks}
+                    onChange={(e) => setCalibFormData({ ...calibFormData, remarks: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400 resize-none" />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddCalibModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Save Record</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Schedule PPM Modal ──────────────────────────────────────────────── */}
+        {isAddMaintenanceModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Clipboard className="w-4 h-4 text-sky-600" />
+                  Schedule PPM
+                </h3>
+                <button
+                  onClick={() => setIsAddMaintenanceModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddMaintenance} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipment</label>
+                  <select value={maintenanceFormData.equipment}
+                    onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, equipment: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required>
+                    <option value="">Select Equipment</option>
+                    {equipment.map(eq => (
+                      <option key={eq.id} value={eq.name}>{eq.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Maintenance Type</label>
+                  <input type="text" placeholder="e.g. Preventive Maintenance" value={maintenanceFormData.type}
+                    onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, type: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Scheduled Date</label>
+                    <input type="date" value={maintenanceFormData.scheduledDate}
+                      onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, scheduledDate: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Next Due Date</label>
+                    <input type="date" value={maintenanceFormData.nextDue}
+                      onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, nextDue: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Technician / Vendor</label>
+                  <input type="text" placeholder="e.g. Biomedical Team" value={maintenanceFormData.technician}
+                    onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, technician: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                  <select value={maintenanceFormData.status}
+                    onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, status: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400">
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Remarks</label>
+                  <textarea rows={2} placeholder="Any additional remarks..." value={maintenanceFormData.remarks}
+                    onChange={(e) => setMaintenanceFormData({ ...maintenanceFormData, remarks: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400 resize-none" />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddMaintenanceModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Save Record</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Report Breakdown Modal ─────────────────────────────────────────── */}
+        {isAddBreakdownModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-lg p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-sky-600" />
+                  Report Breakdown
+                </h3>
+                <button
+                  onClick={() => setIsAddBreakdownModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddBreakdown} className="space-y-4">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Equipment</label>
+                  <select value={breakdownFormData.equipment}
+                    onChange={(e) => setBreakdownFormData({ ...breakdownFormData, equipment: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required>
+                    <option value="">Select Equipment</option>
+                    {equipment.map(eq => (
+                      <option key={eq.id} value={eq.name}>{eq.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Breakdown Date</label>
+                    <input type="date" value={breakdownFormData.breakdownDate}
+                      onChange={(e) => setBreakdownFormData({ ...breakdownFormData, breakdownDate: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Downtime Hours</label>
+                    <input type="number" min="0" value={breakdownFormData.downtimeHours}
+                      onChange={(e) => setBreakdownFormData({ ...breakdownFormData, downtimeHours: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Fault / Issue Description</label>
+                  <textarea rows={2} placeholder="Describe the fault or issue..." value={breakdownFormData.faultDescription}
+                    onChange={(e) => setBreakdownFormData({ ...breakdownFormData, faultDescription: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400 resize-none" required />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Reported By</label>
+                  <input type="text" placeholder="e.g. Technician Name" value={breakdownFormData.reportedBy}
+                    onChange={(e) => setBreakdownFormData({ ...breakdownFormData, reportedBy: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Severity</label>
+                    <select value={breakdownFormData.severity}
+                      onChange={(e) => setBreakdownFormData({ ...breakdownFormData, severity: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                    <select value={breakdownFormData.status}
+                      onChange={(e) => setBreakdownFormData({ ...breakdownFormData, status: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400" required>
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Remarks</label>
+                  <textarea rows={2} placeholder="Any additional remarks..." value={breakdownFormData.remarks}
+                    onChange={(e) => setBreakdownFormData({ ...breakdownFormData, remarks: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:border-sky-400 resize-none" />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsAddBreakdownModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }}
+                    className="px-4 py-2 rounded-xl text-white text-[10px] font-bold hover:opacity-90 transition-all cursor-pointer">Save Record</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   );

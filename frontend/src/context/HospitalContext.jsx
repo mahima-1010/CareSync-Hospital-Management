@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const HospitalContext = createContext();
+
+const API_BASE = 'http://localhost:5000/api';
+
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 const defaultModules = [
   { id: 'policies', label: 'Policies', desc: 'SOPs, clinical guidelines, and documentation audits.', iconName: 'BookOpen', to: '/policies', isCustom: false },
@@ -32,8 +37,6 @@ const predefinedDepartments = [
   { id: 'manpower', name: 'Manpower / HR Protocols', iconName: 'Users', isCustom: false }
 ];
 
-const API_BASE = 'http://localhost:5000/api';
-
 export const HospitalProvider = ({ children }) => {
   const [hospital, setHospital] = useState({
     name: "Apex Cardio Hospital",
@@ -46,23 +49,24 @@ export const HospitalProvider = ({ children }) => {
     modules: defaultModules
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [policyRes, hospRes] = await Promise.all([
-          fetch(`${API_BASE}/policies`).then(r => r.json()),
-          fetch(`${API_BASE}/hospitals`).then(r => r.json())
+          axios.get(`${API_BASE}/policies`),
+          axios.get(`${API_BASE}/hospitals`)
         ]);
         
-        const hospitalData = hospRes[0] || {};
+        const hospitalData = hospRes.data[0] || {};
         setHospital(prev => ({
           ...prev,
           name: hospitalData.name || prev.name,
           hpnId: hospitalData.hpn_id || prev.hpnId,
           establishmentNum: hospitalData.establishment_num || prev.establishmentNum,
           themeColor: hospitalData.theme_color || prev.themeColor,
-          policies: policyRes.map(p => ({
+          policies: policyRes.data.map(p => ({
             id: p.policy_id,
             deptId: p.department_id,
             title: p.title,
@@ -73,8 +77,9 @@ export const HospitalProvider = ({ children }) => {
             author: p.author
           }))
         }));
-      } catch (error) {
-        console.error('Failed to load data:', error);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -83,67 +88,77 @@ export const HospitalProvider = ({ children }) => {
   }, []);
 
   const addDepartment = async (name, iconName) => {
-    const res = await fetch(`${API_BASE}/departments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, iconName })
-    });
-    const newDept = await res.json();
-    setHospital(prev => ({
-      ...prev,
-      departments: [...prev.departments, { id: newDept.department_id, name: newDept.name, iconName: newDept.icon_name, isCustom: true }]
-    }));
+    try {
+      const res = await axios.post(`${API_BASE}/departments`, { name, iconName });
+      setHospital(prev => ({
+        ...prev,
+        departments: [...prev.departments, { id: res.data.department_id, name: res.data.name, iconName: res.data.icon_name, isCustom: true }]
+      }));
+    } catch (err) {
+      console.error('Failed to add department:', err);
+      setError('Failed to add department');
+    }
   };
 
   const deleteDepartment = async (id) => {
     if (!predefinedDepartments.some(d => d.id === id)) {
-      await fetch(`${API_BASE}/departments/${id}`, { method: 'DELETE' });
-      setHospital(prev => ({
-        ...prev,
-        departments: prev.departments.filter(d => d.id !== id),
-        policies: prev.policies.filter(p => p.deptId !== id)
-      }));
+      try {
+        await axios.delete(`${API_BASE}/departments/${id}`);
+        setHospital(prev => ({
+          ...prev,
+          departments: prev.departments.filter(d => d.id !== id),
+          policies: prev.policies.filter(p => p.deptId !== id)
+        }));
+      } catch (err) {
+        console.error('Failed to delete department:', err);
+        setError('Failed to delete department');
+      }
     }
   };
 
   const addPolicy = async (deptId, title, code, content, status) => {
-    const res = await fetch(`${API_BASE}/policies`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ departmentId: deptId, title, code, content, status })
-    });
-    const newPolicy = await res.json();
-    setHospital(prev => ({
-      ...prev,
-      policies: [...prev.policies, {
-        id: newPolicy.policy_id,
-        deptId: newPolicy.department_id,
-        title: newPolicy.title,
-        code: newPolicy.code,
-        content: newPolicy.content,
-        version: newPolicy.version,
-        status: newPolicy.status,
-        author: newPolicy.author
-      }]
-    }));
+    try {
+      const res = await axios.post(`${API_BASE}/policies`, { departmentId: deptId, title, code, content, status });
+      setHospital(prev => ({
+        ...prev,
+        policies: [...prev.policies, {
+          id: res.data.policy_id,
+          deptId: res.data.department_id,
+          title: res.data.title,
+          code: res.data.code,
+          content: res.data.content,
+          version: res.data.version,
+          status: res.data.status,
+          author: res.data.author
+        }]
+      }));
+    } catch (err) {
+      console.error('Failed to add policy:', err);
+      setError('Failed to add policy');
+    }
   };
 
   const updatePolicy = async (id, title, code, content, status) => {
-    const res = await fetch(`${API_BASE}/policies/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, code, content, status })
-    });
-    const updated = await res.json();
-    setHospital(prev => ({
-      ...prev,
-      policies: prev.policies.map(p => p.id === id ? { ...p, title: updated.title, code: updated.code, content: updated.content, status: updated.status, version: updated.version } : p)
-    }));
+    try {
+      const res = await axios.put(`${API_BASE}/policies/${id}`, { title, code, content, status });
+      setHospital(prev => ({
+        ...prev,
+        policies: prev.policies.map(p => p.id === id ? { ...p, title: res.data.title, code: res.data.code, content: res.data.content, status: res.data.status, version: res.data.version } : p)
+      }));
+    } catch (err) {
+      console.error('Failed to update policy:', err);
+      setError('Failed to update policy');
+    }
   };
 
   const deletePolicy = async (id) => {
-    await fetch(`${API_BASE}/policies/${id}`, { method: 'DELETE' });
-    setHospital(prev => ({ ...prev, policies: prev.policies.filter(p => p.id !== id) }));
+    try {
+      await axios.delete(`${API_BASE}/policies/${id}`);
+      setHospital(prev => ({ ...prev, policies: prev.policies.filter(p => p.id !== id) }));
+    } catch (err) {
+      console.error('Failed to delete policy:', err);
+      setError('Failed to delete policy');
+    }
   };
 
   const updateHospital = (data) => {
@@ -163,6 +178,7 @@ export const HospitalProvider = ({ children }) => {
     <HospitalContext.Provider value={{ 
       hospital, 
       loading,
+      error,
       updateHospital, 
       addModule, 
       deleteModule, 
