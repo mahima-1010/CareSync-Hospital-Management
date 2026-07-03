@@ -311,15 +311,56 @@ const RadiologyWorkspace = ({ onBack }) => {
   const [capaItems, setCapaItems] = useState(() => {
     const s = localStorage.getItem('rad_capa_items');
     return s ? JSON.parse(s) : [
-      { id: 'capa1', source: 'Radiation Safety Audit', issue: 'Monthly TLD report not submitted to RSO within due date', rootCause: 'Administrative delay in report consolidation', correctiveAction: 'Report submitted to RSO with explanation', preventiveAction: 'Automated monthly reminder set for TLD submission', responsible: 'Radiology Incharge', dueDate: '2025-06-15', status: 'Open', createdAt: '2025-05-20' },
-      { id: 'capa2', source: 'Equipment Calibration Audit', issue: 'X-Ray unit kVp calibration shows 2% deviation from baseline', rootCause: 'Aging X-ray tube', correctiveAction: 'Calibration completed immediately by vendor', preventiveAction: 'Pre-book calibration slot 30 days before expiry', responsible: 'Biomedical Engineer', dueDate: '2025-06-10', status: 'Investigation', createdAt: '2025-05-15' },
-      { id: 'capa3', source: 'Infection Control Audit', issue: 'Hand hygiene compliance observed at 78% vs target 95%', rootCause: 'Staff not practicing during high workload', correctiveAction: 'Refresher training conducted for all staff', preventiveAction: 'Hand hygiene posters placed at all entry points; monthly audits', responsible: 'Infection Control Nurse', dueDate: '2025-06-20', status: 'Corrective Action', createdAt: '2025-05-28' },
-      { id: 'capa4', source: 'Radiology Incident Report', issue: 'CT scanner gantry rotation error during helical scan', rootCause: 'Encoder calibration drift', correctiveAction: 'Encoder recalibrated; gantry bearing inspected', preventiveAction: 'Weekly functional check added to PPM schedule', responsible: 'Biomedical Engineer', dueDate: '2025-06-05', status: 'Preventive Action', createdAt: '2025-04-10' },
-      { id: 'capa5', source: 'Staff Observation', issue: 'One radiographer overdue for annual dosimeter reading', rootCause: 'Lack of awareness on submission deadline', correctiveAction: 'Dosimeter reading completed; counseling done', preventiveAction: 'Automated alerts 15 days before due date', responsible: 'Radiology Incharge', dueDate: '2025-05-30', status: 'Verification', createdAt: '2025-05-20' },
-      { id: 'capa6', source: 'Infection Control Audit', issue: 'Lead apron storage area shows minor tear on 2 aprons', rootCause: 'Normal wear and tear; no periodic inspection schedule', correctiveAction: 'Damaged aprons replaced', preventiveAction: 'Quarterly apron inspection checklist introduced', responsible: 'Radiology Incharge', dueDate: '2025-06-25', status: 'Closed', createdAt: '2025-05-28' }
+      { id: 'capa1', capaId: 'CAPA-RAD-001', source: 'Internal Audit', issue: 'Monthly TLD report not submitted to RSO within due date', rootCause: 'Administrative delay', correctiveAction: 'Report submitted to RSO', preventiveAction: 'Automated monthly reminder set', responsible: 'Radiology Incharge', dueDate: '2025-06-15', status: 'Open', priority: 'Medium', department: 'Radiology', targetDate: '2025-06-15', actualClosureDate: null, verificationResult: 'Pending', evidenceFiles: [], createdAt: '2025-05-20' },
+      { id: 'capa2', capaId: 'CAPA-RAD-002', source: 'Equipment Management', issue: 'X-Ray unit kVp calibration shows 2% deviation from baseline', rootCause: 'Aging X-ray tube', correctiveAction: 'Calibration completed immediately by vendor', preventiveAction: 'Pre-book calibration slot 30 days before expiry', responsible: 'Biomedical Engineer', dueDate: '2025-06-10', status: 'Investigation', priority: 'High', department: 'Biomedical', targetDate: '2025-06-10', actualClosureDate: null, verificationResult: 'Pending', evidenceFiles: [], createdAt: '2025-05-15' },
+      { id: 'capa3', capaId: 'CAPA-RAD-003', source: 'Staff & Training', issue: 'Hand hygiene compliance observed at 78% vs target 95%', rootCause: 'Staff not practicing during high workload', correctiveAction: 'Refresher training conducted for all staff', preventiveAction: 'Hand hygiene posters placed at all entry points', responsible: 'Infection Control Nurse', dueDate: '2025-06-20', status: 'Corrective Action', priority: 'Low', department: 'Nursing', targetDate: '2025-06-20', actualClosureDate: null, verificationResult: 'Pending', evidenceFiles: [], createdAt: '2025-05-28' },
+      { id: 'capa4', capaId: 'CAPA-RAD-004', source: 'Radiation Safety', issue: 'CT scanner gantry rotation error during helical scan', rootCause: 'Encoder calibration drift', correctiveAction: 'Encoder recalibrated; gantry bearing inspected', preventiveAction: 'Weekly functional check added to PPM schedule', responsible: 'Biomedical Engineer', dueDate: '2025-06-05', status: 'Preventive Action', priority: 'High', department: 'Biomedical', targetDate: '2025-06-05', actualClosureDate: null, verificationResult: 'Pending', evidenceFiles: [], createdAt: '2025-04-10' },
+      { id: 'capa5', capaId: 'CAPA-RAD-005', source: 'Quality Indicator', issue: 'One radiographer overdue for annual dosimeter reading', rootCause: 'Lack of awareness on submission deadline', correctiveAction: 'Dosimeter reading completed; counseling done', preventiveAction: 'Automated alerts 15 days before due date', responsible: 'Radiology Incharge', dueDate: '2025-05-30', status: 'Verification', priority: 'Low', department: 'Radiology', targetDate: '2025-05-30', actualClosureDate: null, verificationResult: 'Pending', evidenceFiles: [], createdAt: '2025-05-20' },
+      { id: 'capa6', capaId: 'CAPA-RAD-006', source: 'NCR', issue: 'Lead apron storage area shows minor tear on 2 aprons', rootCause: 'Normal wear and tear; no periodic inspection schedule', correctiveAction: 'Damaged aprons replaced', preventiveAction: 'Quarterly apron inspection checklist introduced', responsible: 'Radiology Incharge', dueDate: '2025-06-25', status: 'Closed', priority: 'Medium', department: 'Radiology', targetDate: '2025-06-25', actualClosureDate: '2025-06-20', verificationResult: 'Effective', evidenceFiles: [], createdAt: '2025-05-28' }
     ];
   });
   const [selectedCapa, setSelectedCapa] = useState(null);
+
+  const [capaFormData, setCapaFormData] = useState({ capaId: '', source: 'Internal Audit', priority: 'Medium', department: 'Radiology', issue: '', rootCause: '', correctiveAction: '', preventiveAction: '', responsible: '', targetDate: '', status: 'Open', actualClosureDate: '', verificationResult: 'Pending', evidenceFiles: [] });
+  const [editingCapaId, setEditingCapaId] = useState(null);
+  const [isAddCapaModalOpen, setIsAddCapaModalOpen] = useState(false);
+
+  const getNextCapaId = () => {
+    const maxNum = capaItems.reduce((max, item) => {
+      const match = item.capaId?.match(/CAPA-RAD-(\d+)/);
+      return match ? Math.max(max, parseInt(match[1], 10)) : max;
+    }, 0);
+    return `CAPA-RAD-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleAddCapa = (e) => {
+    e.preventDefault();
+    if (capaFormData.status === 'Closed' && (!capaFormData.actualClosureDate || capaFormData.verificationResult === 'Pending')) {
+      alert('Actual Closure Date and Verification Result are required before closing CAPA');
+      return;
+    }
+    if (editingCapaId) {
+      setCapaItems(prev => prev.map(item => item.id === editingCapaId ? { ...item, ...capaFormData } : item));
+      setEditingCapaId(null);
+    } else {
+      const newCapa = { ...capaFormData, id: `capa${Date.now()}`, capaId: getNextCapaId() };
+      setCapaItems(prev => [...prev, newCapa]);
+    }
+    setCapaFormData({ capaId: '', source: 'Internal Audit', priority: 'Medium', department: 'Radiology', issue: '', rootCause: '', correctiveAction: '', preventiveAction: '', responsible: '', targetDate: '', status: 'Open', actualClosureDate: '', verificationResult: 'Pending', evidenceFiles: [] });
+    setIsAddCapaModalOpen(false);
+  };
+
+  const handleEditCapa = (item) => {
+    setCapaFormData({ ...item });
+    setEditingCapaId(item.id);
+    setIsAddCapaModalOpen(true);
+  };
+
+  const handleDeleteCapa = (id) => {
+    if (confirm('Are you sure you want to delete this CAPA record?')) {
+      setCapaItems(prev => prev.filter(item => item.id !== id));
+    }
+  };
 
   useEffect(() => { localStorage.setItem('rad_capa_items', JSON.stringify(capaItems)); }, [capaItems]);
   useEffect(() => { localStorage.setItem('rad_maintenance', JSON.stringify(maintenanceRecords)); }, [maintenanceRecords]);
@@ -445,62 +486,93 @@ const RadiologyWorkspace = ({ onBack }) => {
   const [aerLicenses, setAerLicenses] = useState(() => {
     const s = localStorage.getItem("rad_aer_licenses");
     return s ? JSON.parse(s) : [
-      { id: "aer1", name: "AERB Radiology Department License", no: "AERB/RAD-2024/001", issued: "2024-01-01", expiry: "2026-01-01", status: "Valid" },
-      { id: "aer2", name: "Radiation Worker Registration", no: "AERB/RW-2024/045", issued: "2024-02-01", expiry: "2026-02-01", status: "Valid" },
-      { id: "aer3", name: "CT Scanner Type Approval", no: "AERB/ETA/CT/2023/012", issued: "2023-06-01", expiry: "2026-06-01", status: "Expiring Soon" },
-      { id: "aer4", name: "MRI Type Approval", no: "AERB/ETA/MRI/2023/008", issued: "2023-05-15", expiry: "2026-05-15", status: "Valid" },
-      { id: "aer5", name: "X-Ray Type Approval", no: "AERB/ETA/XRAY/2023/015", issued: "2023-07-01", expiry: "2025-07-01", status: "Overdue" }
+      { id: "aer1", name: "AERB Radiology Department License", no: "AERB/RAD-2024/001", authority: "AERB", issued: "2024-01-01", expiry: "2026-01-01", renewalDate: "", remarks: "" },
+      { id: "aer2", name: "Radiation Worker Registration", no: "AERB/RW-2024/045", authority: "AERB", issued: "2024-02-01", expiry: "2026-02-01", renewalDate: "", remarks: "" },
+      { id: "aer3", name: "CT Scanner Type Approval", no: "AERB/ETA/CT/2023/012", authority: "AERB", issued: "2023-06-01", expiry: "2026-06-01", renewalDate: "", remarks: "" },
+      { id: "aer4", name: "MRI Type Approval", no: "AERB/ETA/MRI/2023/008", authority: "AERB", issued: "2023-05-15", expiry: "2026-05-15", renewalDate: "", remarks: "" },
+      { id: "aer5", name: "X-Ray Type Approval", no: "AERB/ETA/XRAY/2023/015", authority: "AERB", issued: "2023-07-01", expiry: "2025-07-01", renewalDate: "", remarks: "" }
     ];
   });
   const [pcpndtRegs, setPcpndtRegs] = useState(() => {
     const s = localStorage.getItem("rad_pcpndt_regs");
     return s ? JSON.parse(s) : [
-      { id: "pcp1", center: "Radiology Prenatal Imaging Center", registration: "DL/PC/2024/001", issued: "2024-03-01", expiry: "2026-03-01", status: "Valid" },
-      { id: "pcp2", name: "Genetic Clinic Registration", registration: "DL/GC/2024/007", issued: "2024-04-15", expiry: "2026-04-15", status: "Valid" },
-      { id: "pcp3", name: "Ultrasound Machine Registration", registration: "DL/USG/2023/012", issued: "2024-05-20", expiry: "2025-05-20", status: "Expiring Soon" }
+      { id: "pcp1", center: "Radiology Prenatal Imaging Center", registration: "DL/PC/2024/001", authority: "PCPNDT", issued: "2024-03-01", expiry: "2026-03-01", remarks: "" },
+      { id: "pcp2", name: "Genetic Clinic Registration", registration: "DL/GC/2024/007", authority: "PCPNDT", issued: "2024-04-15", expiry: "2026-04-15", remarks: "" },
+      { id: "pcp3", name: "Ultrasound Machine Registration", registration: "DL/USG/2023/012", authority: "PCPNDT", issued: "2024-05-20", expiry: "2025-05-20", remarks: "" }
     ];
   });
   const [vendorAgreements, setVendorAgreements] = useState(() => {
     const s = localStorage.getItem("rad_vendor_agreements");
     return s ? JSON.parse(s) : [
-      { id: "v1", vendor: "Siemens Healthineers", type: "Annual Maintenance Contract", equipment: "CT Scanner", start: "2024-06-01", expiry: "2026-06-01", status: "Valid" },
-      { id: "v2", vendor: "Siemens Healthineers", type: "Annual Maintenance Contract", equipment: "MRI - 1.5T", start: "2024-06-01", expiry: "2025-06-01", status: "Expiring Soon" },
-      { id: "v3", vendor: "Philips Healthcare", type: "Service Agreement", equipment: "Ultrasound", start: "2024-07-01", expiry: "2025-07-01", status: "Valid" },
-      { id: "v4", vendor: "GE Healthcare", type: "Calibration Agreement", equipment: "Mammography", start: "2024-05-15", expiry: "2025-12-15", status: "Valid" },
-      { id: "v5", vendor: "Carestream", type: "Reagent Supply", equipment: "X-Ray Films", start: "2024-01-01", expiry: "2025-05-30", status: "Overdue" }
+      { id: "v1", vendor: "Siemens Healthineers", type: "Annual Maintenance Contract", equipment: "CT Scanner", start: "2024-06-01", expiry: "2026-06-01", remarks: "" },
+      { id: "v2", vendor: "Siemens Healthineers", type: "Annual Maintenance Contract", equipment: "MRI - 1.5T", start: "2024-06-01", expiry: "2025-06-01", remarks: "" },
+      { id: "v3", vendor: "Philips Healthcare", type: "Service Agreement", equipment: "Ultrasound", start: "2024-07-01", expiry: "2025-07-01", remarks: "" },
+      { id: "v4", vendor: "GE Healthcare", type: "Calibration Agreement", equipment: "Mammography", start: "2024-05-15", expiry: "2025-12-15", remarks: "" },
+      { id: "v5", vendor: "Carestream", type: "Reagent Supply", equipment: "X-Ray Films", start: "2024-01-01", expiry: "2025-05-30", remarks: "" }
     ];
   });
   const [regDocuments, setRegDocuments] = useState(() => {
     const s = localStorage.getItem("rad_reg_documents");
     return s ? JSON.parse(s) : [
-      { id: "rd1", name: "AERB License - Radiology Department", no: "AERB/RAD/2024/001", issued: "2024-01-01", expiry: "2026-01-01", status: "Valid" },
-      { id: "rd2", name: "Radiation Worker Registration Certificate", no: "AERB/RW/2024/045", issued: "2024-02-01", expiry: "2026-02-01", status: "Valid" },
-      { id: "rd3", name: "RSO Appointment Letter", no: "ADM/RSO/2024/01", issued: "2024-01-15", expiry: "2027-01-15", status: "Valid" },
-      { id: "rd4", name: "CPMNDT Registration Certificate", no: "DL/PC/2024/001", issued: "2024-03-01", expiry: "2026-03-01", status: "Valid" },
-      { id: "rd5", name: "PCPNDT Operational Guidelines", no: "MOHFW/PCP/2024/001", issued: "2024-01-01", expiry: "2027-01-01", status: "Valid" },
-      { id: "rd6", name: "Radiation Safety Manual", no: "RAD/RSM/2024/001", issued: "2024-01-01", expiry: "2027-01-01", status: "Valid" },
-      { id: "rd7", name: "MRI Safety SOP", no: "POL-RAD-002", issued: "2024-03-15", expiry: "2027-03-15", status: "Valid" },
-      { id: "rd8", name: "AERB Inspection Report 2024", no: "AERB/INS/2024/003", issued: "2024-12-01", expiry: "2029-12-01", status: "Valid" }
+      { id: "rd1", name: "AERB License - Radiology Department", no: "AERB/RAD/2024/001", version: "1.0", effectiveDate: "2024-01-01", expiry: "2026-01-01", remarks: "" },
+      { id: "rd2", name: "Radiation Worker Registration Certificate", no: "AERB/RW/2024/045", version: "1.0", effectiveDate: "2024-02-01", expiry: "2026-02-01", remarks: "" },
+      { id: "rd3", name: "RSO Appointment Letter", no: "ADM/RSO/2024/01", version: "1.0", effectiveDate: "2024-01-15", expiry: "2027-01-15", remarks: "" },
+      { id: "rd4", name: "CPMNDT Registration Certificate", no: "DL/PC/2024/001", version: "1.0", effectiveDate: "2024-03-01", expiry: "2026-03-01", remarks: "" },
+      { id: "rd5", name: "PCPNDT Operational Guidelines", no: "MOHFW/PCP/2024/001", version: "1.0", effectiveDate: "2024-01-01", expiry: "2027-01-01", remarks: "" },
+      { id: "rd6", name: "Radiation Safety Manual", no: "RAD/RSM/2024/001", version: "1.0", effectiveDate: "2024-01-01", expiry: "2027-01-01", remarks: "" },
+      { id: "rd7", name: "MRI Safety SOP", no: "POL-RAD-002", version: "1.0", effectiveDate: "2024-03-15", expiry: "2027-03-15", remarks: "" },
+      { id: "rd8", name: "AERB Inspection Report 2024", no: "AERB/INS/2024/003", version: "1.0", effectiveDate: "2024-12-01", expiry: "2029-12-01", remarks: "" }
     ];
   });
 
-  useEffect(() => { localStorage.setItem("rad_aer_licenses", JSON.stringify(aerLicenses)); }, [aerLicenses]);
-  useEffect(() => { localStorage.setItem("rad_pcpndt_regs", JSON.stringify(pcpndtRegs)); }, [pcpndtRegs]);
-  useEffect(() => { localStorage.setItem("rad_vendor_agreements", JSON.stringify(vendorAgreements)); }, [vendorAgreements]);
-  useEffect(() => { localStorage.setItem("rad_statutory", JSON.stringify(statutory)); }, [statutory]);
-  useEffect(() => { localStorage.setItem("rad_reg_documents", JSON.stringify(regDocuments)); }, [regDocuments]);
+  const [aerFormData, setAerFormData] = useState({ name: '', no: '', authority: 'AERB', issued: '', expiry: '', renewalDate: '', remarks: '' });
+  const [editingAerId, setEditingAerId] = useState(null);
+  const [isAerModalOpen, setIsAerModalOpen] = useState(false);
+
+  const [pcpndtFormData, setPcpndtFormData] = useState({ center: '', registration: '', authority: 'PCPNDT', issued: '', expiry: '', remarks: '' });
+  const [editingPcpndtId, setEditingPcpndtId] = useState(null);
+  const [isPcpndtModalOpen, setIsPcpndtModalOpen] = useState(false);
+
+  const [vendorFormData, setVendorFormData] = useState({ vendor: '', type: '', equipment: '', start: '', expiry: '', remarks: '' });
+  const [editingVendorId, setEditingVendorId] = useState(null);
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+
+  const [regDocFormData, setRegDocFormData] = useState({ name: '', no: '', version: '1.0', effectiveDate: '', expiry: '', remarks: '' });
+  const [editingRegDocId, setEditingRegDocId] = useState(null);
+  const [isRegDocModalOpen, setIsRegDocModalOpen] = useState(false);
+
+  const getComplianceStatus = (expiryDate) => {
+    if (!expiryDate) return "Valid";
+    const today = new Date();
+    const target = new Date(expiryDate);
+    const diffDays = (target - today) / (1000 * 60 * 60 * 24);
+    if (diffDays < 0) return "Overdue";
+    if (diffDays <= 90) return "Expiring Soon";
+    return "Valid";
+  };
+
+  const getDaysRemaining = (expiryDate) => {
+    if (!expiryDate) return null;
+    const today = new Date();
+    const target = new Date(expiryDate);
+    return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+  };
 
   const statutoryKpiData = {
     totalLicenses: aerLicenses.length,
-    validLicenses: aerLicenses.filter(l => l.status === "Valid").length,
-    expiringLicenses: aerLicenses.filter(l => l.status === "Expiring Soon").length,
-    overdueLicenses: aerLicenses.filter(l => l.status === "Overdue").length,
+    validLicenses: aerLicenses.filter(l => getComplianceStatus(l.expiry) === "Valid").length,
+    expiringLicenses: aerLicenses.filter(l => getComplianceStatus(l.expiry) === "Expiring Soon").length,
+    overdueLicenses: aerLicenses.filter(l => getComplianceStatus(l.expiry) === "Overdue").length,
     totalPCPNDT: pcpndtRegs.length,
-    compliantPCPNDT: pcpndtRegs.filter(p => p.status === "Valid").length,
+    compliantPCPNDT: pcpndtRegs.filter(p => getComplianceStatus(p.expiry) === "Valid").length,
     totalVendor: vendorAgreements.length,
-    activeVendor: vendorAgreements.filter(v => v.status === "Valid").length,
+    activeVendor: vendorAgreements.filter(v => getComplianceStatus(v.expiry) === "Valid").length,
     totalRegDocs: regDocuments.length,
-    compliantDocs: regDocuments.filter(d => d.status === "Valid").length
+    compliantDocs: regDocuments.filter(d => getComplianceStatus(d.expiry) === "Valid").length,
+    expiringWithin90Days: [...aerLicenses, ...pcpndtRegs, ...vendorAgreements, ...regDocuments].filter(item => getComplianceStatus(item.expiry) === "Expiring Soon").length,
+    overdueItems: [...aerLicenses, ...pcpndtRegs, ...vendorAgreements, ...regDocuments].filter(item => getComplianceStatus(item.expiry) === "Overdue").length,
+    totalItems: aerLicenses.length + pcpndtRegs.length + vendorAgreements.length + regDocuments.length,
+    compliancePercentage: (() => { const total = aerLicenses.length + pcpndtRegs.length + vendorAgreements.length + regDocuments.length; if (total === 0) return 0; const valid = [...aerLicenses, ...pcpndtRegs, ...vendorAgreements, ...regDocuments].filter(item => getComplianceStatus(item.expiry) === "Valid").length; return Math.round((valid / total) * 100); })()
   };
 
   const isExpiringSoon = (dateStr) => {
@@ -516,6 +588,12 @@ const RadiologyWorkspace = ({ onBack }) => {
     if (status === "Expiring Soon") return "bg-amber-50 text-amber-700 border border-amber-200";
     return "bg-rose-50 text-rose-700 border border-rose-200";
   };
+
+  useEffect(() => { localStorage.setItem("rad_aer_licenses", JSON.stringify(aerLicenses)); }, [aerLicenses]);
+  useEffect(() => { localStorage.setItem("rad_pcpndt_regs", JSON.stringify(pcpndtRegs)); }, [pcpndtRegs]);
+  useEffect(() => { localStorage.setItem("rad_vendor_agreements", JSON.stringify(vendorAgreements)); }, [vendorAgreements]);
+  useEffect(() => { localStorage.setItem("rad_statutory", JSON.stringify(statutory)); }, [statutory]);
+  useEffect(() => { localStorage.setItem("rad_reg_documents", JSON.stringify(regDocuments)); }, [regDocuments]);
 
   const [evidenceFiles, setEvidenceFiles] = useState(() => {
     const s = localStorage.getItem('rad_evidence_files');
@@ -549,6 +627,26 @@ const RadiologyWorkspace = ({ onBack }) => {
   const [evidenceFilterType, setEvidenceFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
+  const [editingEvidenceId, setEditingEvidenceId] = useState(null);
+  const [evidenceFormData, setEvidenceFormData] = useState({
+    name: '',
+    category: 'Audit Evidence',
+    description: '',
+    uploadDate: '',
+    expiryDate: '',
+    version: '1.0',
+    status: 'Active',
+    linkedModule: '',
+    linkedRecordId: '',
+    type: 'PDF',
+    size: '',
+    tags: [],
+    uploadedBy: ''
+  });
+  const [evidenceCategoryFilter, setEvidenceCategoryFilter] = useState('all');
+  const [evidenceStatusFilter, setEvidenceStatusFilter] = useState('all');
+  const [evidenceExpiryFilter, setEvidenceExpiryFilter] = useState('all');
 
   useEffect(() => { localStorage.setItem('rad_evidence_files', JSON.stringify(evidenceFiles)); }, [evidenceFiles]);
 
@@ -627,18 +725,171 @@ const RadiologyWorkspace = ({ onBack }) => {
     alert('Report published successfully.');
   };
 
-  const folderMap = {
-    'AERB Documents': 'aer_docs',
-    'Calibration Certificates': 'calibration',
-    'Audit Reports': 'audit_reports',
-    'Radiation Monitoring': 'rad_monitoring',
-    'Training Records': 'training',
-    'CAPA Evidence': 'capa_evidence'
+  const handleAddAerLicense = (e) => {
+    e.preventDefault();
+    const newLicense = { ...aerFormData, id: `aer${Date.now()}` };
+    setAerLicenses(prev => [...prev, newLicense]);
+    setAerFormData({ name: '', no: '', authority: 'AERB', issued: '', expiry: '', renewalDate: '', remarks: '' });
+    setIsAerModalOpen(false);
+  };
+
+  const handleEditAerLicense = (item) => {
+    setAerFormData({ ...item });
+    setEditingAerId(item.id);
+    setIsAerModalOpen(true);
+  };
+
+  const handleDeleteAerLicense = (id) => {
+    if (confirm('Are you sure you want to delete this AERB License?')) {
+      setAerLicenses(prev => prev.filter(l => l.id !== id));
+    }
+  };
+
+  const handleAddPcpndt = (e) => {
+    e.preventDefault();
+    const newReg = { ...pcpndtFormData, id: `pcp${Date.now()}` };
+    setPcpndtRegs(prev => [...prev, newReg]);
+    setPcpndtFormData({ center: '', registration: '', authority: 'PCPNDT', issued: '', expiry: '', remarks: '' });
+    setIsPcpndtModalOpen(false);
+  };
+
+  const handleEditPcpndt = (item) => {
+    setPcpndtFormData({ ...item, center: item.center || item.name || '' });
+    setEditingPcpndtId(item.id);
+    setIsPcpndtModalOpen(true);
+  };
+
+  const handleDeletePcpndt = (id) => {
+    if (confirm('Are you sure you want to delete this PCPNDT Registration?')) {
+      setPcpndtRegs(prev => prev.filter(p => p.id !== id));
+    }
+  };
+
+  const handleAddVendor = (e) => {
+    e.preventDefault();
+    const newVendor = { ...vendorFormData, id: `v${Date.now()}` };
+    setVendorAgreements(prev => [...prev, newVendor]);
+    setVendorFormData({ vendor: '', type: '', equipment: '', start: '', expiry: '', remarks: '' });
+    setIsVendorModalOpen(false);
+  };
+
+  const handleEditVendor = (item) => {
+    setVendorFormData({ ...item });
+    setEditingVendorId(item.id);
+    setIsVendorModalOpen(true);
+  };
+
+  const handleDeleteVendor = (id) => {
+    if (confirm('Are you sure you want to delete this Vendor Agreement?')) {
+      setVendorAgreements(prev => prev.filter(v => v.id !== id));
+    }
+  };
+
+  const handleAddRegDoc = (e) => {
+    e.preventDefault();
+    const newDoc = { ...regDocFormData, id: `rd${Date.now()}` };
+    setRegDocuments(prev => [...prev, newDoc]);
+    setRegDocFormData({ name: '', no: '', version: '1.0', effectiveDate: '', expiry: '', remarks: '' });
+    setIsRegDocModalOpen(false);
+  };
+
+  const handleEditRegDoc = (item) => {
+    setRegDocFormData({ ...item });
+    setEditingRegDocId(item.id);
+    setIsRegDocModalOpen(true);
+  };
+
+  const handleDeleteRegDoc = (id) => {
+    if (confirm('Are you sure you want to delete this Regulatory Document?')) {
+      setRegDocuments(prev => prev.filter(d => d.id !== id));
+    }
+  };
+
+  const handleOpenEvidenceModal = (file = null) => {
+    if (file) {
+      setEvidenceFormData({
+        name: file.name || '',
+        category: file.category || 'Audit Evidence',
+        description: file.description || '',
+        uploadDate: file.uploadDate || '',
+        expiryDate: file.expiryDate || '',
+        version: file.version || '1.0',
+        status: file.status || 'Active',
+        linkedModule: file.linkedModule || '',
+        linkedRecordId: file.linkedRecordId || '',
+        type: file.type || 'PDF',
+        size: file.size || '',
+        tags: file.tags || [],
+        uploadedBy: file.uploadedBy || ''
+      });
+      setEditingEvidenceId(file.id);
+    } else {
+      setEvidenceFormData({ name: '', category: 'Audit Evidence', description: '', uploadDate: new Date().toISOString().split('T')[0], expiryDate: '', version: '1.0', status: 'Active', linkedModule: '', linkedRecordId: '', type: 'PDF', size: '', tags: [], uploadedBy: '' });
+      setEditingEvidenceId(null);
+    }
+    setIsEvidenceModalOpen(true);
+  };
+
+  const handleSaveEvidence = (e) => {
+    e.preventDefault();
+    if (editingEvidenceId) {
+      setEvidenceFiles(prev => prev.map(f => f.id === editingEvidenceId ? { ...f, ...evidenceFormData } : f));
+    } else {
+      const newFile = { ...evidenceFormData, id: `ev${Date.now()}`, folder: getCategoryFolder(evidenceFormData.category), date: evidenceFormData.uploadDate || new Date().toISOString().split('T')[0] };
+      setEvidenceFiles(prev => [...prev, newFile]);
+    }
+    setIsEvidenceModalOpen(false);
+    setEditingEvidenceId(null);
+  };
+
+  const handleDeleteEvidence = (id) => {
+    if (confirm('Are you sure you want to delete this document?')) {
+      setEvidenceFiles(prev => prev.filter(f => f.id !== id));
+      if (selectedFile?.id === id) setSelectedFile(null);
+    }
+  };
+
+  const handleViewEvidence = (file) => {
+    setSelectedFile(file);
+  };
+
+  const getCategoryFolder = (category) => {
+    const map = {
+      'Audit Evidence': 'Audit Reports',
+      'CAPA Evidence': 'CAPA Evidence',
+      'Regulatory Documents': 'AERB Documents',
+      'Radiation Safety': 'Radiation Monitoring',
+      'Equipment': 'Calibration Certificates',
+      'Staff Training': 'Training Records',
+      'Quality Indicators': 'Audit Reports'
+    };
+    return map[category] || 'Audit Reports';
+  };
+
+  const getEvidenceStatus = (expiryDate) => {
+    if (!expiryDate) return 'Active';
+    const today = new Date();
+    const target = new Date(expiryDate);
+    const diffDays = (target - today) / (1000 * 60 * 60 * 24);
+    if (diffDays < 0) return 'Expired';
+    if (diffDays <= 90) return 'Expiring Soon';
+    return 'Active';
   };
 
   const filteredFiles = evidenceFiles
     .filter(f => activeEvidenceFolder === 'all' || f.folder === activeEvidenceFolder)
-    .filter(f => evidenceSearch === '' || f.name.toLowerCase().includes(evidenceSearch.toLowerCase()) || f.tags.some(t => t.toLowerCase().includes(evidenceSearch.toLowerCase())))
+    .filter(f => evidenceCategoryFilter === 'all' || f.category === evidenceCategoryFilter)
+    .filter(f => evidenceStatusFilter === 'all' || f.status === evidenceStatusFilter || getEvidenceStatus(f.expiryDate) === evidenceStatusFilter)
+    .filter(f => {
+      if (evidenceExpiryFilter === 'all') return true;
+      if (!f.expiryDate) return evidenceExpiryFilter === 'valid';
+      const diff = (new Date(f.expiryDate) - new Date()) / (1000 * 60 * 60 * 24);
+      if (evidenceExpiryFilter === 'expired') return diff < 0;
+      if (evidenceExpiryFilter === 'expiring_soon') return diff >= 0 && diff <= 90;
+      if (evidenceExpiryFilter === 'valid') return diff > 90;
+      return true;
+    })
+    .filter(f => evidenceSearch === '' || f.name.toLowerCase().includes(evidenceSearch.toLowerCase()) || f.description?.toLowerCase().includes(evidenceSearch.toLowerCase()) || f.tags.some(t => t.toLowerCase().includes(evidenceSearch.toLowerCase())) || f.linkedModule?.toLowerCase().includes(evidenceSearch.toLowerCase()))
     .filter(f => evidenceFilterType === 'all' || f.type === evidenceFilterType)
     .sort((a, b) => sortBy === 'date' ? new Date(b.date) - new Date(a.date) : a.name.localeCompare(b.name));
 
@@ -815,51 +1066,204 @@ const RadiologyWorkspace = ({ onBack }) => {
           </div>
           <div className="flex items-center gap-2 text-[8px] text-slate-400 font-bold uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Hospital Customized
-          </div>
-        </div>
-      </aside>
+                 </div>
+               </div>
+              </aside>
+            <main className="flex-1 overflow-y-auto custom-scroll bg-slate-50/40 p-6 space-y-5">
 
-      <main className="flex-1 overflow-y-auto custom-scroll bg-slate-50/40 p-6 space-y-5">
-        {activeTab === 'overview' && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'Safety Incidents', value: kpiData.totalIncidents, icon: 'AlertTriangle', color: 'text-rose-600' },
-                { label: 'Equipment Operational', value: `${kpiData.equipmentOperational}/${kpiData.equipmentTotal}`, icon: 'Settings', color: 'text-sky-600' },
-                { label: 'Training Completed', value: kpiData.trainingCompleted, icon: 'Users', color: 'text-emerald-600' },
-                { label: 'Audit Score', value: `${kpiData.auditScore}%`, icon: 'CheckCircle', color: 'text-amber-600' },
-                { label: 'Open CAPA', value: kpiData.openCapa, icon: 'AlertTriangle', color: 'text-orange-600' },
-                { label: 'Statutory Compliance', value: `${kpiData.statutoryCompliant}/${kpiData.statutoryTotal}`, icon: 'Award', color: 'text-blue-600' }
-              ].map((kpi, idx) => (
-                <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
+            {isAerModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-800">{editingAerId ? 'Edit AERB License' : 'Add AERB License'}</h3>
+                    <button onClick={() => { setIsAerModalOpen(false); setEditingAerId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleAddAerLicense} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">License Name *</label>
+                        <input type="text" value={aerFormData.name} onChange={(e) => setAerFormData({...aerFormData, name: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">License Number *</label>
+                        <input type="text" value={aerFormData.no} onChange={(e) => setAerFormData({...aerFormData, no: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Authority</label>
+                        <select value={aerFormData.authority} onChange={(e) => setAerFormData({...aerFormData, authority: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="AERB">AERB</option>
+                          <option value="NABH">NABH</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Renewal Date</label>
+                        <input type="date" value={aerFormData.renewalDate} onChange={(e) => setAerFormData({...aerFormData, renewalDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Issue Date *</label>
+                        <input type="date" value={aerFormData.issued} onChange={(e) => setAerFormData({...aerFormData, issued: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Expiry Date *</label>
+                        <input type="date" value={aerFormData.expiry} onChange={(e) => setAerFormData({...aerFormData, expiry: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
                     <div>
-                      <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-                      <p className="text-xl font-extrabold text-slate-900 mt-1">{kpi.value}</p>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                      <textarea value={aerFormData.remarks} onChange={(e) => setAerFormData({...aerFormData, remarks: e.target.value})} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"></textarea>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                      <TabIcon icon={kpi.icon} />
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" onClick={() => { setIsAerModalOpen(false); setEditingAerId(null); }} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-[9px] font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="flex-1 px-3 py-2 rounded-lg text-white text-[9px] font-bold">{editingAerId ? 'Update' : 'Add License'}</button>
                     </div>
-                  </div>
+                  </form>
                 </div>
-              ))}
-            </div>
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3 mb-4">Department Performance Overview</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {['Radiation Safety Trend', 'Equipment Uptime', 'Quality Metrics'].map((title, i) => (
-                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-4 h-40 flex items-center justify-center">
-                    <div className="text-center">
-                      <BarChart3 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                      <p className="text-[10px] font-bold text-slate-400">{title}</p>
-                      <p className="text-[9px] text-slate-400 mt-1">Chart placeholder</p>
-                    </div>
-                  </div>
-                ))}
               </div>
-            </div>
-          </div>
-        )}
+            )}
+
+            {isPcpndtModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-800">{editingPcpndtId ? 'Edit PCPNDT Registration' : 'Add PCPNDT Registration'}</h3>
+                    <button onClick={() => { setIsPcpndtModalOpen(false); setEditingPcpndtId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleAddPcpndt} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Center Name *</label>
+                        <input type="text" value={pcpndtFormData.center} onChange={(e) => setPcpndtFormData({...pcpndtFormData, center: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Registration Number *</label>
+                        <input type="text" value={pcpndtFormData.registration} onChange={(e) => setPcpndtFormData({...pcpndtFormData, registration: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Authority</label>
+                        <select value={pcpndtFormData.authority} onChange={(e) => setPcpndtFormData({...pcpndtFormData, authority: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="PCPNDT">PCPNDT</option>
+                          <option value="MOHFW">MOHFW</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Issue Date *</label>
+                        <input type="date" value={pcpndtFormData.issued} onChange={(e) => setPcpndtFormData({...pcpndtFormData, issued: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Expiry Date *</label>
+                      <input type="date" value={pcpndtFormData.expiry} onChange={(e) => setPcpndtFormData({...pcpndtFormData, expiry: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                      <textarea value={pcpndtFormData.remarks} onChange={(e) => setPcpndtFormData({...pcpndtFormData, remarks: e.target.value})} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"></textarea>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" onClick={() => { setIsPcpndtModalOpen(false); setEditingPcpndtId(null); }} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-[9px] font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="flex-1 px-3 py-2 rounded-lg text-white text-[9px] font-bold">{editingPcpndtId ? 'Update' : 'Add Registration'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {isVendorModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-800">{editingVendorId ? 'Edit Vendor Agreement' : 'Add Vendor Agreement'}</h3>
+                    <button onClick={() => { setIsVendorModalOpen(false); setEditingVendorId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleAddVendor} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Vendor Name *</label>
+                        <input type="text" value={vendorFormData.vendor} onChange={(e) => setVendorFormData({...vendorFormData, vendor: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Agreement Type *</label>
+                        <input type="text" value={vendorFormData.type} onChange={(e) => setVendorFormData({...vendorFormData, type: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Equipment</label>
+                        <input type="text" value={vendorFormData.equipment} onChange={(e) => setVendorFormData({...vendorFormData, equipment: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Start Date *</label>
+                        <input type="date" value={vendorFormData.start} onChange={(e) => setVendorFormData({...vendorFormData, start: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Expiry Date *</label>
+                      <input type="date" value={vendorFormData.expiry} onChange={(e) => setVendorFormData({...vendorFormData, expiry: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                      <textarea value={vendorFormData.remarks} onChange={(e) => setVendorFormData({...vendorFormData, remarks: e.target.value})} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"></textarea>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" onClick={() => { setIsVendorModalOpen(false); setEditingVendorId(null); }} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-[9px] font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="flex-1 px-3 py-2 rounded-lg text-white text-[9px] font-bold">{editingVendorId ? 'Update' : 'Add Agreement'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {isRegDocModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-800">{editingRegDocId ? 'Edit Regulatory Document' : 'Add Regulatory Document'}</h3>
+                    <button onClick={() => { setIsRegDocModalOpen(false); setEditingRegDocId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleAddRegDoc} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Document Name *</label>
+                        <input type="text" value={regDocFormData.name} onChange={(e) => setRegDocFormData({...regDocFormData, name: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Document Number *</label>
+                        <input type="text" value={regDocFormData.no} onChange={(e) => setRegDocFormData({...regDocFormData, no: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Version</label>
+                        <input type="text" value={regDocFormData.version} onChange={(e) => setRegDocFormData({...regDocFormData, version: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Effective Date</label>
+                        <input type="date" value={regDocFormData.effectiveDate} onChange={(e) => setRegDocFormData({...regDocFormData, effectiveDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Expiry Date *</label>
+                      <input type="date" value={regDocFormData.expiry} onChange={(e) => setRegDocFormData({...regDocFormData, expiry: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                      <textarea value={regDocFormData.remarks} onChange={(e) => setRegDocFormData({...regDocFormData, remarks: e.target.value})} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"></textarea>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" onClick={() => { setIsRegDocModalOpen(false); setEditingRegDocId(null); }} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-[9px] font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="flex-1 px-3 py-2 rounded-lg text-white text-[9px] font-bold">{editingRegDocId ? 'Update' : 'Add Document'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
 
         {activeTab === 'policies' && (
           <div className="flex gap-0 -m-6 min-h-[calc(100vh-4rem)]">
@@ -1905,16 +2309,33 @@ const RadiologyWorkspace = ({ onBack }) => {
 
         {activeTab === 'capa' && (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-bold text-slate-800">CAPA Management</h2>
+              <button onClick={() => setIsAddCapaModalOpen(true)} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add CAPA</button>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
               {[
                 { label: 'Open CAPA', value: capaItems.filter(c => c.status === 'Open').length, color: 'text-amber-600' },
                 { label: 'Under Investigation', value: capaItems.filter(c => c.status === 'Investigation').length, color: 'text-blue-600' },
                 { label: 'Under Verification', value: capaItems.filter(c => c.status === 'Verification').length, color: 'text-purple-600' },
-                { label: 'Closed CAPA', value: capaItems.filter(c => c.status === 'Closed').length, color: 'text-emerald-600' }
+                { label: 'Closed CAPA', value: capaItems.filter(c => c.status === 'Closed').length, color: 'text-emerald-600' },
+                { label: 'Overdue CAPA', value: capaItems.filter(c => c.status !== 'Closed' && new Date(c.targetDate || c.dueDate) < new Date()).length, color: 'text-rose-600' },
+                { label: 'Due This Month', value: capaItems.filter(c => { const d = new Date(c.targetDate || c.dueDate); const now = new Date(); return c.status !== 'Closed' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).length, color: 'text-orange-600' }
               ].map((kpi, idx) => (
                 <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
                   <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'Effectiveness Verified %', value: (() => { const closed = capaItems.filter(c => c.status === 'Closed' && c.verificationResult === 'Effective'); return closed.length > 0 ? Math.round((closed.length / capaItems.filter(c => c.status === 'Closed').length) * 100) : 0; })(), color: 'text-emerald-600', suffix: '%' },
+                { label: 'Avg Closure Time (days)', value: (() => { const closed = capaItems.filter(c => c.status === 'Closed' && c.actualClosureDate); return closed.length > 0 ? Math.round(closed.reduce((sum, c) => { const created = new Date(c.createdAt); const closedDate = new Date(c.actualClosureDate); return sum + ((closedDate - created) / (1000 * 60 * 60 * 24)); }, 0) / closed.length) : 0; })(), color: 'text-blue-600', suffix: ' d' }
+              ].map((kpi, idx) => (
+                <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}{kpi.suffix}</p>
                 </div>
               ))}
             </div>
@@ -1935,25 +2356,36 @@ const RadiologyWorkspace = ({ onBack }) => {
                      </div>
                    </div>
                    <div className="flex-1 overflow-y-auto custom-scroll p-2 space-y-2">
-                     {col.items.map(item => {
-                        return (
-                        <div key={item.id} onClick={() => setSelectedCapa(selectedCapa?.id === item.id ? null : item)}
-                          className={`bg-white rounded-xl p-3 shadow-sm border border-slate-200 cursor-pointer transition-all hover:shadow-md ${selectedCapa?.id === item.id ? 'ring-2 ring-sky-400' : ''}`}>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[8px] font-bold text-slate-400 font-mono">{item.source}</span>
-                            <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold ${isOverdue ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>Due: {item.dueDate}</span>
-                          </div>
-                          <h4 className="text-[10px] font-bold text-slate-800 leading-snug mb-2">{item.issue}</h4>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[8px] text-slate-500">Owner: {item.responsible}</span>
-                            {item.status === 'Closed' ? (
-                              <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                            ) : (
-                              <Clock className="w-3.5 h-3.5 text-slate-400" />
-                            )}
-                          </div>
-                        </div>
-                      );})}
+                      {col.items.map(item => {
+                         const priorityColors = { 'Critical': 'bg-rose-50 text-rose-700 border-rose-200', 'High': 'bg-orange-50 text-orange-700 border-orange-200', 'Medium': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'Low': 'bg-green-50 text-green-700 border-green-200' };
+                         return (
+                         <div key={item.id} onClick={(e) => { if (!e.target.closest('button')) setSelectedCapa(selectedCapa?.id === item.id ? null : item); }}
+                           className={`bg-white rounded-xl p-3 shadow-sm border border-slate-200 cursor-pointer transition-all hover:shadow-md ${selectedCapa?.id === item.id ? 'ring-2 ring-sky-400' : ''}`}>
+                           <div className="flex items-center justify-between mb-1.5">
+                             <div className="flex items-center gap-1.5">
+                               <span className="text-[8px] font-bold font-mono text-slate-500">{item.capaId}</span>
+                               <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold border ${priorityColors[item.priority] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>{item.priority}</span>
+                             </div>
+                             <div className="flex items-center gap-1">
+                               <button onClick={(e) => { e.stopPropagation(); handleEditCapa(item); }} className="p-1 rounded hover:bg-blue-50 text-blue-500"><Edit3 className="w-3 h-3" /></button>
+                               <button onClick={(e) => { e.stopPropagation(); handleDeleteCapa(item.id); }} className="p-1 rounded hover:bg-rose-50 text-rose-500"><Trash2 className="w-3 h-3" /></button>
+                             </div>
+                           </div>
+                           <div className="flex items-center justify-between mb-1.5">
+                             <span className="text-[8px] font-bold text-sky-600 font-mono">Dept: {item.department}</span>
+                             <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold ${isOverdue(item.targetDate || item.dueDate) ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>Due: {item.targetDate || item.dueDate}</span>
+                           </div>
+                           <h4 className="text-[10px] font-bold text-slate-800 leading-snug mb-2">{item.issue}</h4>
+                           <div className="flex items-center justify-between">
+                             <span className="text-[8px] text-slate-500">Owner: {item.responsible}</span>
+                             {item.status === 'Closed' ? (
+                               <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                             ) : (
+                               <Clock className="w-3.5 h-3.5 text-slate-400" />
+                             )}
+                           </div>
+                         </div>
+                       );})}
 
                       {col.items.length === 0 && (
                        <div className="text-center py-6">
@@ -1971,9 +2403,12 @@ const RadiologyWorkspace = ({ onBack }) => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-xs font-bold text-slate-800">CAPA Details</h3>
-                      <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${selectedCapa.status === 'Closed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>{selectedCapa.status}</span>
+                      <span className={`px-2 py-1 rounded text-[8px] font-bold border ${selectedCapa.status === 'Closed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>{selectedCapa.status}</span>
+                      <span className="text-[8px] font-bold font-mono text-slate-500">{selectedCapa.capaId}</span>
+                      <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold border ${selectedCapa.priority === 'Critical' ? 'bg-rose-50 text-rose-700 border-rose-200' : selectedCapa.priority === 'High' ? 'bg-orange-50 text-orange-700 border-orange-200' : selectedCapa.priority === 'Medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-green-50 text-green-700 border-green-200'}`}>{selectedCapa.priority}</span>
+                      <span className="text-[8px] font-bold text-sky-600">Dept: {selectedCapa.department}</span>
                     </div>
-                    <p className="text-[9px] text-slate-500 font-mono">Source: {selectedCapa.source}  Created: {selectedCapa.createdAt}</p>
+                    <p className="text-[9px] text-slate-500">Source: {selectedCapa.source}  Created: {selectedCapa.createdAt}</p>
                   </div>
                   <button onClick={() => setSelectedCapa(null)} className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500"><X className="w-3.5 h-3.5" /></button>
                 </div>
@@ -1998,7 +2433,13 @@ const RadiologyWorkspace = ({ onBack }) => {
                   </div>
                   <div className="flex items-center gap-6 text-[9px] text-slate-600 pt-2 border-t border-slate-100">
                     <div><span className="text-slate-400">Responsible:</span> <span className="font-bold">{selectedCapa.responsible}</span></div>
-                    <div><span className="text-slate-400">Due Date:</span> <span className="font-bold">{selectedCapa.dueDate}</span></div>
+                    <div><span className="text-slate-400">Target Date:</span> <span className="font-bold">{selectedCapa.targetDate || selectedCapa.dueDate}</span></div>
+                    {selectedCapa.status === 'Closed' && (
+                      <>
+                        <div><span className="text-slate-400">Closure Date:</span> <span className="font-bold">{selectedCapa.actualClosureDate}</span></div>
+                        <div><span className="text-slate-400">Verification:</span> <span className={`font-bold ${selectedCapa.verificationResult === 'Effective' ? 'text-emerald-600' : 'text-amber-600'}`}>{selectedCapa.verificationResult}</span></div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2006,25 +2447,126 @@ const RadiologyWorkspace = ({ onBack }) => {
           </div>
         )}
 
+        {isAddCapaModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-bold text-slate-800">{editingCapaId ? 'Edit CAPA' : 'Add New CAPA'}</h3>
+                <button onClick={() => { setIsAddCapaModalOpen(false); setEditingCapaId(null); }} className="p-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500"><X className="w-3.5 h-3.5" /></button>
+              </div>
+              <form onSubmit={handleAddCapa} className="space-y-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">CAPA ID</label>
+                    <input type="text" value={capaFormData.capaId} disabled className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-500" />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Source</label>
+                    <select value={capaFormData.source} onChange={(e) => setCapaFormData({ ...capaFormData, source: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]">
+                      <option value="Internal Audit">Internal Audit</option>
+                      <option value="Equipment Management">Equipment Management</option>
+                      <option value="Staff & Training">Staff & Training</option>
+                      <option value="Radiation Safety">Radiation Safety</option>
+                      <option value="Quality Indicator">Quality Indicator</option>
+                      <option value="NCR">NCR</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Priority</label>
+                    <select value={capaFormData.priority} onChange={(e) => setCapaFormData({ ...capaFormData, priority: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]">
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Department</label>
+                    <select value={capaFormData.department} onChange={(e) => setCapaFormData({ ...capaFormData, department: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]">
+                      <option value="Radiology">Radiology</option>
+                      <option value="Biomedical">Biomedical</option>
+                      <option value="Nursing">Nursing</option>
+                      <option value="Radiation Safety">Radiation Safety</option>
+                      <option value="HR">HR</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Target Date</label>
+                    <input type="date" value={capaFormData.targetDate} onChange={(e) => setCapaFormData({ ...capaFormData, targetDate: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]" required />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Issue / Finding</label>
+                  <textarea value={capaFormData.issue} onChange={(e) => setCapaFormData({ ...capaFormData, issue: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px] h-16 resize-none" placeholder="Describe the issue or finding..." required />
+                </div>
+                <div>
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Root Cause</label>
+                  <textarea value={capaFormData.rootCause} onChange={(e) => setCapaFormData({ ...capaFormData, rootCause: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px] h-16 resize-none" placeholder="Identify the root cause..." />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Corrective Action</label>
+                    <textarea value={capaFormData.correctiveAction} onChange={(e) => setCapaFormData({ ...capaFormData, correctiveAction: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px] h-16 resize-none" />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Preventive Action</label>
+                    <textarea value={capaFormData.preventiveAction} onChange={(e) => setCapaFormData({ ...capaFormData, preventiveAction: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px] h-16 resize-none" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Responsible</label>
+                    <input type="text" value={capaFormData.responsible} onChange={(e) => setCapaFormData({ ...capaFormData, responsible: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]" required />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Status</label>
+                    <select value={capaFormData.status} onChange={(e) => setCapaFormData({ ...capaFormData, status: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]">
+                      <option value="Open">Open</option>
+                      <option value="Investigation">Investigation</option>
+                      <option value="Corrective Action">Corrective Action</option>
+                      <option value="Preventive Action">Preventive Action</option>
+                      <option value="Verification">Verification</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase">Actual Closure Date</label>
+                    <input type="date" value={capaFormData.actualClosureDate} onChange={(e) => setCapaFormData({ ...capaFormData, actualClosureDate: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Verification Result</label>
+                  <select value={capaFormData.verificationResult} onChange={(e) => setCapaFormData({ ...capaFormData, verificationResult: e.target.value })} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-[10px]">
+                    <option value="Pending">Pending</option>
+                    <option value="Effective">Effective</option>
+                    <option value="Ineffective">Ineffective</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsAddCapaModalOpen(false); setEditingCapaId(null); }} className="px-4 py-2 rounded-lg border border-slate-200 text-[10px] font-bold text-slate-500 hover:bg-slate-50">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-4 py-2 rounded-lg text-white text-[10px] font-bold hover:opacity-90">{editingCapaId ? 'Update CAPA' : 'Create CAPA'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'statutory' && (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
               {[
-                { label: 'AERB Valid', value: statutoryKpiData.validLicenses, color: 'text-emerald-600' },
-                { label: 'AERB Expiring Soon', value: statutoryKpiData.expiringLicenses, color: 'text-amber-600' },
-                { label: 'AERB Overdue', value: statutoryKpiData.overdueLicenses, color: 'text-rose-600' },
-                { label: 'PCPNDT Compliant', value: `${statutoryKpiData.compliantPCPNDT}/${statutoryKpiData.totalPCPNDT}`, color: 'text-blue-600' }
+                { label: 'Total Items', value: statutoryKpiData.totalItems, color: 'text-slate-700' },
+                { label: 'Valid', value: statutoryKpiData.validLicenses + statutoryKpiData.compliantPCPNDT + statutoryKpiData.activeVendor + statutoryKpiData.compliantDocs, color: 'text-emerald-600' },
+                { label: 'Expiring Soon', value: statutoryKpiData.expiringWithin90Days, color: 'text-amber-600' },
+                { label: 'Overdue', value: statutoryKpiData.overdueItems, color: 'text-rose-600' },
+                { label: 'Compliance %', value: `${statutoryKpiData.compliancePercentage}%`, color: 'text-blue-600' },
+                { label: 'Total Licenses', value: statutoryKpiData.totalLicenses, color: 'text-purple-600' }
               ].map((kpi, idx) => (
                 <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-                      <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
-                    </div>
-                    <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-lg">{(idx === 0 ? '' : idx === 1 ? '' : idx === 2 ? '' : '')}</span>
-                    </div>
-                  </div>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
                 </div>
               ))}
             </div>
@@ -2033,62 +2575,69 @@ const RadiologyWorkspace = ({ onBack }) => {
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3">AERB License & Certificates</h3>
-                  <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
+                  <button onClick={() => { setAerFormData({ name: '', no: '', authority: 'AERB', issued: '', expiry: '', renewalDate: '', remarks: '' }); setEditingAerId(null); setIsAerModalOpen(true); }} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
                 </div>
                 <div className="space-y-3">
-                  {aerLicenses.map(lic => (
+                  {aerLicenses.map(lic => {
+                    const compStatus = getComplianceStatus(lic.expiry);
+                    const daysRem = getDaysRemaining(lic.expiry);
+                    return (
                     <div key={lic.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="text-xs font-bold text-slate-800">{lic.name}</h4>
-                        <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(lic.status)}`}>{lic.status}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(compStatus)}`}>{compStatus}</span>
+                          {daysRem !== null && <span className={`text-[8px] font-bold ${daysRem < 0 ? 'text-rose-600' : daysRem <= 90 ? 'text-amber-600' : 'text-slate-500'}`}>{daysRem < 0 ? `${Math.abs(daysRem)}d overdue` : `${daysRem}d left`}</span>}
+                        </div>
                       </div>
-                      <p className="text-[9px] text-slate-500">No: {lic.no}</p>
+                      <p className="text-[9px] text-slate-500">No: {lic.no}  Authority: {lic.authority}</p>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
-                        <div>
-                          <span className="text-[8px] font-bold text-slate-400">ISSUED: </span>
-                          <span className="text-[9px] text-slate-600 font-medium">{lic.issued}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div>
-                            <span className="text-[8px] font-bold text-slate-400">EXPIRY: </span>
-                            <span className={`text-[9px] font-bold ${lic.status === 'Overdue' ? 'text-rose-600' : lic.status === 'Expiring Soon' ? 'text-amber-600' : 'text-slate-700'}`}>{lic.expiry}</span>
-                          </div>
-                          {lic.status !== 'Valid' && (
-                            <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold ${lic.status === 'Overdue' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>
-                              {lic.status === 'Overdue' ? ' EXPIRED' : 'Expiring Soon'}
-                            </span>
-                          )}
-                        </div>
+                        <span className="text-[9px] text-slate-500">Issued: {lic.issued}</span>
+                        <span className={`text-[9px] font-bold ${compStatus === 'Overdue' ? 'text-rose-600' : compStatus === 'Expiring Soon' ? 'text-amber-600' : 'text-slate-700'}`}>Expiry: {lic.expiry}</span>
                       </div>
-                      {lic.status !== 'Valid' && (
-                        <button onClick={() => setAerLicenses(prev => prev.map(l => l.id === lic.id ? { ...l, status: 'Valid', expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] } : l))} className="mt-2 w-full px-2 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-700 text-[8px] font-bold hover:bg-emerald-50 cursor-pointer transition-colors">
-                           Mark Renewed
-                        </button>
-                      )}
+                      {lic.remarks && <p className="text-[8px] text-slate-400 mt-1">Remarks: {lic.remarks}</p>}
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <button onClick={() => handleEditAerLicense(lic)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer">Edit</button>
+                        <button onClick={() => handleDeleteAerLicense(lic.id)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-rose-600 hover:border-rose-300 cursor-pointer">Delete</button>
+                        {compStatus !== 'Valid' && (
+                          <button onClick={() => setAerLicenses(prev => prev.map(l => l.id === lic.id ? { ...l, expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], renewalDate: new Date().toISOString().split('T')[0] } : l))} className="px-2 py-1 rounded border border-emerald-200 text-[8px] font-bold text-emerald-700 hover:bg-emerald-50 cursor-pointer">Renew</button>
+                        )}
+                      </div>
                     </div>
-                  ))}
+                    );})}
                 </div>
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3">PCPNDT Compliance</h3>
-                  <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
+                  <button onClick={() => { setPcpndtFormData({ center: '', registration: '', authority: 'PCPNDT', issued: '', expiry: '', remarks: '' }); setEditingPcpndtId(null); setIsPcpndtModalOpen(true); }} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
                 </div>
                 <div className="space-y-3">
-                  {pcpndtRegs.map(pcp => (
+                  {pcpndtRegs.map(pcp => {
+                    const compStatus = getComplianceStatus(pcp.expiry);
+                    const daysRem = getDaysRemaining(pcp.expiry);
+                    return (
                     <div key={pcp.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="text-xs font-bold text-slate-800">{pcp.center}</h4>
-                        <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(pcp.status)}`}>{pcp.status}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(compStatus)}`}>{compStatus}</span>
+                          {daysRem !== null && <span className={`text-[8px] font-bold ${daysRem < 0 ? 'text-rose-600' : daysRem <= 90 ? 'text-amber-600' : 'text-slate-500'}`}>{daysRem < 0 ? `${Math.abs(daysRem)}d overdue` : `${daysRem}d left`}</span>}
+                        </div>
                       </div>
-                      <p className="text-[9px] text-slate-500">Reg: {pcp.registration}</p>
+                      <p className="text-[9px] text-slate-500">Reg: {pcp.registration}  Authority: {pcp.authority}</p>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
                         <span className="text-[9px] text-slate-500">Issued: {pcp.issued}</span>
-                        <span className={`text-[9px] font-bold ${pcp.status === 'Expiring Soon' ? 'text-amber-600' : 'text-slate-700'}`}>Expiry: {pcp.expiry}</span>
+                        <span className={`text-[9px] font-bold ${compStatus === 'Overdue' ? 'text-rose-600' : compStatus === 'Expiring Soon' ? 'text-amber-600' : 'text-slate-700'}`}>Expiry: {pcp.expiry}</span>
+                      </div>
+                      {pcp.remarks && <p className="text-[8px] text-slate-400 mt-1">Remarks: {pcp.remarks}</p>}
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <button onClick={() => handleEditPcpndt(pcp)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer">Edit</button>
+                        <button onClick={() => handleDeletePcpndt(pcp.id)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-rose-600 hover:border-rose-300 cursor-pointer">Delete</button>
                       </div>
                     </div>
-                  ))}
+                    );})}
                 </div>
               </div>
             </div>
@@ -2097,56 +2646,79 @@ const RadiologyWorkspace = ({ onBack }) => {
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3">Vendor Agreements & Contracts</h3>
-                  <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
+                  <button onClick={() => { setVendorFormData({ vendor: '', type: '', equipment: '', start: '', expiry: '', remarks: '' }); setEditingVendorId(null); setIsVendorModalOpen(true); }} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Add</button>
                 </div>
                 <div className="space-y-3">
-                  {vendorAgreements.map(v => (
+                  {vendorAgreements.map(v => {
+                    const compStatus = getComplianceStatus(v.expiry);
+                    const daysRem = getDaysRemaining(v.expiry);
+                    return (
                     <div key={v.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs font-bold text-slate-800">{v.type}</h4>
-                          <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(v.status)}`}>{v.status}</span>
+                          <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(compStatus)}`}>{compStatus}</span>
                         </div>
+                        {daysRem !== null && <span className={`text-[8px] font-bold ${daysRem < 0 ? 'text-rose-600' : daysRem <= 90 ? 'text-amber-600' : 'text-slate-500'}`}>{daysRem < 0 ? `${Math.abs(daysRem)}d overdue` : `${daysRem}d left`}</span>}
                       </div>
                       <p className="text-[9px] text-slate-500">Vendor: {v.vendor}  Equipment: {v.equipment}</p>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
                         <span className="text-[9px] text-slate-500">From: {v.start}</span>
-                        <span className={`text-[9px] font-bold ${v.status === 'Expiring Soon' || v.status === 'Overdue' ? 'text-amber-600' : 'text-slate-700'}`}>Expires: {v.expiry}</span>
+                        <span className={`text-[9px] font-bold ${compStatus === 'Overdue' ? 'text-rose-600' : compStatus === 'Expiring Soon' ? 'text-amber-600' : 'text-slate-700'}`}>Expires: {v.expiry}</span>
+                      </div>
+                      {v.remarks && <p className="text-[8px] text-slate-400 mt-1">Remarks: {v.remarks}</p>}
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <button onClick={() => handleEditVendor(v)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer">Edit</button>
+                        <button onClick={() => handleDeleteVendor(v.id)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-rose-600 hover:border-rose-300 cursor-pointer">Delete</button>
                       </div>
                     </div>
-                  ))}
+                    );})}
                 </div>
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3">Regulatory Documents</h3>
-                  <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Upload className="w-3 h-3" /> Upload</button>
+                  <button onClick={() => { setRegDocFormData({ name: '', no: '', version: '1.0', effectiveDate: '', expiry: '', remarks: '' }); setEditingRegDocId(null); setIsRegDocModalOpen(true); }} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-1.5 rounded-lg text-white text-[9px] font-bold flex items-center gap-1"><Plus className="w-3 h-3" /> Upload</button>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {regDocuments.map(doc => (
+                  {regDocuments.map(doc => {
+                    const compStatus = getComplianceStatus(doc.expiry);
+                    const daysRem = getDaysRemaining(doc.expiry);
+                    return (
                     <div key={doc.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                       <div className="flex items-start gap-2">
                         <div className="p-1.5 rounded-lg bg-white border border-slate-100 shrink-0"><FileText className="w-3.5 h-3.5 text-slate-500" /></div>
-                        <div className="min-w-0">
-                          <h4 className="text-[10px] font-bold text-slate-800 leading-snug">{doc.name}</h4>
-                          <p className="text-[8px] text-slate-400 font-mono mt-0.5">{doc.no}</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(doc.status)}`}>{doc.status}</span>
-                            <span className="text-[8px] text-slate-400">Exp: {doc.expiry}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-[10px] font-bold text-slate-800 leading-snug">{doc.name}</h4>
+                            <span className={`px-2 py-1 rounded-full text-[8px] font-bold ${statusClass(compStatus)}`}>{compStatus}</span>
+                          </div>
+                          <p className="text-[8px] text-slate-400 font-mono">No: {doc.no}  v{doc.version}</p>
+                          <div className="flex items-center justify-between mt-1.5">
+                            <span className="text-[8px] text-slate-400">Eff: {doc.effectiveDate}</span>
+                            <span className={`text-[8px] font-bold ${daysRem !== null && daysRem < 0 ? 'text-rose-600' : daysRem !== null && daysRem <= 90 ? 'text-amber-600' : 'text-slate-500'}`}>
+                              Exp: {doc.expiry} {daysRem !== null && daysRem >= 0 ? `(${daysRem}d)` : ''}
+                            </span>
+                          </div>
+                          {doc.remarks && <p className="text-[8px] text-slate-400 mt-1">Remarks: {doc.remarks}</p>}
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <button onClick={() => handleEditRegDoc(doc)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer">Edit</button>
+                            <button onClick={() => handleDeleteRegDoc(doc.id)} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-rose-600 hover:border-rose-300 cursor-pointer">Delete</button>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );})}
                 </div>
               </div>
             </div>
 
             {[
-              ...aerLicenses.filter(l => l.status !== 'Valid').map(l => ({ kind: 'AERB', title: l.name, date: l.expiry, status: l.status })),
-              ...pcpndtRegs.filter(p => p.status !== 'Valid').map(p => ({ kind: 'PCPNDT', title: p.center, date: p.expiry, status: p.status })),
-              ...vendorAgreements.filter(v => v.status !== 'Valid').map(v => ({ kind: 'Vendor', title: `${v.type} - ${v.equipment}`, date: v.expiry, status: v.status }))
+              ...aerLicenses.filter(l => getComplianceStatus(l.expiry) !== 'Valid').map(l => ({ kind: 'AERB', title: l.name, date: l.expiry, status: getComplianceStatus(l.expiry) })),
+              ...pcpndtRegs.filter(p => getComplianceStatus(p.expiry) !== 'Valid').map(p => ({ kind: 'PCPNDT', title: p.center, date: p.expiry, status: getComplianceStatus(p.expiry) })),
+              ...vendorAgreements.filter(v => getComplianceStatus(v.expiry) !== 'Valid').map(v => ({ kind: 'Vendor', title: `${v.type} - ${v.equipment}`, date: v.expiry, status: getComplianceStatus(v.expiry) })),
+              ...regDocuments.filter(d => getComplianceStatus(d.expiry) !== 'Valid').map(d => ({ kind: 'RegDoc', title: d.name, date: d.expiry, status: getComplianceStatus(d.expiry) }))
             ].filter(Boolean).length > 0 && (
               <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
@@ -2155,9 +2727,10 @@ const RadiologyWorkspace = ({ onBack }) => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
-                    ...aerLicenses.filter(l => l.status !== 'Valid').map(l => ({ kind: 'AERB', title: l.name, date: l.expiry, status: l.status })),
-                    ...pcpndtRegs.filter(p => p.status !== 'Valid').map(p => ({ kind: 'PCPNDT', title: p.center, date: p.expiry, status: p.status })),
-                    ...vendorAgreements.filter(v => v.status !== 'Valid').map(v => ({ kind: 'Vendor', title: `${v.type} - ${v.equipment}`, date: v.expiry, status: v.status }))
+                    ...aerLicenses.filter(l => getComplianceStatus(l.expiry) !== 'Valid').map(l => ({ kind: 'AERB', title: l.name, date: l.expiry, status: getComplianceStatus(l.expiry) })),
+                    ...pcpndtRegs.filter(p => getComplianceStatus(p.expiry) !== 'Valid').map(p => ({ kind: 'PCPNDT', title: p.center, date: p.expiry, status: getComplianceStatus(p.expiry) })),
+                    ...vendorAgreements.filter(v => getComplianceStatus(v.expiry) !== 'Valid').map(v => ({ kind: 'Vendor', title: `${v.type} - ${v.equipment}`, date: v.expiry, status: getComplianceStatus(v.expiry) })),
+                    ...regDocuments.filter(d => getComplianceStatus(d.expiry) !== 'Valid').map(d => ({ kind: 'RegDoc', title: d.name, date: d.expiry, status: getComplianceStatus(d.expiry) }))
                   ].map((alert, i) => (
                     <div key={i} className="bg-white border border-rose-100 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
@@ -2180,8 +2753,30 @@ const RadiologyWorkspace = ({ onBack }) => {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                  <input value={evidenceSearch} onChange={e => setEvidenceSearch(e.target.value)} placeholder="Search files, tags..." className="pl-8 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] text-slate-700 placeholder:text-slate-400 w-56" />
+                  <input value={evidenceSearch} onChange={e => setEvidenceSearch(e.target.value)} placeholder="Search files..." className="pl-8 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] text-slate-700 placeholder:text-slate-400 w-48" />
                 </div>
+                <select value={evidenceCategoryFilter} onChange={e => setEvidenceCategoryFilter(e.target.value)} className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-bold text-slate-600 cursor-pointer">
+                  <option value="all">All Categories</option>
+                  <option value="Audit Evidence">Audit Evidence</option>
+                  <option value="CAPA Evidence">CAPA Evidence</option>
+                  <option value="Regulatory Documents">Regulatory Documents</option>
+                  <option value="Radiation Safety">Radiation Safety</option>
+                  <option value="Equipment">Equipment</option>
+                  <option value="Staff Training">Staff Training</option>
+                  <option value="Quality Indicators">Quality Indicators</option>
+                </select>
+                <select value={evidenceStatusFilter} onChange={e => setEvidenceStatusFilter(e.target.value)} className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-bold text-slate-600 cursor-pointer">
+                  <option value="all">All Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Expiring Soon">Expiring Soon</option>
+                  <option value="Expired">Expired</option>
+                </select>
+                <select value={evidenceExpiryFilter} onChange={e => setEvidenceExpiryFilter(e.target.value)} className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-bold text-slate-600 cursor-pointer">
+                  <option value="all">All Expiry</option>
+                  <option value="expired">Expired</option>
+                  <option value="expiring_soon">Expiring Soon (90d)</option>
+                  <option value="valid">Valid</option>
+                </select>
                 <select value={evidenceFilterType} onChange={e => setEvidenceFilterType(e.target.value)} className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-bold text-slate-600 cursor-pointer">
                   <option value="all">All Types</option>
                   <option value="PDF">PDF</option>
@@ -2193,7 +2788,7 @@ const RadiologyWorkspace = ({ onBack }) => {
                   <option value="date">Sort: Newest</option>
                   <option value="name">Sort: Name A-Z</option>
                 </select>
-                <button style={{ backgroundColor: hospital.themeColor }} className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2"><Upload className="w-3.5 h-3.5" /> Upload File</button>
+                <button onClick={() => handleOpenEvidenceModal()} style={{ backgroundColor: hospital.themeColor }} className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2"><Upload className="w-3.5 h-3.5" /> Upload File</button>
               </div>
             </div>
 
@@ -2224,34 +2819,44 @@ const RadiologyWorkspace = ({ onBack }) => {
               </div>
               {filteredFiles.length > 0 ? (
                 <div className="divide-y divide-slate-100">
-                  {filteredFiles.map(file => (
-                    <div key={file.id} onClick={() => setSelectedFile(selectedFile?.id === file.id ? null : file)} className={`px-5 py-3 flex items-center justify-between hover:bg-slate-50/50 cursor-pointer transition-colors ${selectedFile?.id === file.id ? 'bg-sky-50/60' : ''}`}>
-                      <div className="flex items-center gap-3 min-w-0">
+                  {filteredFiles.map(file => {
+                    const evStatus = getEvidenceStatus(file.expiryDate);
+                    return (
+                    <div key={file.id} className={`px-5 py-3 flex items-center justify-between hover:bg-slate-50/50 transition-colors ${selectedFile?.id === file.id ? 'bg-sky-50/60' : ''}`}>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 shrink-0">
                           {typeIcons[file.type] || <FileText className="w-4 h-4 text-slate-500" />}
                         </div>
-                        <div className="min-w-0">
-                          <h4 className="text-[10px] font-bold text-slate-800 truncate">{file.name}</h4>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[8px] font-mono text-slate-400">{file.type}  {file.size}</span>
-                            <span className="text-[8px] text-slate-400"></span>
-                            <span className="text-[8px] text-slate-400">{file.date}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h4 className="text-[10px] font-bold text-slate-800 truncate">{file.name}</h4>
+                            <span className={`px-1.5 py-0.5 rounded text-[7px] font-bold ${evStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : evStatus === 'Expiring Soon' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>{evStatus}</span>
                           </div>
-                          <div className="flex items-center gap-1 mt-1">
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className="text-[8px] font-mono text-slate-400">v{file.version || '1.0'}</span>
+                            <span className="text-[8px] text-slate-400">|</span>
+                            <span className="text-[8px] font-mono text-slate-400">{file.type}  {file.size || '—'}</span>
+                            <span className="text-[8px] text-slate-400">|</span>
+                            <span className="text-[8px] text-slate-400">{file.uploadDate || file.date}</span>
+                            {file.expiryDate && <span className="text-[8px] text-slate-400">| Exp: {file.expiryDate}</span>}
+                          </div>
+                          <div className="flex items-center gap-1 mt-1 flex-wrap">
+                            <span className="px-1.5 py-0.5 rounded text-[7px] font-bold bg-sky-50 text-sky-700 border border-sky-100">{file.category}</span>
+                            {file.linkedModule && <span className="px-1.5 py-0.5 rounded text-[7px] font-bold bg-purple-50 text-purple-700 border border-purple-100">Linked: {file.linkedModule}</span>}
                             {file.tags.map((tag, i) => (
                               <span key={i} className="px-1.5 py-0.5 rounded text-[7px] font-bold bg-sky-50 text-sky-700 border border-sky-100">{tag}</span>
                             ))}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0 ml-4">
-                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Linked: {file.linkedTo}</span>
-                        <span className="text-[8px] text-slate-400">By {file.uploadedBy}</span>
-                        <button className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1 hover:border-sky-300 hover:text-sky-700 cursor-pointer"><Eye className="w-3 h-3" /> View</button>
-                        <button className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer"><Download className="w-3 h-3" /> Download</button>
+                      <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                        <button onClick={(e) => { e.stopPropagation(); handleViewEvidence(file); }} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer"><Eye className="w-3 h-3" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); alert('Download started for: ' + file.name); }} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer"><Download className="w-3 h-3" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleOpenEvidenceModal(file); }} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer"><Edit3 className="w-3 h-3" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleDeleteEvidence(file.id); }} className="px-2 py-1 rounded border border-slate-200 text-[8px] font-bold text-rose-600 hover:border-rose-300 cursor-pointer"><Trash2 className="w-3 h-3" /></button>
                       </div>
                     </div>
-                  ))}
+                    );})}
                 </div>
               ) : (
                 <div className="py-10 flex flex-col items-center justify-center">
@@ -2273,29 +2878,37 @@ const RadiologyWorkspace = ({ onBack }) => {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-xs font-bold text-slate-800">{selectedFile.name}</h3>
                         <span className={`px-2 py-0.5 rounded text-[7px] font-bold ${selectedFile.type === 'PDF' ? 'bg-rose-50 text-rose-700 border border-rose-200' : selectedFile.type === 'Excel' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{selectedFile.type}</span>
+                        <span className={`px-2 py-0.5 rounded text-[7px] font-bold ${getEvidenceStatus(selectedFile.expiryDate) === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : getEvidenceStatus(selectedFile.expiryDate) === 'Expiring Soon' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>{getEvidenceStatus(selectedFile.expiryDate)}</span>
                       </div>
-                      <p className="text-[9px] text-slate-500 font-mono">Size: {selectedFile.size}  Date: {selectedFile.date}</p>
+                      <p className="text-[9px] text-slate-500 font-mono">v{selectedFile.version || '1.0'}  |  {selectedFile.size || '—'}  |  {selectedFile.uploadDate || selectedFile.date}</p>
+                      {selectedFile.expiryDate && <p className="text-[9px] text-slate-500 font-mono">Expiry: {selectedFile.expiryDate}</p>}
                     </div>
                   </div>
                   <button onClick={() => setSelectedFile(null)} className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500"><X className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="space-y-3">
-                  <div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Tags</span>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      {selectedFile.tags.map((tag, i) => (
-                        <span key={i} className="px-2 py-1 rounded-lg text-[8px] font-bold bg-sky-50 text-sky-700 border border-sky-100">{tag}</span>
-                      ))}
+                  {selectedFile.description && <div><span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Description</span><p className="text-xs text-slate-700 mt-1">{selectedFile.description}</p></div>}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Category</span>
+                      <p className="text-xs text-slate-800 mt-1 font-medium">{selectedFile.category || selectedFile.folder}</p>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Linked Module</span>
-                      <p className="text-xs text-slate-800 mt-1 font-medium">{selectedFile.linkedTo}</p>
+                      <p className="text-xs text-slate-800 mt-1 font-medium">{selectedFile.linkedModule || selectedFile.linkedTo || '—'}</p>
                     </div>
                     <div>
                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Uploaded By</span>
-                      <p className="text-xs text-slate-800 mt-1 font-medium">{selectedFile.uploadedBy}</p>
+                      <p className="text-xs text-slate-800 mt-1 font-medium">{selectedFile.uploadedBy || '—'}</p>
+                    </div>
+                  </div>
+                  {selectedFile.linkedRecordId && <div><span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Linked Record ID</span><p className="text-xs text-slate-800 mt-1 font-mono">{selectedFile.linkedRecordId}</p></div>}
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Tags</span>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      {selectedFile.tags.map((tag, i) => (
+                        <span key={i} className="px-2 py-1 rounded-lg text-[8px] font-bold bg-sky-50 text-sky-700 border border-sky-100">{tag}</span>
+                      ))}
                     </div>
                   </div>
                   <div>
@@ -2303,28 +2916,110 @@ const RadiologyWorkspace = ({ onBack }) => {
                     <p className="text-xs text-slate-700 mt-1">Radiology / Evidence Repository / <span className="font-bold text-slate-900">{selectedFile.folder}</span></p>
                   </div>
                   <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
-                    <button className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-sky-300 hover:text-sky-700 cursor-pointer"><Eye className="w-3.5 h-3.5" /> Preview</button>
-                    <button className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer"><Download className="w-3.5 h-3.5" /> Download</button>
-                    <button className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-amber-300 hover:text-amber-700 cursor-pointer"><Upload className="w-3.5 h-3.5" /> Replace</button>
-                    <button style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[9px] font-bold flex items-center gap-1.5 hover:brightness-95 cursor-pointer"><Plus className="w-3.5 h-3.5" /> Link to CAPA / Audit</button>
+                    <button onClick={() => alert('Preview not available for this file type')} className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-sky-300 hover:text-sky-700 cursor-pointer"><Eye className="w-3.5 h-3.5" /> Preview</button>
+                    <button onClick={() => alert('Download started for: ' + selectedFile.name)} className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer"><Download className="w-3.5 h-3.5" /> Download</button>
+                    <button onClick={() => handleOpenEvidenceModal(selectedFile)} className="px-3 py-2 rounded-xl border border-slate-200 text-[9px] font-bold text-slate-600 flex items-center gap-1.5 hover:border-amber-300 hover:text-amber-700 cursor-pointer"><Edit3 className="w-3.5 h-3.5" /> Edit</button>
+                    <button onClick={() => alert('Link to module feature coming soon')} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[9px] font-bold flex items-center gap-1.5 hover:brightness-95 cursor-pointer"><Plus className="w-3.5 h-3.5" /> Link to Module</button>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3 mb-4">Quick Upload Zone</h3>
-              <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-sky-300 hover:bg-sky-50/10 transition-all cursor-pointer">
-                <Upload className="w-8 h-8 text-slate-300" />
-                <p className="text-[10px] font-bold text-slate-500">Drag and drop files here, or click to browse</p>
-                <p className="text-[9px] text-slate-400">Supports PDF, DOCX, Images, Excel  Max 25 MB per file  Auto-detect tags</p>
-                <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
-                  {['AERB Documents', 'Calibration Certificates', 'Audit Reports', 'Radiation Monitoring', 'Training Records', 'CAPA Evidence'].map(folder => (
-                    <button key={folder} onClick={(e) => { e.stopPropagation(); alert(`Upload to: ${folder}`); }} className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[8px] font-bold text-slate-600 hover:border-sky-300 hover:text-sky-700 cursor-pointer transition-colors">{folder}</button>
-                  ))}
+            {isEvidenceModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-800">{editingEvidenceId ? 'Edit Document' : 'Add New Document'}</h3>
+                    <button onClick={() => { setIsEvidenceModalOpen(false); setEditingEvidenceId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveEvidence} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Document Name *</label>
+                        <input type="text" value={evidenceFormData.name} onChange={(e) => setEvidenceFormData({...evidenceFormData, name: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Category *</label>
+                        <select value={evidenceFormData.category} onChange={(e) => setEvidenceFormData({...evidenceFormData, category: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="Audit Evidence">Audit Evidence</option>
+                          <option value="CAPA Evidence">CAPA Evidence</option>
+                          <option value="Regulatory Documents">Regulatory Documents</option>
+                          <option value="Radiation Safety">Radiation Safety</option>
+                          <option value="Equipment">Equipment</option>
+                          <option value="Staff Training">Staff Training</option>
+                          <option value="Quality Indicators">Quality Indicators</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">File Type</label>
+                        <select value={evidenceFormData.type} onChange={(e) => setEvidenceFormData({...evidenceFormData, type: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="PDF">PDF</option>
+                          <option value="Excel">Excel</option>
+                          <option value="Word">Word</option>
+                          <option value="Image">Image</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Version</label>
+                        <input type="text" value={evidenceFormData.version} onChange={(e) => setEvidenceFormData({...evidenceFormData, version: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Size</label>
+                        <input type="text" value={evidenceFormData.size} onChange={(e) => setEvidenceFormData({...evidenceFormData, size: e.target.value})} placeholder="e.g. 2.4 MB" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Upload Date</label>
+                        <input type="date" value={evidenceFormData.uploadDate} onChange={(e) => setEvidenceFormData({...evidenceFormData, uploadDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Expiry Date</label>
+                        <input type="date" value={evidenceFormData.expiryDate} onChange={(e) => setEvidenceFormData({...evidenceFormData, expiryDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
+                        <select value={evidenceFormData.status} onChange={(e) => setEvidenceFormData({...evidenceFormData, status: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="Active">Active</option>
+                          <option value="Expiring Soon">Expiring Soon</option>
+                          <option value="Expired">Expired</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Linked Module</label>
+                        <select value={evidenceFormData.linkedModule} onChange={(e) => setEvidenceFormData({...evidenceFormData, linkedModule: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                          <option value="">— None —</option>
+                          <option value="Internal Audits">Internal Audits</option>
+                          <option value="CAPA">CAPA</option>
+                          <option value="NCR">NCR</option>
+                          <option value="Quality Indicators">Quality Indicators</option>
+                          <option value="Statutory Compliance">Statutory Compliance</option>
+                          <option value="Radiation Safety">Radiation Safety</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Linked Record ID</label>
+                        <input type="text" value={evidenceFormData.linkedRecordId} onChange={(e) => setEvidenceFormData({...evidenceFormData, linkedRecordId: e.target.value})} placeholder="e.g. capa1, audit1" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Tags (comma separated)</label>
+                        <input type="text" value={Array.isArray(evidenceFormData.tags) ? evidenceFormData.tags.join(', ') : evidenceFormData.tags} onChange={(e) => setEvidenceFormData({...evidenceFormData, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)})} placeholder="e.g. AERB, License, 2025" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Uploaded By</label>
+                        <input type="text" value={evidenceFormData.uploadedBy} onChange={(e) => setEvidenceFormData({...evidenceFormData, uploadedBy: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-[9px] font-medium text-slate-600 mb-1">Description</label>
+                        <textarea value={evidenceFormData.description} onChange={(e) => setEvidenceFormData({...evidenceFormData, description: e.target.value})} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"></textarea>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" onClick={() => { setIsEvidenceModalOpen(false); setEditingEvidenceId(null); }} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-[9px] font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="flex-1 px-3 py-2 rounded-lg text-white text-[9px] font-bold">{editingEvidenceId ? 'Update' : 'Add Document'}</button>
+                    </div>
+                  </form>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
         {activeTab === 'reports' && (

@@ -1,0 +1,4 @@
+import React, { useState, useEffect } from 'react';
+import { useHospital } from '../context/HospitalContext';
+import { ChevronLeft, Plus, X, Edit3, Trash2, Eye, AlertTriangle, Activity, FileText, Award, BarChart3, Search, Users, Shield, Clipboard, CheckCircle, TrendingUp, Filter, Calendar, Clock } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

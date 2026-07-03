@@ -4,10 +4,10 @@ import {
   ChevronLeft,
   LayoutDashboard,
   BarChart3,
-  TestTube2,
-  Microscope,
-  ShieldCheck,
-  ClipboardCheck,
+  Stethoscope,
+  CheckSquare,
+  Wrench,
+  ClipboardList,
   FileText,
   Plus,
   Edit3,
@@ -35,20 +35,16 @@ import {
 } from 'recharts';
 
 const TABS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'quality', label: 'Quality Indicators', icon: BarChart3 },
-  { id: 'sample', label: 'Sample & TAT Management', icon: TestTube2 },
-  { id: 'equipment', label: 'Equipment & Quality Control', icon: Microscope },
-  { id: 'safety', label: 'Laboratory Safety', icon: ShieldCheck },
-  { id: 'audit', label: 'Internal Audit', icon: ClipboardCheck },
-  { id: 'reports', label: 'Reports', icon: FileText },
+  { id: 'dashboard',      label: 'Dashboard',               icon: LayoutDashboard },
+  { id: 'quality',        label: 'Quality Indicators',      icon: BarChart3 },
+  { id: 'procedure',      label: 'Procedure Management',   icon: Stethoscope },
+  { id: 'radiation',      label: 'Radiation Safety',       icon: CheckSquare },
+  { id: 'equipment',      label: 'Equipment Management',   icon: Wrench },
+  { id: 'audit',          label: 'Audit Checklist',        icon: ClipboardList },
+  { id: 'reports',        label: 'Reports',                 icon: FileText },
 ];
 
-const LS_KEY_QUALITY = 'laboratory_quality_indicators';
-const LS_KEY_SAMPLE = 'laboratory_sample_tat';
-const LS_KEY_EQUIPMENT = 'laboratory_equipment_qc';
-const LS_KEY_SAFETY = 'laboratory_safety';
-const LS_KEY_AUDIT = 'laboratory_internal_audit';
+const LS_KEY_QUALITY = 'cathlab_quality_indicators';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -59,117 +55,97 @@ const EMPTY_QUALITY_FORM = {
   id: '',
   month: 'January',
   year: new Date().getFullYear(),
-  totalInvestigations: 0,
-  reportingErrors: 0,
-  reportingErrorPercent: 0,
-  redoInvestigations: 0,
-  redoPercent: 0,
-  safetyCompliancePercent: 100,
-  avgWaitingTime: 0,
-  avgReportingTime: 0,
+  totalProcedures: 0,
+  doorToBalloonTime: 0,
+  procedureSuccessRate: 100,
+  complicationRate: 0,
+  bleedingComplicationRate: 0,
+  contrastReactionRate: 0,
+  infectionRate: 0,
+  mortalityRate: 0,
+  patientSatisfaction: 100,
   status: 'Active',
 };
 
-const SAMPLE_QUALITY_RECORDS = [
-  { id: 'lqi-001', month: 'January', year: 2025, totalInvestigations: 2500, reportingErrors: 12, reportingErrorPercent: 0.48, redoInvestigations: 25, redoPercent: 1.0, safetyCompliancePercent: 96, avgWaitingTime: 15, avgReportingTime: 45, status: 'Active' },
-  { id: 'lqi-002', month: 'February', year: 2025, totalInvestigations: 2350, reportingErrors: 8, reportingErrorPercent: 0.34, redoInvestigations: 18, redoPercent: 0.77, safetyCompliancePercent: 98, avgWaitingTime: 12, avgReportingTime: 42, status: 'Active' },
-  { id: 'lqi-003', month: 'March', year: 2025, totalInvestigations: 2800, reportingErrors: 15, reportingErrorPercent: 0.54, redoInvestigations: 30, redoPercent: 1.07, safetyCompliancePercent: 95, avgWaitingTime: 18, avgReportingTime: 48, status: 'Active' },
-  { id: 'lqi-004', month: 'April', year: 2025, totalInvestigations: 2400, reportingErrors: 10, reportingErrorPercent: 0.42, redoInvestigations: 22, redoPercent: 0.92, safetyCompliancePercent: 97, avgWaitingTime: 14, avgReportingTime: 44, status: 'Active' },
-  { id: 'lqi-005', month: 'May', year: 2025, totalInvestigations: 2650, reportingErrors: 9, reportingErrorPercent: 0.34, redoInvestigations: 20, redoPercent: 0.76, safetyCompliancePercent: 98, avgWaitingTime: 13, avgReportingTime: 43, status: 'Active' },
+const SAMPLE_QUALITY_INDICATORS = [
+  { id: 'cqi-001', month: 'January',  year: 2025, totalProcedures: 45, doorToBalloonTime: 28, procedureSuccessRate: 98, complicationRate: 2.1, bleedingComplicationRate: 1.2, contrastReactionRate: 0.5, infectionRate: 0.3, mortalityRate: 0.5, patientSatisfaction: 94, status: 'Active' },
+  { id: 'cqi-002', month: 'February', year: 2025, totalProcedures: 42, doorToBalloonTime: 32, procedureSuccessRate: 97, complicationRate: 2.5, bleedingComplicationRate: 1.5, contrastReactionRate: 0.8, infectionRate: 0.4, mortalityRate: 0.7, patientSatisfaction: 92, status: 'Active' },
+  { id: 'cqi-003', month: 'March',    year: 2025, totalProcedures: 50, doorToBalloonTime: 25, procedureSuccessRate: 99, complicationRate: 1.8, bleedingComplicationRate: 1.0, contrastReactionRate: 0.3, infectionRate: 0.2, mortalityRate: 0.3, patientSatisfaction: 95, status: 'Active' },
+  { id: 'cqi-004', month: 'April',    year: 2025, totalProcedures: 48, doorToBalloonTime: 30, procedureSuccessRate: 96, complicationRate: 2.8, bleedingComplicationRate: 1.6, contrastReactionRate: 0.9, infectionRate: 0.5, mortalityRate: 0.8, patientSatisfaction: 91, status: 'Active' },
+  { id: 'cqi-005', month: 'May',      year: 2025, totalProcedures: 52, doorToBalloonTime: 27, procedureSuccessRate: 98, complicationRate: 2.2, bleedingComplicationRate: 1.3, contrastReactionRate: 0.6, infectionRate: 0.3, mortalityRate: 0.4, patientSatisfaction: 93, status: 'Active' },
 ];
 
-const SAMPLE_TYPES = ['Blood', 'Urine', 'Serum', 'Plasma', 'Tissue'];
+const LS_KEY_PROCEDURE = 'cathlab_procedure_management';
+const LS_KEY_RADIATION = 'cathlab_radiation_safety';
 
-const EMPTY_SAMPLE_FORM = {
+const EMPTY_RADIATION_FORM = {
   id: '',
   month: 'January',
   year: new Date().getFullYear(),
-  sampleType: 'Blood',
-  samplesReceived: 0,
-  samplesRejected: 0,
-  labelingErrors: 0,
-  avgTat: 0,
-  tatCompliancePercent: 100,
-  criticalResultsReported: 0,
+  totalFluoroscopyProcedures: 0,
+  leadApronCompliance: 100,
+  thyroidShieldCompliance: 100,
+  dosimeterBadgeCompliance: 100,
+  averageFluoroscopyTime: 0,
+  radiationExposureIncidents: 0,
+  staffDoseMonitoringCompliance: 100,
   status: 'Active',
 };
 
-const SAMPLE_RECORDS = [
-  { id: 'ls-001', month: 'January', year: 2025, sampleType: 'Blood', samplesReceived: 350, samplesRejected: 2, labelingErrors: 1, avgTat: 45, tatCompliancePercent: 96.5, criticalResultsReported: 8, status: 'Active' },
-  { id: 'ls-002', month: 'February', year: 2025, sampleType: 'Urine', samplesReceived: 280, samplesRejected: 3, labelingErrors: 0, avgTat: 32, tatCompliancePercent: 98.2, criticalResultsReported: 5, status: 'Active' },
-  { id: 'ls-003', month: 'March', year: 2025, sampleType: 'Serum', samplesReceived: 420, samplesRejected: 1, labelingErrors: 2, avgTat: 58, tatCompliancePercent: 94.8, criticalResultsReported: 12, status: 'Active' },
-  { id: 'ls-004', month: 'April', year: 2025, sampleType: 'Plasma', samplesReceived: 195, samplesRejected: 4, labelingErrors: 1, avgTat: 38, tatCompliancePercent: 95.7, criticalResultsReported: 3, status: 'Active' },
-  { id: 'ls-005', month: 'May', year: 2025, sampleType: 'Tissue', samplesReceived: 85, samplesRejected: 0, labelingErrors: 0, avgTat: 72, tatCompliancePercent: 99.1, criticalResultsReported: 7, status: 'Active' },
+const SAMPLE_RADIATION_RECORDS = [
+  { id: 'crr-001', month: 'January',  year: 2025, totalFluoroscopyProcedures: 45, leadApronCompliance: 98, thyroidShieldCompliance: 96, dosimeterBadgeCompliance: 100, averageFluoroscopyTime: 12, radiationExposureIncidents: 0, staffDoseMonitoringCompliance: 99, status: 'Active' },
+  { id: 'crr-002', month: 'February', year: 2025, totalFluoroscopyProcedures: 42, leadApronCompliance: 97, thyroidShieldCompliance: 95, dosimeterBadgeCompliance: 99, averageFluoroscopyTime: 14, radiationExposureIncidents: 0, staffDoseMonitoringCompliance: 98, status: 'Active' },
+  { id: 'crr-003', month: 'March',    year: 2025, totalFluoroscopyProcedures: 50, leadApronCompliance: 99, thyroidShieldCompliance: 98, dosimeterBadgeCompliance: 100, averageFluoroscopyTime: 11, radiationExposureIncidents: 1, staffDoseMonitoringCompliance: 100, status: 'Active' },
+  { id: 'crr-004', month: 'April',    year: 2025, totalFluoroscopyProcedures: 48, leadApronCompliance: 96, thyroidShieldCompliance: 94, dosimeterBadgeCompliance: 98, averageFluoroscopyTime: 15, radiationExposureIncidents: 0, staffDoseMonitoringCompliance: 97, status: 'Active' },
+  { id: 'crr-005', month: 'May',      year: 2025, totalFluoroscopyProcedures: 52, leadApronCompliance: 100, thyroidShieldCompliance: 97, dosimeterBadgeCompliance: 100, averageFluoroscopyTime: 10, radiationExposureIncidents: 0, staffDoseMonitoringCompliance: 99, status: 'Active' },
 ];
 
-const EQUIPMENT_CATEGORIES = ['Analyzer', 'Centrifuge', 'Microscope', 'Incubator', 'Autoclave', 'Other'];
+const EMPTY_PROCEDURE_FORM = {
+  id: '',
+  month: 'January',
+  year: new Date().getFullYear(),
+  procedureType: 'Diagnostic',
+  totalProcedures: 0,
+  coronaryAngiography: 0,
+  pciPtca: 0,
+  pacemakerImplantation: 0,
+  epRfAblation: 0,
+  procedureSuccessRate: 100,
+  averageProcedureTime: 0,
+  status: 'Active',
+};
+
+const SAMPLE_PROCEDURE_RECORDS = [
+  { id: 'cpp-001', month: 'January',  year: 2025, procedureType: 'Diagnostic', totalProcedures: 25, coronaryAngiography: 15, pciPtca: 8, pacemakerImplantation: 2, epRfAblation: 0, procedureSuccessRate: 98, averageProcedureTime: 45, status: 'Active' },
+  { id: 'cpp-002', month: 'February', year: 2025, procedureType: 'Therapeutic', totalProcedures: 28, coronaryAngiography: 12, pciPtca: 15, pacemakerImplantation: 1, epRfAblation: 0, procedureSuccessRate: 96, averageProcedureTime: 60, status: 'Active' },
+  { id: 'cpp-003', month: 'March',    year: 2025, procedureType: 'Mixed', totalProcedures: 30, coronaryAngiography: 18, pciPtca: 10, pacemakerImplantation: 2, epRfAblation: 0, procedureSuccessRate: 99, averageProcedureTime: 55, status: 'Active' },
+  { id: 'cpp-004', month: 'April',    year: 2025, procedureType: 'Emergency', totalProcedures: 22, coronaryAngiography: 10, pciPtca: 12, pacemakerImplantation: 0, epRfAblation: 0, procedureSuccessRate: 95, averageProcedureTime: 50, status: 'Active' },
+  { id: 'cpp-005', month: 'May',      year: 2025, procedureType: 'Therapeutic', totalProcedures: 32, coronaryAngiography: 16, pciPtca: 14, pacemakerImplantation: 2, epRfAblation: 0, procedureSuccessRate: 97, averageProcedureTime: 58, status: 'Active' },
+];
+
+const LS_KEY_EQUIPMENT = 'cathlab_equipment_management';
 
 const EMPTY_EQUIPMENT_FORM = {
   id: '',
   month: 'January',
   year: new Date().getFullYear(),
   equipmentName: '',
-  equipmentCategory: 'Analyzer',
-  calibrationStatus: 'Due',
-  pmStatus: 'Due',
-  internalQcStatus: 'Due',
-  eqasStatus: 'Due',
+  equipmentCategory: 'Imaging',
+  preventiveMaintenanceStatus: 'Up-to-date',
+  calibrationStatus: 'Calibrated',
   breakdownCount: 0,
-  lastCalibrationDate: '',
+  downtime: 0,
+  lastServiceDate: '',
+  nextServiceDate: '',
   status: 'Active',
 };
 
-const EQUIPMENT_RECORDS = [
-  { id: 'eq-001', month: 'January', year: 2025, equipmentName: 'Hematology Analyzer', equipmentCategory: 'Analyzer', calibrationStatus: 'Done', pmStatus: 'Done', internalQcStatus: 'Done', eqasStatus: 'Passed', breakdownCount: 0, lastCalibrationDate: '2025-01-15', status: 'Active' },
-  { id: 'eq-002', month: 'February', year: 2025, equipmentName: 'Biochemistry Analyzer', equipmentCategory: 'Analyzer', calibrationStatus: 'Done', pmStatus: 'Due', internalQcStatus: 'Done', eqasStatus: 'Passed', breakdownCount: 1, lastCalibrationDate: '2025-02-10', status: 'Active' },
-  { id: 'eq-003', month: 'March', year: 2025, equipmentName: 'Electrophoresis System', equipmentCategory: 'Analyzer', calibrationStatus: 'Due', pmStatus: 'Done', internalQcStatus: 'Due', eqasStatus: 'Pending', breakdownCount: 0, lastCalibrationDate: '2024-12-20', status: 'Active' },
-  { id: 'eq-004', month: 'April', year: 2025, equipmentName: 'High-speed Centrifuge', equipmentCategory: 'Centrifuge', calibrationStatus: 'Done', pmStatus: 'Done', internalQcStatus: 'Done', eqasStatus: 'Passed', breakdownCount: 0, lastCalibrationDate: '2025-04-05', status: 'Active' },
-  { id: 'eq-005', month: 'May', year: 2025, equipmentName: 'Lab Microscope', equipmentCategory: 'Microscope', calibrationStatus: 'Done', pmStatus: 'Due', internalQcStatus: 'Done', eqasStatus: 'Passed', breakdownCount: 0, lastCalibrationDate: '2025-05-12', status: 'Active' },
-];
-
-const EMPTY_SAFETY_FORM = {
-  id: '',
-  month: 'January',
-  year: new Date().getFullYear(),
-  ppeCompliance: 100,
-  handHygieneCompliance: 100,
-  needleStickIncidents: 0,
-  biohazardSpillIncidents: 0,
-  chemicalSpillIncidents: 0,
-  fireSafetyCompliance: 100,
-  bmwCompliance: 100,
-  status: 'Active',
-};
-
-const SAFETY_RECORDS = [
-  { id: 'saf-001', month: 'January', year: 2025, ppeCompliance: 98.5, handHygieneCompliance: 99.2, needleStickIncidents: 0, biohazardSpillIncidents: 0, chemicalSpillIncidents: 0, fireSafetyCompliance: 100, bmwCompliance: 99, status: 'Active' },
-  { id: 'saf-002', month: 'February', year: 2025, ppeCompliance: 97.8, handHygieneCompliance: 98.5, needleStickIncidents: 1, biohazardSpillIncidents: 0, chemicalSpillIncidents: 0, fireSafetyCompliance: 100, bmwCompliance: 98, status: 'Active' },
-  { id: 'saf-003', month: 'March', year: 2025, ppeCompliance: 99.1, handHygieneCompliance: 99.0, needleStickIncidents: 0, biohazardSpillIncidents: 1, chemicalSpillIncidents: 0, fireSafetyCompliance: 100, bmwCompliance: 99, status: 'Active' },
-  { id: 'saf-004', month: 'April', year: 2025, ppeCompliance: 98.2, handHygieneCompliance: 98.8, needleStickIncidents: 0, biohazardSpillIncidents: 0, chemicalSpillIncidents: 1, fireSafetyCompliance: 99, bmwCompliance: 97, status: 'Active' },
-  { id: 'saf-005', month: 'May', year: 2025, ppeCompliance: 99.5, handHygieneCompliance: 99.5, needleStickIncidents: 0, biohazardSpillIncidents: 0, chemicalSpillIncidents: 0, fireSafetyCompliance: 100, bmwCompliance: 100, status: 'Active' },
-];
-
-const AUDIT_AREAS = ['Pre-Analytical Process', 'Analytical Process', 'Post-Analytical Process', 'Equipment Management', 'Infection Prevention & Control', 'Quality Assurance (IQC/EQAS)', 'Laboratory Safety', 'Staff Training'];
-
-const EMPTY_AUDIT_FORM = {
-  id: '',
-  month: 'January',
-  year: new Date().getFullYear(),
-  auditArea: 'Pre-Analytical Process',
-  complianceScore: 100,
-  findings: '',
-  correctiveAction: '',
-  auditor: '',
-  auditDate: '',
-  status: 'Active',
-};
-
-const AUDIT_RECORDS = [
-  { id: 'aud-001', month: 'January', year: 2025, auditArea: 'Pre-Analytical Process', complianceScore: 96, findings: 'Sample labeling delays observed', correctiveAction: 'Implemented rush collection protocol', auditor: 'Dr. Smith', auditDate: '2025-01-20', status: 'Active' },
-  { id: 'aud-002', month: 'February', year: 2025, auditArea: 'Analytical Process', complianceScore: 98, findings: 'Calibration due on Hematology Analyzer', correctiveAction: 'Scheduled calibration completed', auditor: 'QC Team', auditDate: '2025-02-15', status: 'Active' },
-  { id: 'aud-003', month: 'March', year: 2025, auditArea: 'Post-Analysis Process', complianceScore: 94, findings: 'Reporting turnaround time exceeded', correctiveAction: 'Added evening shift for reporting', auditor: 'Dr. Johnson', auditDate: '2025-03-10', status: 'Active' },
-  { id: 'aud-004', month: 'April', year: 2025, auditArea: 'Equipment Management', complianceScore: 99, findings: 'PM overdue for 2 centrifuges', correctiveAction: 'Preventive maintenance rescheduled', auditor: 'Biomed Team', auditDate: '2025-04-22', status: 'Active' },
-  { id: 'aud-005', month: 'May', year: 2025, auditArea: 'Laboratory Safety', complianceScore: 100, findings: 'All safety protocols compliant', correctiveAction: 'None required', auditor: 'Safety Officer', auditDate: '2025-05-18', status: 'Active' },
+const SAMPLE_EQUIPMENT_RECORDS = [
+  { id: 'ceq-001', month: 'January',  year: 2025, equipmentName: 'Cath Lab Imaging System', equipmentCategory: 'Imaging', preventiveMaintenanceStatus: 'Up-to-date', calibrationStatus: 'Calibrated', breakdownCount: 0, downtime: 0, lastServiceDate: '2025-01-10', nextServiceDate: '2025-07-10', status: 'Active' },
+  { id: 'ceq-002', month: 'January',  year: 2025, equipmentName: 'Patient Monitor', equipmentCategory: 'Monitoring', preventiveMaintenanceStatus: 'Due Soon', calibrationStatus: 'Calibrated', breakdownCount: 1, downtime: 4, lastServiceDate: '2025-01-05', nextServiceDate: '2025-04-05', status: 'Active' },
+  { id: 'ceq-003', month: 'February', year: 2025, equipmentName: 'Defibrillator', equipmentCategory: 'Life Support', preventiveMaintenanceStatus: 'Up-to-date', calibrationStatus: 'Pending', breakdownCount: 0, downtime: 0, lastServiceDate: '2025-02-12', nextServiceDate: '2025-08-12', status: 'Active' },
+  { id: 'ceq-004', month: 'February', year: 2025, equipmentName: 'Contrast Injector', equipmentCategory: 'Infusion', preventiveMaintenanceStatus: 'Up-to-date', calibrationStatus: 'Calibrated', breakdownCount: 0, downtime: 0, lastServiceDate: '2025-02-08', nextServiceDate: '2025-05-08', status: 'Active' },
+  { id: 'ceq-005', month: 'March',    year: 2025, equipmentName: 'Infusion Pump', equipmentCategory: 'Infusion', preventiveMaintenanceStatus: 'Overdue', calibrationStatus: 'Calibrated', breakdownCount: 2, downtime: 8, lastServiceDate: '2025-03-01', nextServiceDate: '2025-03-15', status: 'Pending' },
 ];
 
 const NumField = ({ label, field, form, setForm, step = '1' }) => (
@@ -178,14 +154,8 @@ const NumField = ({ label, field, form, setForm, step = '1' }) => (
     <input
       type="number"
       step={step}
-      min="0"
-      max={field.includes('Percent') ? 100 : undefined}
       value={form[field]}
-      onChange={(e) => {
-        const val = parseFloat(e.target.value) || 0;
-        const capped = field.includes('Percent') ? Math.min(100, Math.max(0, val)) : Math.max(0, val);
-        setForm({ ...form, [field]: capped });
-      }}
+      onChange={(e) => setForm({ ...form, [field]: parseFloat(e.target.value) || 0 })}
       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
     />
   </div>
@@ -208,10 +178,11 @@ const QualityTab = ({
     );
   });
 
-  const totalInvestigations = qualityIndicators.reduce((s, r) => s + (r.totalInvestigations || 0), 0);
-  const avgReportingError = qualityIndicators.length ? (qualityIndicators.reduce((s, r) => s + (r.reportingErrorPercent || 0), 0) / qualityIndicators.length).toFixed(2) : 0;
-  const avgRedo = qualityIndicators.length ? (qualityIndicators.reduce((s, r) => s + (r.redoPercent || 0), 0) / qualityIndicators.length).toFixed(2) : 0;
-  const avgWaiting = qualityIndicators.length ? (qualityIndicators.reduce((s, r) => s + (r.avgWaitingTime || 0), 0) / qualityIndicators.length).toFixed(1) : 0;
+  const totalRecords = qualityIndicators.length;
+  const totalProcedures = qualityIndicators.reduce((s, r) => s + (r.totalProcedures || 0), 0);
+  const avgSuccessRate = totalRecords ? (qualityIndicators.reduce((s, r) => s + (r.procedureSuccessRate || 0), 0) / totalRecords).toFixed(1) : 0;
+  const avgDoorToBalloon = totalRecords ? (qualityIndicators.reduce((s, r) => s + (r.doorToBalloonTime || 0), 0) / totalRecords).toFixed(1) : 0;
+  const avgSatisfaction = totalRecords ? (qualityIndicators.reduce((s, r) => s + (r.patientSatisfaction || 0), 0) / totalRecords).toFixed(1) : 0;
 
   const STATUS_BADGE = {
     Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -220,9 +191,8 @@ const QualityTab = ({
   };
 
   const TH_COLS = [
-    'Record ID', 'Month', 'Total Investigations', 'Reporting Errors',
-    'Reporting Error %', 'Re-do Investigations', 'Re-do %', 'Safety Compliance %',
-    'Avg Waiting Time', 'Avg Reporting Time', 'Status', 'Actions',
+    'Record ID', 'Month', 'Total Procedures', 'Door-to-Balloon', 'Success Rate',
+    'Complication Rate', 'Bleeding Rate', 'Contrast Reaction', 'Infection Rate', 'Mortality Rate', 'Patient Satisfaction', 'Status', 'Actions',
   ];
 
   return (
@@ -230,7 +200,7 @@ const QualityTab = ({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-extrabold text-slate-800">Quality Indicators</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Quality monthly metrics</p>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department monthly metrics</p>
         </div>
         <button
           onClick={() => handleOpenQualityModal()}
@@ -243,10 +213,10 @@ const QualityTab = ({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total Investigations', value: totalInvestigations, color: 'text-blue-600' },
-          { label: 'Reporting Error %', value: `${avgReportingError}%`, color: 'text-rose-600' },
-          { label: 'Re-do Investigation %', value: `${avgRedo}%`, color: 'text-amber-600' },
-          { label: 'Avg Waiting Time (min)', value: avgWaiting, color: 'text-emerald-600' },
+          { label: 'Total Procedures', value: totalProcedures, color: 'text-blue-600' },
+          { label: 'Procedure Success Rate', value: `${avgSuccessRate}%`, color: 'text-rose-600' },
+          { label: 'Avg Door-to-Balloon', value: `${avgDoorToBalloon} min`, color: 'text-amber-600' },
+          { label: 'Patient Satisfaction', value: `${avgSatisfaction}%`, color: 'text-emerald-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -283,14 +253,15 @@ const QualityTab = ({
                 <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
                   <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.totalInvestigations}</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.reportingErrors}</td>
-                  <td className="px-3 py-3 text-orange-600 font-bold">{r.reportingErrorPercent}%</td>
-                  <td className="px-3 py-3 text-amber-600 font-bold">{r.redoInvestigations}</td>
-                  <td className="px-3 py-3 text-yellow-600 font-bold">{r.redoPercent}%</td>
-                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.safetyCompliancePercent}%</td>
-                  <td className="px-3 py-3 text-blue-600 font-bold">{r.avgWaitingTime}</td>
-                  <td className="px-3 py-3 text-sky-600 font-bold">{r.avgReportingTime}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.totalProcedures}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.doorToBalloonTime}</td>
+                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.procedureSuccessRate}%</td>
+                  <td className="px-3 py-3 text-rose-600 font-bold">{r.complicationRate}%</td>
+                  <td className="px-3 py-3 text-orange-600 font-bold">{r.bleedingComplicationRate}%</td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.contrastReactionRate}%</td>
+                  <td className="px-3 py-3 text-purple-600 font-bold">{r.infectionRate}%</td>
+                  <td className="px-3 py-3 text-red-600 font-bold">{r.mortalityRate}%</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.patientSatisfaction}%</td>
                   <td className="px-3 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
                       {r.status}
@@ -326,38 +297,34 @@ const QualityTab = ({
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
-          <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {qualityIndicators.length} record{qualityIndicators.length !== 1 ? 's' : ''}
-          </span>
-        </div>
       </div>
     </div>
   );
 };
 
-const SampleTab = ({
+const ProcedureTab = ({
   hospital,
-  sampleRecords,
+  procedureRecords,
   searchQuery,
   setSearchQuery,
-  handleOpenSampleModal,
-  handleDeleteSample,
+  handleOpenProcedureModal,
+  handleDeleteProcedure,
 }) => {
-  const filtered = sampleRecords.filter((r) => {
+  const filtered = procedureRecords.filter((r) => {
     const q = searchQuery.toLowerCase();
     return (
       r.month.toLowerCase().includes(q) ||
       String(r.year).includes(q) ||
-      r.sampleType.toLowerCase().includes(q) ||
+      r.procedureType.toLowerCase().includes(q) ||
       r.status.toLowerCase().includes(q)
     );
   });
 
-  const totalSamples = sampleRecords.reduce((s, r) => s + (r.samplesReceived || 0), 0);
-  const rejectionPercent = sampleRecords.length ? (sampleRecords.reduce((s, r) => s + (r.samplesRejected || 0), 0) / totalSamples * 100).toFixed(2) : 0;
-  const avgTat = sampleRecords.length ? (sampleRecords.reduce((s, r) => s + (r.avgTat || 0), 0) / sampleRecords.length).toFixed(1) : 0;
-  const avgTatCompliance = sampleRecords.length ? (sampleRecords.reduce((s, r) => s + (r.tatCompliancePercent || 0), 0) / sampleRecords.length).toFixed(1) : 0;
+  const totalRecords = procedureRecords.length;
+  const totalProcedures = procedureRecords.reduce((s, r) => s + (r.totalProcedures || 0), 0);
+  const totalCoronary = procedureRecords.reduce((s, r) => s + (r.coronaryAngiography || 0), 0);
+  const totalPCI = procedureRecords.reduce((s, r) => s + (r.pciPtca || 0), 0);
+  const avgSuccessRate = totalRecords ? (procedureRecords.reduce((s, r) => s + (r.procedureSuccessRate || 0), 0) / totalRecords).toFixed(1) : 0;
 
   const STATUS_BADGE = {
     Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -366,32 +333,31 @@ const SampleTab = ({
   };
 
   const TH_COLS = [
-    'Record ID', 'Month', 'Sample Type', 'Samples Received', 'Samples Rejected',
-    'Labeling Errors', 'Average TAT', 'TAT Compliance', 'Critical Results', 'Status', 'Actions',
+    'Record ID', 'Month', 'Procedure Type', 'Total Procedures', 'Coronary Angio', 'PCI/PTCA', 'Pacemaker', 'EP/RF Ablation', 'Success Rate', 'Avg Time', 'Status', 'Actions',
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Sample & TAT Management</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Laboratory sample tracking and turnaround time</p>
+          <h3 className="text-xs font-extrabold text-slate-800">Procedure Management</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department procedure metrics</p>
         </div>
         <button
-          onClick={() => handleOpenSampleModal()}
+          onClick={() => handleOpenProcedureModal()}
           style={{ backgroundColor: hospital.themeColor }}
           className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Sample Record
+          <Plus className="w-3.5 h-3.5" /> Add Procedure Record
         </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total Samples', value: totalSamples, color: 'text-blue-600' },
-          { label: 'Sample Rejection %', value: `${rejectionPercent}%`, color: 'text-rose-600' },
-          { label: 'Average TAT (min)', value: avgTat, color: 'text-amber-600' },
-          { label: 'TAT Compliance %', value: `${avgTatCompliance}%`, color: 'text-emerald-600' },
+          { label: 'Total Procedures', value: totalProcedures, color: 'text-blue-600' },
+          { label: 'Coronary Angiography', value: totalCoronary, color: 'text-rose-600' },
+          { label: 'PCI/PTCA Procedures', value: totalPCI, color: 'text-amber-600' },
+          { label: 'Procedure Success Rate', value: `${avgSuccessRate}%`, color: 'text-emerald-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -404,7 +370,7 @@ const SampleTab = ({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by month, sample type, or status…"
+          placeholder="Search by month, year, type, or status…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
@@ -428,13 +394,14 @@ const SampleTab = ({
                 <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
                   <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                  <td className="px-3 py-3 text-sky-600 font-bold">{r.sampleType}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.samplesReceived}</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.samplesRejected}</td>
-                  <td className="px-3 py-3 text-orange-600 font-bold">{r.labelingErrors}</td>
-                  <td className="px-3 py-3 text-blue-600 font-bold">{r.avgTat}</td>
-                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.tatCompliancePercent}%</td>
-                  <td className="px-3 py-3 text-violet-600 font-bold">{r.criticalResultsReported}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.procedureType}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.totalProcedures}</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.coronaryAngiography}</td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.pciPtca}</td>
+                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.pacemakerImplantation}</td>
+                  <td className="px-3 py-3 text-purple-600 font-bold">{r.epRfAblation}</td>
+                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.procedureSuccessRate}%</td>
+                  <td className="px-3 py-3 text-slate-600">{r.averageProcedureTime}</td>
                   <td className="px-3 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
                       {r.status}
@@ -443,14 +410,14 @@ const SampleTab = ({
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleOpenSampleModal(r)}
+                        onClick={() => handleOpenProcedureModal(r)}
                         className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={() => handleDeleteSample(r.id)}
+                        onClick={() => handleDeleteProcedure(r.id)}
                         className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
                         title="Delete"
                       >
@@ -463,7 +430,7 @@ const SampleTab = ({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
-                    {searchQuery ? 'No records match your search.' : 'No sample records yet. Click "Add Sample Record" to begin.'}
+                    {searchQuery ? 'No records match your search.' : 'No procedure records yet. Click "Add Procedure Record" to begin.'}
                   </td>
                 </tr>
               )}
@@ -472,7 +439,7 @@ const SampleTab = ({
         </div>
         <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
           <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {sampleRecords.length} record{sampleRecords.length !== 1 ? 's' : ''}
+            Showing {filtered.length} of {procedureRecords.length} record{procedureRecords.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
@@ -480,166 +447,15 @@ const SampleTab = ({
   );
 };
 
-const EquipmentTab = ({
+const RadiationTab = ({
   hospital,
-  equipmentRecords,
+  radiationRecords,
   searchQuery,
   setSearchQuery,
-  handleOpenEquipmentModal,
-  handleDeleteEquipment,
+  handleOpenRadiationModal,
+  handleDeleteRadiation,
 }) => {
-  const filtered = equipmentRecords.filter((r) => {
-    const q = searchQuery.toLowerCase();
-    return (
-      r.equipmentName.toLowerCase().includes(q) ||
-      r.equipmentCategory.toLowerCase().includes(q) ||
-      r.status.toLowerCase().includes(q)
-    );
-  });
-
-  const totalEquipment = equipmentRecords.length;
-  const calibCompliance = equipmentRecords.length ? (equipmentRecords.filter((r) => r.calibrationStatus === 'Done').length / equipmentRecords.length * 100).toFixed(1) : 0;
-  const qcCompliance = equipmentRecords.length ? (equipmentRecords.filter((r) => r.internalQcStatus === 'Done').length / equipmentRecords.length * 100).toFixed(1) : 0;
-  const eqasCompliance = equipmentRecords.length ? (equipmentRecords.filter((r) => r.eqasStatus === 'Passed').length / equipmentRecords.length * 100).toFixed(1) : 0;
-
-  const STATUS_BADGE = {
-    Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Inactive: 'bg-slate-50 text-slate-500 border-slate-200',
-    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
-  };
-
-  const TH_COLS = [
-    'Record ID', 'Equipment Name', 'Category', 'Calibration Status', 'PM Status',
-    'Internal QC', 'EQAS', 'Breakdown Count', 'Last Calibration', 'Status', 'Actions',
-  ];
-
-  const STATUS_COLORS = {
-    Done:   'text-emerald-600',
-    Due:    'text-amber-600',
-    Overdue: 'text-rose-600',
-    Passed:  'text-emerald-600',
-    Failed:  'text-rose-600',
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Equipment & Quality Control</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Laboratory equipment calibration and QC tracking</p>
-        </div>
-        <button
-          onClick={() => handleOpenEquipmentModal()}
-          style={{ backgroundColor: hospital.themeColor }}
-          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
-        >
-          <Plus className="w-3.5 h-3.5" /> Add Equipment
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: 'Total Equipment', value: totalEquipment, color: 'text-blue-600' },
-          { label: 'Calibration Compliance %', value: `${calibCompliance}%`, color: 'text-emerald-600' },
-          { label: 'Internal QC Compliance %', value: `${qcCompliance}%`, color: 'text-sky-600' },
-          { label: 'EQAS Compliance %', value: `${eqasCompliance}%`, color: 'text-violet-600' },
-        ].map((kpi) => (
-          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-        <input
-          type="text"
-          placeholder="Search by equipment name, category, or status…"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
-        />
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[10px]">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                {TH_COLS.map((h) => (
-                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
-                  <td className="px-3 py-3 font-semibold text-slate-700">{r.equipmentName}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.equipmentCategory}</td>
-                  <td className={`px-3 py-3 font-bold ${STATUS_COLORS[r.calibrationStatus] || 'text-slate-600'}`}>{r.calibrationStatus}</td>
-                  <td className={`px-3 py-3 font-bold ${STATUS_COLORS[r.pmStatus] || 'text-slate-600'}`}>{r.pmStatus}</td>
-                  <td className={`px-3 py-3 font-bold ${STATUS_COLORS[r.internalQcStatus] || 'text-slate-600'}`}>{r.internalQcStatus}</td>
-                  <td className={`px-3 py-3 font-bold ${STATUS_COLORS[r.eqasStatus] || 'text-slate-600'}`}>{r.eqasStatus}</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.breakdownCount}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.lastCalibrationDate || '-'}</td>
-                  <td className="px-3 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
-                      {r.status}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleOpenEquipmentModal(r)}
-                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
-                        title="Edit"
-                      >
-                        <Edit3 className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEquipment(r.id)}
-                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
-                    {searchQuery ? 'No records match your search.' : 'No equipment records yet. Click "Add Equipment" to begin.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
-          <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {equipmentRecords.length} record{equipmentRecords.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const SafetyTab = ({
-  hospital,
-  safetyRecords,
-  searchQuery,
-  setSearchQuery,
-  handleOpenSafetyModal,
-  handleDeleteSafety,
-}) => {
-  const filtered = safetyRecords.filter((r) => {
+  const filtered = radiationRecords.filter((r) => {
     const q = searchQuery.toLowerCase();
     return (
       r.month.toLowerCase().includes(q) ||
@@ -648,10 +464,11 @@ const SafetyTab = ({
     );
   });
 
-  const avgPpe = safetyRecords.length ? (safetyRecords.reduce((s, r) => s + (r.ppeCompliance || 0), 0) / safetyRecords.length).toFixed(1) : 0;
-  const avgHandHygiene = safetyRecords.length ? (safetyRecords.reduce((s, r) => s + (r.handHygieneCompliance || 0), 0) / safetyRecords.length).toFixed(1) : 0;
-  const totalNeedleStick = safetyRecords.reduce((s, r) => s + (r.needleStickIncidents || 0), 0);
-  const avgBmw = safetyRecords.length ? (safetyRecords.reduce((s, r) => s + (r.bmwCompliance || 0), 0) / safetyRecords.length).toFixed(1) : 0;
+  const totalRecords = radiationRecords.length;
+  const totalFluoroscopy = radiationRecords.reduce((s, r) => s + (r.totalFluoroscopyProcedures || 0), 0);
+  const avgLeadApron = totalRecords ? (radiationRecords.reduce((s, r) => s + (r.leadApronCompliance || 0), 0) / totalRecords).toFixed(1) : 0;
+  const avgDosimeter = totalRecords ? (radiationRecords.reduce((s, r) => s + (r.dosimeterBadgeCompliance || 0), 0) / totalRecords).toFixed(1) : 0;
+  const totalIncidents = radiationRecords.reduce((s, r) => s + (r.radiationExposureIncidents || 0), 0);
 
   const STATUS_BADGE = {
     Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -660,32 +477,32 @@ const SafetyTab = ({
   };
 
   const TH_COLS = [
-    'Record ID', 'Month', 'PPE Compliance', 'Hand Hygiene', 'Needle Stick Incidents',
-    'Biohazard Spills', 'Chemical Spills', 'Fire Safety Compliance', 'BMW Compliance', 'Status', 'Actions',
+    'Record ID', 'Month', 'Fluoroscopy Procedures', 'Lead Apron', 'Thyroid Shield',
+    'Dosimeter Badge', 'Avg Fluoroscopy Time', 'Staff Dose Compliance', 'Radiation Incidents', 'Status', 'Actions',
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Laboratory Safety</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Safety compliance and incident tracking</p>
+          <h3 className="text-xs font-extrabold text-slate-800">Radiation Safety</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department radiation safety metrics</p>
         </div>
         <button
-          onClick={() => handleOpenSafetyModal()}
+          onClick={() => handleOpenRadiationModal()}
           style={{ backgroundColor: hospital.themeColor }}
           className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Safety Record
+          <Plus className="w-3.5 h-3.5" /> Add Radiation Record
         </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'PPE Compliance %', value: `${avgPpe}%`, color: 'text-blue-600' },
-          { label: 'Hand Hygiene Compliance %', value: `${avgHandHygiene}%`, color: 'text-sky-600' },
-          { label: 'Needle Stick Incidents', value: totalNeedleStick, color: 'text-rose-600' },
-          { label: 'BMW Compliance %', value: `${avgBmw}%`, color: 'text-emerald-600' },
+          { label: 'Total Fluoroscopy Procedures', value: totalFluoroscopy, color: 'text-blue-600' },
+          { label: 'Lead Apron Compliance %', value: `${avgLeadApron}%`, color: 'text-rose-600' },
+          { label: 'Dosimeter Badge Compliance %', value: `${avgDosimeter}%`, color: 'text-amber-600' },
+          { label: 'Radiation Incidents', value: totalIncidents, color: 'text-emerald-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -722,13 +539,13 @@ const SafetyTab = ({
                 <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
                   <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                  <td className="px-3 py-3 text-blue-600 font-bold">{r.ppeCompliance}%</td>
-                  <td className="px-3 py-3 text-sky-600 font-bold">{r.handHygieneCompliance}%</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.needleStickIncidents}</td>
-                  <td className="px-3 py-3 text-amber-600 font-bold">{r.biohazardSpillIncidents}</td>
-                  <td className="px-3 py-3 text-orange-600 font-bold">{r.chemicalSpillIncidents}</td>
-                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.fireSafetyCompliance}%</td>
-                  <td className="px-3 py-3 text-violet-600 font-bold">{r.bmwCompliance}%</td>
+                  <td className="px-3 py-3 text-slate-600">{r.totalFluoroscopyProcedures}</td>
+                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.leadApronCompliance}%</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.thyroidShieldCompliance}%</td>
+                  <td className="px-3 py-3 text-purple-600 font-bold">{r.dosimeterBadgeCompliance}%</td>
+                  <td className="px-3 py-3 text-slate-600">{r.averageFluoroscopyTime}</td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.staffDoseMonitoringCompliance}%</td>
+                  <td className="px-3 py-3 text-rose-600 font-bold">{r.radiationExposureIncidents}</td>
                   <td className="px-3 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
                       {r.status}
@@ -737,14 +554,14 @@ const SafetyTab = ({
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleOpenSafetyModal(r)}
+                        onClick={() => handleOpenRadiationModal(r)}
                         className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={() => handleDeleteSafety(r.id)}
+                        onClick={() => handleDeleteRadiation(r.id)}
                         className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
                         title="Delete"
                       >
@@ -757,7 +574,7 @@ const SafetyTab = ({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
-                    {searchQuery ? 'No records match your search.' : 'No safety records yet. Click "Add Safety Record" to begin.'}
+                    {searchQuery ? 'No records match your search.' : 'No radiation records yet. Click "Add Radiation Record" to begin.'}
                   </td>
                 </tr>
               )}
@@ -766,13 +583,191 @@ const SafetyTab = ({
         </div>
         <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
           <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {safetyRecords.length} record{safetyRecords.length !== 1 ? 's' : ''}
+            Showing {filtered.length} of {radiationRecords.length} record{radiationRecords.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
     </div>
   );
 };
+
+const EquipmentTab = ({
+  hospital,
+  equipmentRecords,
+  searchQuery,
+  setSearchQuery,
+  handleOpenEquipmentModal,
+  handleDeleteEquipment,
+}) => {
+  const filtered = equipmentRecords.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.month.toLowerCase().includes(q) ||
+      String(r.year).includes(q) ||
+      r.equipmentName.toLowerCase().includes(q) ||
+      r.equipmentCategory.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
+
+  const totalEquipment = equipmentRecords.length;
+  const pmCompliant = equipmentRecords.filter((r) => r.preventiveMaintenanceStatus === 'Up-to-date').length;
+  const pmCompliance = totalEquipment ? ((pmCompliant / totalEquipment) * 100).toFixed(1) : 0;
+  const calibCompliant = equipmentRecords.filter((r) => r.calibrationStatus === 'Calibrated').length;
+  const calibCompliance = totalEquipment ? ((calibCompliant / totalEquipment) * 100).toFixed(1) : 0;
+  const totalBreakdowns = equipmentRecords.reduce((s, r) => s + (r.breakdownCount || 0), 0);
+
+  const STATUS_BADGE = {
+    Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Inactive: 'bg-slate-50 text-slate-500 border-slate-200',
+    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const TH_COLS = [
+    'Record ID', 'Equipment Name', 'Category', 'PM Status', 'Calibration',
+    'Breakdown Count', 'Downtime', 'Last Service', 'Next Service', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Equipment Management</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department equipment metrics</p>
+        </div>
+        <button
+          onClick={() => handleOpenEquipmentModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Equipment Record
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Equipment', value: totalEquipment, color: 'text-blue-600' },
+          { label: 'PM Compliance %', value: `${pmCompliance}%`, color: 'text-emerald-600' },
+          { label: 'Calibration Compliance %', value: `${calibCompliance}%`, color: 'text-rose-600' },
+          { label: 'Total Breakdowns', value: totalBreakdowns, color: 'text-amber-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by month, year, name, category, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.equipmentName}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.equipmentCategory}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${r.preventiveMaintenanceStatus === 'Up-to-date' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : r.preventiveMaintenanceStatus === 'Due Soon' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
+                      {r.preventiveMaintenanceStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${r.calibrationStatus === 'Calibrated' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
+                      {r.calibrationStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.breakdownCount}</td>
+                  <td className="px-3 py-3 text-rose-600 font-bold">{r.downtime} hrs</td>
+                  <td className="px-3 py-3 text-slate-600">{r.lastServiceDate}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.nextServiceDate}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenEquipmentModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEquipment(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No equipment records yet. Click "Add Equipment Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {equipmentRecords.length} record{equipmentRecords.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LS_KEY_AUDIT = 'cathlab_audit_checklist';
+
+const EMPTY_AUDIT_FORM = {
+  id: '',
+  month: 'January',
+  year: new Date().getFullYear(),
+  auditArea: 'Care of Patients',
+  complianceScore: 100,
+  findings: 0,
+  correctiveAction: '',
+  auditor: '',
+  auditDate: '',
+  status: 'Active',
+};
+
+const SAMPLE_AUDIT_RECORDS = [
+  { id: 'ca-001', month: 'January',  year: 2025, auditArea: 'Care of Patients', complianceScore: 96, findings: 2, correctiveAction: 'Updated patient monitoring protocols', auditor: 'Dr. Sharma', auditDate: '2025-01-15', status: 'Active' },
+  { id: 'ca-002', month: 'February', year: 2025, auditArea: 'Radiation Safety', complianceScore: 92, findings: 5, correctiveAction: 'Replaced expired lead aprons', auditor: 'Dr. Patel', auditDate: '2025-02-10', status: 'Active' },
+  { id: 'ca-003', month: 'March',    year: 2025, auditArea: 'Infection Control', complianceScore: 98, findings: 1, correctiveAction: 'Enhanced sterilization procedures', auditor: 'Dr. Kumar', auditDate: '2025-03-05', status: 'Active' },
+  { id: 'ca-004', month: 'April',    year: 2025, auditArea: 'Medication Management', complianceScore: 94, findings: 3, correctiveAction: 'Corrected storage temperature', auditor: 'Dr. Singh', auditDate: '2025-04-12', status: 'Pending' },
+  { id: 'ca-005', month: 'May',      year: 2025, auditArea: 'Equipment Management', complianceScore: 97, findings: 2, correctiveAction: 'Scheduled preventive maintenance', auditor: 'Dr. Reddy', auditDate: '2025-05-08', status: 'Active' },
+];
 
 const AuditTab = ({
   hospital,
@@ -786,6 +781,7 @@ const AuditTab = ({
     const q = searchQuery.toLowerCase();
     return (
       r.month.toLowerCase().includes(q) ||
+      String(r.year).includes(q) ||
       r.auditArea.toLowerCase().includes(q) ||
       r.auditor.toLowerCase().includes(q) ||
       r.status.toLowerCase().includes(q)
@@ -793,9 +789,9 @@ const AuditTab = ({
   });
 
   const totalAudits = auditRecords.length;
-  const avgCompliance = auditRecords.length ? (auditRecords.reduce((s, r) => s + (r.complianceScore || 0), 0) / auditRecords.length).toFixed(1) : 0;
-  const openFindings = auditRecords.filter((r) => r.findings && r.findings.trim() !== '').length;
-  const closedFindings = auditRecords.filter((r) => r.correctiveAction && r.correctiveAction.trim() !== '').length;
+  const avgCompliance = totalAudits ? (auditRecords.reduce((s, r) => s + (r.complianceScore || 0), 0) / totalAudits).toFixed(1) : 0;
+  const openFindings = auditRecords.reduce((s, r) => s + (r.findings || 0), 0);
+  const closedFindings = auditRecords.filter((r) => r.status === 'Active').length;
 
   const STATUS_BADGE = {
     Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -804,16 +800,17 @@ const AuditTab = ({
   };
 
   const TH_COLS = [
-    'Audit ID', 'Month', 'Audit Area', 'Compliance %', 'Findings',
-    'Corrective Action', 'Auditor', 'Audit Date', 'Status', 'Actions',
+    'Audit ID', 'Month', 'Audit Area', 'Compliance %',
+    'Findings', 'Corrective Action', 'Auditor',
+    'Audit Date', 'Status', 'Actions',
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Internal Audit</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Laboratory audit tracking and compliance</p>
+          <h3 className="text-xs font-extrabold text-slate-800">Audit Checklist</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department audit records</p>
         </div>
         <button
           onClick={() => handleOpenAuditModal()}
@@ -827,9 +824,9 @@ const AuditTab = ({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: 'Total Audits', value: totalAudits, color: 'text-blue-600' },
-          { label: 'Average Compliance %', value: `${avgCompliance}%`, color: 'text-emerald-600' },
+          { label: 'Average Compliance %', value: `${avgCompliance}%`, color: 'text-rose-600' },
           { label: 'Open Findings', value: openFindings, color: 'text-amber-600' },
-          { label: 'Closed Findings', value: closedFindings, color: 'text-sky-600' },
+          { label: 'Closed Findings', value: closedFindings, color: 'text-emerald-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -842,7 +839,7 @@ const AuditTab = ({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by month, area, auditor, or status…"
+          placeholder="Search by month, year, audit area, auditor, or status…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
@@ -866,12 +863,12 @@ const AuditTab = ({
                 <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
                   <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                  <td className="px-3 py-3 text-sky-600 font-bold">{r.auditArea}</td>
-                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.complianceScore}%</td>
-                  <td className="px-3 py-3 text-slate-600 max-w-[150px] truncate">{r.findings || '-'}</td>
-                  <td className="px-3 py-3 text-violet-600 max-w-[150px] truncate">{r.correctiveAction || '-'}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.auditArea}</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.complianceScore}%</td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.findings}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.correctiveAction}</td>
                   <td className="px-3 py-3 text-slate-600">{r.auditor}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.auditDate || '-'}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.auditDate}</td>
                   <td className="px-3 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
                       {r.status}
@@ -917,95 +914,114 @@ const AuditTab = ({
   );
 };
 
-const ReportsDashboard = ({
+const ReportsTab = ({
+  hospital,
   qualityIndicators,
-  sampleRecords,
+  procedureRecords,
+  radiationRecords,
   equipmentRecords,
-  safetyRecords,
   auditRecords,
-  onExportCSV,
-  onExportPDF,
-  onPrint,
 }) => {
   const totalQuality = qualityIndicators.length;
-  const totalSamples = sampleRecords.length;
+  const totalProcedure = procedureRecords.length;
+  const totalRadiation = radiationRecords.length;
   const totalEquipment = equipmentRecords.length;
-  const totalSafety = safetyRecords.length;
-  const totalAudits = auditRecords.length;
+  const totalAudit = auditRecords.length;
+  const avgProcedureSuccessRate = totalProcedure
+    ? (procedureRecords.reduce((s, r) => s + (r.procedureSuccessRate || 0), 0) / totalProcedure).toFixed(1)
+    : 0;
+  const avgDoorToBalloon = totalQuality
+    ? (qualityIndicators.reduce((s, r) => s + (r.doorToBalloonTime || 0), 0) / totalQuality).toFixed(1)
+    : 0;
+  const avgAuditCompliance = totalAudit
+    ? (auditRecords.reduce((s, r) => s + (r.complianceScore || 0), 0) / totalAudit).toFixed(1)
+    : 0;
 
-  const avgReportingError = qualityIndicators.length ? (qualityIndicators.reduce((s, r) => s + (r.reportingErrorPercent || 0), 0) / qualityIndicators.length).toFixed(2) : 0;
-  const avgTatCompliance = sampleRecords.length ? (sampleRecords.reduce((s, r) => s + (r.tatCompliancePercent || 0), 0) / sampleRecords.length).toFixed(1) : 0;
-  const avgAuditCompliance = auditRecords.length ? (auditRecords.reduce((s, r) => s + (r.complianceScore || 0), 0) / auditRecords.length).toFixed(1) : 0;
+  const procedureTrendData = qualityIndicators.map((r) => ({
+    month: r.month,
+    procedures: r.totalProcedures || 0,
+    successRate: r.procedureSuccessRate || 0,
+  }));
 
-  const investigationTrend = qualityIndicators.map((r) => ({ month: r.month, investigations: r.totalInvestigations, errorPercent: r.reportingErrorPercent }));
+  const procedureDistData = procedureRecords.reduce((acc, r) => {
+    const type = r.procedureType || 'Other';
+    const existing = acc.find((d) => d.name === type);
+    if (existing) existing.value += r.totalProcedures || 0;
+    else acc.push({ name: type, value: r.totalProcedures || 0 });
+    return acc;
+  }, []);
 
-  const sampleDistribution = SAMPLE_TYPES.map((t) => ({
-    name: t,
-    value: sampleRecords.filter((r) => r.sampleType === t).reduce((s, r) => s + (r.samplesReceived || 0), 0),
-  })).filter((d) => d.value > 0);
+  const radiationComplianceData = radiationRecords.map((r) => ({
+    month: r.month,
+    compliance: ((r.leadApronCompliance + r.thyroidShieldCompliance + r.dosimeterBadgeCompliance) / 3).toFixed(1),
+  }));
 
-  const equipmentQCData = EQUIPMENT_CATEGORIES.map((c) => ({
-    name: c,
-    compliance: equipmentRecords.filter((r) => r.equipmentCategory === c).length ?
-      (equipmentRecords.filter((r) => r.equipmentCategory === c && r.calibrationStatus === 'Done').length / equipmentRecords.filter((r) => r.equipmentCategory === c).length * 100).toFixed(1) : 0,
-  })).filter((d) => equipmentRecords.some((r) => r.equipmentCategory === d.name));
+  const equipmentStatusData = equipmentRecords.reduce((acc, r) => {
+    const status = r.status || 'Active';
+    const existing = acc.find((d) => d.name === status);
+    if (existing) existing.value += 1;
+    else acc.push({ name: status, value: 1 });
+    return acc;
+  }, []);
 
-  const safetyTrend = safetyRecords.map((r) => ({ month: r.month, ppe: r.ppeCompliance, handHygiene: r.handHygieneCompliance }));
+  const auditComplianceData = auditRecords.map((r) => ({
+    month: r.month,
+    compliance: r.complianceScore || 0,
+  }));
 
-  const auditByArea = AUDIT_AREAS.map((a) => ({
-    area: a,
-    compliance: auditRecords.filter((r) => r.auditArea === a).length ?
-      (auditRecords.filter((r) => r.auditArea === a).reduce((s, r) => s + (r.complianceScore || 0), 0) / auditRecords.filter((r) => r.auditArea === a).length).toFixed(1) : 0,
-  })).filter((d) => auditRecords.some((r) => r.auditArea === d.area));
+  const monthlySummaryData = qualityIndicators.map((q) => {
+    const monthProcedures = procedureRecords
+      .filter((p) => p.month === q.month && p.year === q.year)
+      .reduce((s, p) => s + (p.totalProcedures || 0), 0);
+    const monthRadiation = radiationRecords
+      .filter((r) => r.month === q.month && r.year === q.year)
+      .reduce((s, r) => s + (r.dosimeterBadgeCompliance || 0), 0);
+    const monthEquipment = equipmentRecords
+      .filter((e) => e.month === q.month && e.year === q.year)
+      .reduce((s, e) => s + (e.preventiveMaintenanceStatus === 'Up-to-date' ? 100 : 0), 0);
+    const equipmentCount = equipmentRecords.filter((e) => e.month === q.month && e.year === q.year).length;
+    const monthAudit = auditRecords
+      .filter((a) => a.month === q.month && a.year === q.year)
+      .reduce((s, a) => s + (a.complianceScore || 0), 0);
+    const auditCount = auditRecords.filter((a) => a.month === q.month && a.year === q.year).length;
 
-  const monthlySummary = MONTHS.map((m) => {
-    const q = qualityIndicators.find((r) => r.month === m && r.year === 2025);
-    const s = sampleRecords.find((r) => r.month === m && r.year === 2025);
-    const e = equipmentRecords.filter((r) => r.month === m && r.year === 2025);
     return {
-      month: m.slice(0, 3),
-      investigations: q?.totalInvestigations || 0,
-      errorPercent: q?.reportingErrorPercent || 0,
-      sampleRejection: s ? ((s.samplesRejected / s.samplesReceived) * 100).toFixed(2) : 0,
-      tatCompliance: s?.tatCompliancePercent || 0,
-      equipmentQC: e.length ? (e.filter((r) => r.internalQcStatus === 'Done').length / e.length * 100).toFixed(1) : 0,
-      auditCompliance: auditRecords.find((r) => r.month === m && r.year === 2025)?.complianceScore || 0,
-      status: q?.status || s?.status || 'N/A',
+      month: `${q.month} ${q.year}`,
+      totalProcedures: monthProcedures || q.totalProcedures,
+      doorToBalloon: q.doorToBalloonTime,
+      successRate: q.procedureSuccessRate,
+      radiationCompliance: monthRadiation / (radiationRecords.filter((r) => r.month === q.month && r.year === q.year).length || 1),
+      equipmentCompliance: equipmentCount ? monthEquipment / equipmentCount : 100,
+      auditCompliance: auditCount ? monthAudit / auditCount : 0,
+      status: q.status,
     };
   });
 
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
+  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
+  const handleExportCSV = () => {};
+  const handleExportPDF = () => {};
+  const handlePrintReport = () => {};
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-extrabold text-slate-800">Reports & Analytics</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Laboratory performance analytics dashboard</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={onExportCSV} className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all">
-            <Download className="w-3.5 h-3.5" /> Export CSV
-          </button>
-          <button onClick={onExportPDF} className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all">
-            <FileDown className="w-3.5 h-3.5" /> Export PDF
-          </button>
-          <button onClick={onPrint} className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all">
-            <Printer className="w-3.5 h-3.5" /> Print
-          </button>
+          <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department analytics dashboard</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: 'Total Quality Records', value: totalQuality, color: 'text-blue-600' },
-          { label: 'Total Sample Records', value: totalSamples, color: 'text-sky-600' },
+          { label: 'Total Procedure Records', value: totalProcedure, color: 'text-rose-600' },
+          { label: 'Total Radiation Records', value: totalRadiation, color: 'text-amber-600' },
           { label: 'Total Equipment Records', value: totalEquipment, color: 'text-emerald-600' },
-          { label: 'Total Safety Records', value: totalSafety, color: 'text-violet-600' },
-          { label: 'Total Audit Records', value: totalAudits, color: 'text-amber-600' },
-          { label: 'Avg Reporting Error %', value: `${avgReportingError}%`, color: 'text-rose-600' },
-          { label: 'Avg TAT Compliance %', value: `${avgTatCompliance}%`, color: 'text-emerald-600' },
-          { label: 'Avg Audit Compliance %', value: `${avgAuditCompliance}%`, color: 'text-blue-600' },
+          { label: 'Total Audit Records', value: totalAudit, color: 'text-purple-600' },
+          { label: 'Avg Procedure Success Rate', value: `${avgProcedureSuccessRate}%`, color: 'text-sky-600' },
+          { label: 'Avg Door-to-Balloon Time', value: `${avgDoorToBalloon} min`, color: 'text-cyan-600' },
+          { label: 'Avg Audit Compliance', value: `${avgAuditCompliance}%`, color: 'text-indigo-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -1014,142 +1030,162 @@ const ReportsDashboard = ({
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Monthly Investigations Trend</h4>
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Monthly Procedure Trend</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={investigationTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 8 }} />
-              <YAxis tick={{ fontSize: 8 }} />
+            <LineChart data={procedureTrendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 9 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="investigations" stroke="#3b82f6" name="Investigations" />
+              <Legend />
+              <Line type="monotone" dataKey="procedures" stroke="#3b82f6" strokeWidth={2} name="Procedures" />
+              <Line type="monotone" dataKey="successRate" stroke="#10b981" strokeWidth={2} name="Success Rate" />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Sample Type Distribution</h4>
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Procedure Distribution</h4>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={sampleDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
-                {sampleDistribution.map((_, i) => <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />)}
+              <Pie data={procedureDistData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60}>
+                {procedureDistData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
               </Pie>
               <Tooltip />
-              <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: 8 }} />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Equipment QC Compliance</h4>
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Radiation Compliance</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={equipmentQCData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 8 }} />
-              <YAxis tick={{ fontSize: 8 }} />
+            <BarChart data={radiationComplianceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 9 }} domain={[90, 100]} />
               <Tooltip />
-              <Bar dataKey="compliance" fill="#10b981" />
+              <Bar dataKey="compliance" fill="#f59e0b" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Laboratory Safety Compliance</h4>
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Equipment Status</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={safetyTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 8 }} />
-              <YAxis tick={{ fontSize: 8 }} />
+            <PieChart>
+              <Pie data={equipmentStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60}>
+                {equipmentStatusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
               <Tooltip />
-              <Line type="monotone" dataKey="ppe" stroke="#3b82f6" name="PPE" />
-              <Line type="monotone" dataKey="handHygiene" stroke="#10b981" name="Hand Hygiene" />
-            </LineChart>
+              <Legend />
+            </PieChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm lg:col-span-2">
-          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Audit Compliance by Area</h4>
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Audit Compliance Trend</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={auditByArea}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="area" tick={{ fontSize: 8 }} />
-              <YAxis tick={{ fontSize: 8 }} />
+            <BarChart data={auditComplianceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 9 }} domain={[0, 100]} />
               <Tooltip />
               <Bar dataKey="compliance" fill="#8b5cf6" />
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <h4 className="text-[10px] font-bold text-slate-700 mb-3">Monthly Cath Lab Summary</h4>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={monthlySummaryData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 9 }} />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="totalProcedures" stroke="#3b82f6" strokeWidth={2} name="Procedures" />
+              <Line type="monotone" dataKey="successRate" stroke="#10b981" strokeWidth={2} name="Success Rate" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <h4 className="text-[10px] font-bold text-slate-700 p-4 border-b border-slate-100">Monthly Laboratory Summary</h4>
         <div className="overflow-x-auto">
           <table className="w-full text-[10px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                {['Month', 'Total Investigations', 'Reporting Error %', 'Sample Rejection %', 'TAT Compliance %', 'Equipment QC Compliance', 'Audit Compliance', 'Status'].map((h) => (
+                {['Month', 'Total Procedures', 'Door-to-Balloon Time', 'Procedure Success Rate', 'Radiation Compliance', 'Equipment Compliance', 'Audit Compliance', 'Status'].map((h) => (
                   <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {monthlySummary.map((r) => (
-                <tr key={r.month} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="px-3 py-3 font-semibold text-slate-700">{r.month}</td>
-                  <td className="px-3 py-3 text-blue-600 font-bold">{r.investigations}</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.errorPercent}%</td>
-                  <td className="px-3 py-3 text-amber-600 font-bold">{r.sampleRejection}%</td>
-                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.tatCompliance}%</td>
-                  <td className="px-3 py-3 text-sky-600 font-bold">{r.equipmentQC}%</td>
-                  <td className="px-3 py-3 text-violet-600 font-bold">{r.auditCompliance}%</td>
-                  <td className="px-3 py-3 text-slate-600">{r.status}</td>
+              {monthlySummaryData.map((r, i) => (
+                <tr key={i} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.totalProcedures}</td>
+                  <td className="px-3 py-3 text-amber-600 font-bold">{r.doorToBalloon} min</td>
+                  <td className="px-3 py-3 text-emerald-600 font-bold">{r.successRate}%</td>
+                  <td className="px-3 py-3 text-orange-600 font-bold">{r.radiationCompliance.toFixed(1)}%</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.equipmentCompliance.toFixed(1)}%</td>
+                  <td className="px-3 py-3 text-purple-600 font-bold">{r.auditCompliance.toFixed(1)}%</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${r.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                      {r.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
-</tbody>
-           </table>
+              {monthlySummaryData.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-3 py-10 text-center text-slate-400">No data available</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-        <h4 className="text-[10px] font-bold text-slate-700 mb-3">Monthly Laboratory Summary</h4>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={monthlySummary}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" tick={{ fontSize: 8 }} />
-            <YAxis tick={{ fontSize: 8 }} />
-            <Tooltip />
-            <Line type="monotone" dataKey="investigations" stroke="#3b82f6" name="Investigations" />
-            <Line type="monotone" dataKey="tatCompliance" stroke="#10b981" name="TAT Compliance" />
-            <Line type="monotone" dataKey="auditCompliance" stroke="#8b5cf6" name="Audit Compliance" />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {monthlySummaryData.length} monthly entr{monthlySummaryData.length !== 1 ? 'ies' : 'y'}
+          </span>
+          <div className="flex items-center gap-2">
+            <button onClick={handleExportCSV} className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-700 text-[9px] font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
+              <Download className="w-3 h-3" /> Export CSV
+            </button>
+            <button onClick={handleExportPDF} className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-700 text-[9px] font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
+              <FileDown className="w-3 h-3" /> Export PDF
+            </button>
+            <button onClick={handlePrintReport} className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-700 text-[9px] font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
+              <Printer className="w-3 h-3" /> Print Report
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-const LaboratoryQualityWorkspace = ({ onBack }) => {
+const CathLabWorkspace = ({ onBack }) => {
   const { hospital } = useHospital();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const [qualityIndicators, setQualityIndicators] = useState(() => {
     const saved = localStorage.getItem(LS_KEY_QUALITY);
-    return saved ? JSON.parse(saved) : SAMPLE_QUALITY_RECORDS;
+    return saved ? JSON.parse(saved) : SAMPLE_QUALITY_INDICATORS;
   });
   const [isQualityModalOpen, setIsQualityModalOpen] = useState(false);
   const [editingQualityId, setEditingQualityId] = useState(null);
   const [qualityForm, setQualityForm] = useState({ ...EMPTY_QUALITY_FORM });
   const [qualitySearch, setQualitySearch] = useState('');
-
-  const [sampleRecords, setSampleRecords] = useState(() => {
-    const saved = localStorage.getItem(LS_KEY_SAMPLE);
-    return saved ? JSON.parse(saved) : SAMPLE_RECORDS;
-  });
-  const [isSampleModalOpen, setIsSampleModalOpen] = useState(false);
-  const [editingSampleId, setEditingSampleId] = useState(null);
-  const [sampleForm, setSampleForm] = useState({ ...EMPTY_SAMPLE_FORM });
-  const [sampleSearch, setSampleSearch] = useState('');
 
   React.useEffect(() => {
     localStorage.setItem(LS_KEY_QUALITY, JSON.stringify(qualityIndicators));
@@ -1161,7 +1197,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
       const num = parseInt(parts[parts.length - 1], 10);
       return num > max ? num : max;
     }, 0);
-    return `lqi-${String(maxNum + 1).padStart(3, '0')}`;
+    return `cqi-${String(maxNum + 1).padStart(3, '0')}`;
   };
 
   const handleOpenQualityModal = (record = null) => {
@@ -1194,52 +1230,113 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
     }
   };
 
-  React.useEffect(() => {
-    localStorage.setItem(LS_KEY_SAMPLE, JSON.stringify(sampleRecords));
-  }, [sampleRecords]);
+  const [procedureRecords, setProcedureRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_PROCEDURE);
+    return saved ? JSON.parse(saved) : SAMPLE_PROCEDURE_RECORDS;
+  });
+  const [isProcedureModalOpen, setIsProcedureModalOpen] = useState(false);
+  const [editingProcedureId, setEditingProcedureId] = useState(null);
+  const [procedureForm, setProcedureForm] = useState({ ...EMPTY_PROCEDURE_FORM });
+  const [procedureSearch, setProcedureSearch] = useState('');
 
-  const getNextSampleId = () => {
-    const maxNum = sampleRecords.reduce((max, r) => {
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_PROCEDURE, JSON.stringify(procedureRecords));
+  }, [procedureRecords]);
+
+  const getNextProcedureId = () => {
+    const maxNum = procedureRecords.reduce((max, r) => {
       const parts = r.id.split('-');
       const num = parseInt(parts[parts.length - 1], 10);
       return num > max ? num : max;
     }, 0);
-    return `ls-${String(maxNum + 1).padStart(3, '0')}`;
+    return `cpp-${String(maxNum + 1).padStart(3, '0')}`;
   };
 
-  const handleOpenSampleModal = (record = null) => {
+  const handleOpenProcedureModal = (record = null) => {
     if (record) {
-      setSampleForm({ ...record });
-      setEditingSampleId(record.id);
+      setProcedureForm({ ...record });
+      setEditingProcedureId(record.id);
     } else {
-      setSampleForm({ ...EMPTY_SAMPLE_FORM, id: getNextSampleId() });
-      setEditingSampleId(null);
+      setProcedureForm({ ...EMPTY_PROCEDURE_FORM, id: getNextProcedureId() });
+      setEditingProcedureId(null);
     }
-    setIsSampleModalOpen(true);
+    setIsProcedureModalOpen(true);
   };
 
-  const handleSaveSample = (e) => {
+  const handleSaveProcedure = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (editingSampleId) {
-      setSampleRecords((prev) =>
-        prev.map((r) => (r.id === editingSampleId ? { ...sampleForm, id: editingSampleId } : r))
+    if (editingProcedureId) {
+      setProcedureRecords((prev) =>
+        prev.map((r) => (r.id === editingProcedureId ? { ...procedureForm, id: editingProcedureId } : r))
       );
     } else {
-      setSampleRecords((prev) => [...prev, { ...sampleForm }]);
+      setProcedureRecords((prev) => [...prev, { ...procedureForm }]);
     }
-    setIsSampleModalOpen(false);
-    setEditingSampleId(null);
+    setIsProcedureModalOpen(false);
+    setEditingProcedureId(null);
   };
 
-  const handleDeleteSample = (id) => {
-    if (window.confirm('Delete this sample record?')) {
-      setSampleRecords((prev) => prev.filter((r) => r.id !== id));
+  const handleDeleteProcedure = (id) => {
+    if (window.confirm('Delete this procedure record?')) {
+      setProcedureRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  const [radiationRecords, setRadiationRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_RADIATION);
+    return saved ? JSON.parse(saved) : SAMPLE_RADIATION_RECORDS;
+  });
+  const [isRadiationModalOpen, setIsRadiationModalOpen] = useState(false);
+  const [editingRadiationId, setEditingRadiationId] = useState(null);
+  const [radiationForm, setRadiationForm] = useState({ ...EMPTY_RADIATION_FORM });
+  const [radiationSearch, setRadiationSearch] = useState('');
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_RADIATION, JSON.stringify(radiationRecords));
+  }, [radiationRecords]);
+
+  const getNextRadiationId = () => {
+    const maxNum = radiationRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `crr-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenRadiationModal = (record = null) => {
+    if (record) {
+      setRadiationForm({ ...record });
+      setEditingRadiationId(record.id);
+    } else {
+      setRadiationForm({ ...EMPTY_RADIATION_FORM, id: getNextRadiationId() });
+      setEditingRadiationId(null);
+    }
+    setIsRadiationModalOpen(true);
+  };
+
+  const handleSaveRadiation = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingRadiationId) {
+      setRadiationRecords((prev) =>
+        prev.map((r) => (r.id === editingRadiationId ? { ...radiationForm, id: editingRadiationId } : r))
+      );
+    } else {
+      setRadiationRecords((prev) => [...prev, { ...radiationForm }]);
+    }
+    setIsRadiationModalOpen(false);
+    setEditingRadiationId(null);
+  };
+
+const handleDeleteRadiation = (id) => {
+    if (window.confirm('Delete this radiation record?')) {
+      setRadiationRecords((prev) => prev.filter((r) => r.id !== id));
     }
   };
 
   const [equipmentRecords, setEquipmentRecords] = useState(() => {
     const saved = localStorage.getItem(LS_KEY_EQUIPMENT);
-    return saved ? JSON.parse(saved) : EQUIPMENT_RECORDS;
+    return saved ? JSON.parse(saved) : SAMPLE_EQUIPMENT_RECORDS;
   });
   const [isEquipmentModalOpen, setIsEquipmentModalOpen] = useState(false);
   const [editingEquipmentId, setEditingEquipmentId] = useState(null);
@@ -1256,7 +1353,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
       const num = parseInt(parts[parts.length - 1], 10);
       return num > max ? num : max;
     }, 0);
-    return `eq-${String(maxNum + 1).padStart(3, '0')}`;
+    return `ceq-${String(maxNum + 1).padStart(3, '0')}`;
   };
 
   const handleOpenEquipmentModal = (record = null) => {
@@ -1289,61 +1386,9 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
     }
   };
 
-  const [safetyRecords, setSafetyRecords] = useState(() => {
-    const saved = localStorage.getItem(LS_KEY_SAFETY);
-    return saved ? JSON.parse(saved) : SAFETY_RECORDS;
-  });
-  const [isSafetyModalOpen, setIsSafetyModalOpen] = useState(false);
-  const [editingSafetyId, setEditingSafetyId] = useState(null);
-  const [safetyForm, setSafetyForm] = useState({ ...EMPTY_SAFETY_FORM });
-  const [safetySearch, setSafetySearch] = useState('');
-
-  React.useEffect(() => {
-    localStorage.setItem(LS_KEY_SAFETY, JSON.stringify(safetyRecords));
-  }, [safetyRecords]);
-
-  const getNextSafetyId = () => {
-    const maxNum = safetyRecords.reduce((max, r) => {
-      const parts = r.id.split('-');
-      const num = parseInt(parts[parts.length - 1], 10);
-      return num > max ? num : max;
-    }, 0);
-    return `saf-${String(maxNum + 1).padStart(3, '0')}`;
-  };
-
-  const handleOpenSafetyModal = (record = null) => {
-    if (record) {
-      setSafetyForm({ ...record });
-      setEditingSafetyId(record.id);
-    } else {
-      setSafetyForm({ ...EMPTY_SAFETY_FORM, id: getNextSafetyId() });
-      setEditingSafetyId(null);
-    }
-    setIsSafetyModalOpen(true);
-  };
-
-  const handleSaveSafety = (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (editingSafetyId) {
-      setSafetyRecords((prev) =>
-        prev.map((r) => (r.id === editingSafetyId ? { ...safetyForm, id: editingSafetyId } : r))
-      );
-    } else {
-      setSafetyRecords((prev) => [...prev, { ...safetyForm }]);
-    }
-    setIsSafetyModalOpen(false);
-    setEditingSafetyId(null);
-  };
-
-  const handleDeleteSafety = (id) => {
-    if (window.confirm('Delete this safety record?')) {
-      setSafetyRecords((prev) => prev.filter((r) => r.id !== id));
-    }
-  };
-
   const [auditRecords, setAuditRecords] = useState(() => {
     const saved = localStorage.getItem(LS_KEY_AUDIT);
-    return saved ? JSON.parse(saved) : AUDIT_RECORDS;
+    return saved ? JSON.parse(saved) : SAMPLE_AUDIT_RECORDS;
   });
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [editingAuditId, setEditingAuditId] = useState(null);
@@ -1360,7 +1405,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
       const num = parseInt(parts[parts.length - 1], 10);
       return num > max ? num : max;
     }, 0);
-    return `aud-${String(maxNum + 1).padStart(3, '0')}`;
+    return `ca-${String(maxNum + 1).padStart(3, '0')}`;
   };
 
   const handleOpenAuditModal = (record = null) => {
@@ -1393,14 +1438,10 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
     }
   };
 
-  const handleExportCSV = () => console.log('Export CSV clicked');
-  const handleExportPDF = () => console.log('Export PDF clicked');
-  const handlePrint = () => console.log('Print clicked');
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <div className="text-xs text-slate-600">Dashboard content coming soon...</div>;
+        return <DashboardTab hospital={hospital} />;
       case 'quality':
         return (
           <QualityTab
@@ -1412,15 +1453,26 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
             handleDeleteQuality={handleDeleteQuality}
           />
         );
-      case 'sample':
+      case 'procedure':
         return (
-          <SampleTab
+          <ProcedureTab
             hospital={hospital}
-            sampleRecords={sampleRecords}
-            searchQuery={sampleSearch}
-            setSearchQuery={setSampleSearch}
-            handleOpenSampleModal={handleOpenSampleModal}
-            handleDeleteSample={handleDeleteSample}
+            procedureRecords={procedureRecords}
+            searchQuery={procedureSearch}
+            setSearchQuery={setProcedureSearch}
+            handleOpenProcedureModal={handleOpenProcedureModal}
+            handleDeleteProcedure={handleDeleteProcedure}
+          />
+        );
+      case 'radiation':
+        return (
+          <RadiationTab
+            hospital={hospital}
+            radiationRecords={radiationRecords}
+            searchQuery={radiationSearch}
+            setSearchQuery={setRadiationSearch}
+            handleOpenRadiationModal={handleOpenRadiationModal}
+            handleDeleteRadiation={handleDeleteRadiation}
           />
         );
       case 'equipment':
@@ -1432,17 +1484,6 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
             setSearchQuery={setEquipmentSearch}
             handleOpenEquipmentModal={handleOpenEquipmentModal}
             handleDeleteEquipment={handleDeleteEquipment}
-          />
-        );
-      case 'safety':
-        return (
-          <SafetyTab
-            hospital={hospital}
-            safetyRecords={safetyRecords}
-            searchQuery={safetySearch}
-            setSearchQuery={setSafetySearch}
-            handleOpenSafetyModal={handleOpenSafetyModal}
-            handleDeleteSafety={handleDeleteSafety}
           />
         );
       case 'audit':
@@ -1457,18 +1498,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
           />
         );
       case 'reports':
-        return (
-          <ReportsDashboard
-            qualityIndicators={qualityIndicators}
-            sampleRecords={sampleRecords}
-            equipmentRecords={equipmentRecords}
-            safetyRecords={safetyRecords}
-            auditRecords={auditRecords}
-            onExportCSV={handleExportCSV}
-            onExportPDF={handleExportPDF}
-            onPrint={handlePrint}
-          />
-        );
+        return <ReportsTab hospital={hospital} qualityIndicators={qualityIndicators} procedureRecords={procedureRecords} radiationRecords={radiationRecords} equipmentRecords={equipmentRecords} auditRecords={auditRecords} />;
       default:
         return null;
     }
@@ -1486,9 +1516,9 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
             <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Policies Directory
           </button>
-          <h2 className="text-xs font-extrabold text-slate-900 mt-2">Laboratory Quality</h2>
+          <h2 className="text-xs font-extrabold text-slate-900 mt-2">CathLab Department</h2>
           <p className="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest font-bold">
-            NABH KPI & Compliance Module
+            NABH Clinical Quality Module
           </p>
         </div>
 
@@ -1519,7 +1549,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
 
         <div className="p-3 border-t border-slate-100">
           <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">
-            Lab Quality — NABH Module
+            CathLab Dept — NABH Module
           </p>
         </div>
       </aside>
@@ -1538,7 +1568,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                 <h3 className="text-sm font-extrabold text-slate-800">
                   {editingQualityId ? 'Edit Quality Indicator Record' : 'Add Monthly Quality Data'}
                 </h3>
-                <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Quality — Quality Metrics</p>
+                <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department — Quality Metrics</p>
               </div>
               <button
                 onClick={() => { setIsQualityModalOpen(false); setEditingQualityId(null); }}
@@ -1575,18 +1605,19 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                 </div>
               </div>
 
-              {/* Investigation Metrics */}
+              {/* Procedure Metrics */}
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Investigation Metrics</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Procedure Metrics</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <NumField label="Total Investigations" field="totalInvestigations" form={qualityForm} setForm={setQualityForm} />
-                  <NumField label="Reporting Errors" field="reportingErrors" form={qualityForm} setForm={setQualityForm} />
-                  <NumField label="Reporting Error %" field="reportingErrorPercent" form={qualityForm} setForm={setQualityForm} step="0.01" />
-                  <NumField label="Re-do Investigations" field="redoInvestigations" form={qualityForm} setForm={setQualityForm} />
-                  <NumField label="Re-do %" field="redoPercent" form={qualityForm} setForm={setQualityForm} step="0.01" />
-                  <NumField label="Safety Compliance %" field="safetyCompliancePercent" form={qualityForm} setForm={setQualityForm} step="0.1" />
-                  <NumField label="Avg Waiting Time (min)" field="avgWaitingTime" form={qualityForm} setForm={setQualityForm} />
-                  <NumField label="Avg Reporting Time (min)" field="avgReportingTime" form={qualityForm} setForm={setQualityForm} />
+                  <NumField label="Total Procedures" field="totalProcedures" form={qualityForm} setForm={setQualityForm} />
+                  <NumField label="Door-to-Balloon Time (min)" field="doorToBalloonTime" form={qualityForm} setForm={setQualityForm} />
+                  <NumField label="Procedure Success Rate %" field="procedureSuccessRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Complication Rate %" field="complicationRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Bleeding Complication Rate %" field="bleedingComplicationRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Contrast Reaction Rate %" field="contrastReactionRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Infection Rate %" field="infectionRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Mortality Rate %" field="mortalityRate" form={qualityForm} setForm={setQualityForm} step="0.1" />
+                  <NumField label="Patient Satisfaction %" field="patientSatisfaction" form={qualityForm} setForm={setQualityForm} step="0.1" />
                 </div>
               </div>
 
@@ -1631,35 +1662,35 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
         </div>
       )}
 
-      {/* ── Sample & TAT Modal ── */}
-      {isSampleModalOpen && (
+      {/* ── Procedure Management Modal ── */}
+      {isProcedureModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-800">
-                  {editingSampleId ? 'Edit Sample Record' : 'Add Sample TAT Record'}
+                  {editingProcedureId ? 'Edit Procedure Record' : 'Add Monthly Procedure Data'}
                 </h3>
-                <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Sample & Turnaround Time</p>
+                <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department — Procedure Management</p>
               </div>
               <button
-                onClick={() => { setIsSampleModalOpen(false); setEditingSampleId(null); }}
+                onClick={() => { setIsProcedureModalOpen(false); setEditingProcedureId(null); }}
                 className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveSample} className="space-y-5">
-              {/* Reporting Period */}
+            <form onSubmit={handleSaveProcedure} className="space-y-5">
+              {/* Reporting Period & Type */}
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Reporting Period</p>
-                <div className="grid grid-cols-2 gap-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Reporting Period &amp; Type</p>
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Month *</label>
                     <select
-                      value={sampleForm.month}
-                      onChange={(e) => setSampleForm({ ...sampleForm, month: e.target.value })}
+                      value={procedureForm.month}
+                      onChange={(e) => setProcedureForm({ ...procedureForm, month: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
                       {MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}
@@ -1669,41 +1700,38 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Year *</label>
                     <input
                       type="number"
-                      value={sampleForm.year}
-                      onChange={(e) => setSampleForm({ ...sampleForm, year: parseInt(e.target.value) || 2025 })}
+                      value={procedureForm.year}
+                      onChange={(e) => setProcedureForm({ ...procedureForm, year: parseInt(e.target.value) || 2025 })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Sample Type */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Sample Type</p>
-                <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Sample Type *</label>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Procedure Type *</label>
                     <select
-                      value={sampleForm.sampleType}
-                      onChange={(e) => setSampleForm({ ...sampleForm, sampleType: e.target.value })}
+                      value={procedureForm.procedureType}
+                      onChange={(e) => setProcedureForm({ ...procedureForm, procedureType: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
-                      {SAMPLE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                      <option value="Diagnostic">Diagnostic</option>
+                      <option value="Therapeutic">Therapeutic</option>
+                      <option value="Mixed">Mixed</option>
+                      <option value="Emergency">Emergency</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Sample Metrics */}
+              {/* Procedure Counts */}
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Sample Metrics</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Procedure Counts</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <NumField label="Samples Received" field="samplesReceived" form={sampleForm} setForm={setSampleForm} />
-                  <NumField label="Samples Rejected" field="samplesRejected" form={sampleForm} setForm={setSampleForm} />
-                  <NumField label="Labeling Errors" field="labelingErrors" form={sampleForm} setForm={setSampleForm} />
-                  <NumField label="Average TAT (min)" field="avgTat" form={sampleForm} setForm={setSampleForm} />
-                  <NumField label="TAT Compliance %" field="tatCompliancePercent" form={sampleForm} setForm={setSampleForm} step="0.1" />
-                  <NumField label="Critical Results Reported" field="criticalResultsReported" form={sampleForm} setForm={setSampleForm} />
+                  <NumField label="Total Procedures" field="totalProcedures" form={procedureForm} setForm={setProcedureForm} />
+                  <NumField label="Coronary Angiography" field="coronaryAngiography" form={procedureForm} setForm={setProcedureForm} />
+                  <NumField label="PCI/PTCA" field="pciPtca" form={procedureForm} setForm={setProcedureForm} />
+                  <NumField label="Pacemaker Implantation" field="pacemakerImplantation" form={procedureForm} setForm={setProcedureForm} />
+                  <NumField label="EP Study / RF Ablation" field="epRfAblation" form={procedureForm} setForm={setProcedureForm} />
+                  <NumField label="Procedure Success Rate %" field="procedureSuccessRate" form={procedureForm} setForm={setProcedureForm} step="0.1" />
+                  <NumField label="Average Procedure Time (min)" field="averageProcedureTime" form={procedureForm} setForm={setProcedureForm} />
                 </div>
               </div>
 
@@ -1714,8 +1742,8 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
                     <select
-                      value={sampleForm.status}
-                      onChange={(e) => setSampleForm({ ...sampleForm, status: e.target.value })}
+                      value={procedureForm.status}
+                      onChange={(e) => setProcedureForm({ ...procedureForm, status: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
                       <option value="Active">Active</option>
@@ -1730,7 +1758,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => { setIsSampleModalOpen(false); setEditingSampleId(null); }}
+                  onClick={() => { setIsProcedureModalOpen(false); setEditingProcedureId(null); }}
                   className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
                 >
                   Cancel
@@ -1740,24 +1768,24 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                   style={{ backgroundColor: hospital.themeColor }}
                   className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
                 >
-                  {editingSampleId ? 'Save Changes' : 'Add Record'}
+                  {editingProcedureId ? 'Save Changes' : 'Add Record'}
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+</form>
+           </div>
+         </div>
+       )}
 
-      {/* ── Equipment & Quality Control Modal ── */}
+      {/* ── Equipment Management Modal ── */}
       {isEquipmentModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-800">
-                  {editingEquipmentId ? 'Edit Equipment Record' : 'Add Equipment QC Record'}
+                  {editingEquipmentId ? 'Edit Equipment Record' : 'Add Equipment Data'}
                 </h3>
-                <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Equipment & Quality Control</p>
+                <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department — Equipment Management</p>
               </div>
               <button
                 onClick={() => { setIsEquipmentModalOpen(false); setEditingEquipmentId(null); }}
@@ -1805,7 +1833,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       value={equipmentForm.equipmentName}
                       onChange={(e) => setEquipmentForm({ ...equipmentForm, equipmentName: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      placeholder="Enter equipment name"
+                      placeholder="e.g., Cath Lab Imaging System"
                     />
                   </div>
                   <div>
@@ -1815,26 +1843,26 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       onChange={(e) => setEquipmentForm({ ...equipmentForm, equipmentCategory: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
-                      {EQUIPMENT_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                      <option value="Imaging">Imaging</option>
+                      <option value="Monitoring">Monitoring</option>
+                      <option value="Life Support">Life Support</option>
+                      <option value="Infusion">Infusion</option>
+                      <option value="Radiation">Radiation</option>
+                      <option value="Consumables">Consumables</option>
                     </select>
                   </div>
-                  <NumField label="Breakdown Count" field="breakdownCount" form={equipmentForm} setForm={setEquipmentForm} />
                   <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Last Calibration Date</label>
-                    <input
-                      type="date"
-                      value={equipmentForm.lastCalibrationDate}
-                      onChange={(e) => setEquipmentForm({ ...equipmentForm, lastCalibrationDate: e.target.value })}
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Preventive Maintenance Status *</label>
+                    <select
+                      value={equipmentForm.preventiveMaintenanceStatus}
+                      onChange={(e) => setEquipmentForm({ ...equipmentForm, preventiveMaintenanceStatus: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
+                    >
+                      <option value="Up-to-date">Up-to-date</option>
+                      <option value="Due Soon">Due Soon</option>
+                      <option value="Overdue">Overdue</option>
+                    </select>
                   </div>
-                </div>
-              </div>
-
-              {/* QC Status */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">QC Status</p>
-                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Calibration Status *</label>
                     <select
@@ -1842,46 +1870,37 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       onChange={(e) => setEquipmentForm({ ...equipmentForm, calibrationStatus: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
-                      <option value="Done">Done</option>
-                      <option value="Due">Due</option>
-                      <option value="Overdue">Overdue</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">PM Status *</label>
-                    <select
-                      value={equipmentForm.pmStatus}
-                      onChange={(e) => setEquipmentForm({ ...equipmentForm, pmStatus: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                      <option value="Done">Done</option>
-                      <option value="Due">Due</option>
-                      <option value="Overdue">Overdue</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Internal QC Status *</label>
-                    <select
-                      value={equipmentForm.internalQcStatus}
-                      onChange={(e) => setEquipmentForm({ ...equipmentForm, internalQcStatus: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                      <option value="Done">Done</option>
-                      <option value="Due">Due</option>
-                      <option value="Overdue">Overdue</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">EQAS Status *</label>
-                    <select
-                      value={equipmentForm.eqasStatus}
-                      onChange={(e) => setEquipmentForm({ ...equipmentForm, eqasStatus: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                      <option value="Passed">Passed</option>
+                      <option value="Calibrated">Calibrated</option>
                       <option value="Pending">Pending</option>
-                      <option value="Failed">Failed</option>
+                      <option value="Overdue">Overdue</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Service Metrics */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Service Metrics</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <NumField label="Breakdown Count" field="breakdownCount" form={equipmentForm} setForm={setEquipmentForm} />
+                  <NumField label="Downtime (hours)" field="downtime" form={equipmentForm} setForm={setEquipmentForm} />
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Last Service Date *</label>
+                    <input
+                      type="date"
+                      value={equipmentForm.lastServiceDate}
+                      onChange={(e) => setEquipmentForm({ ...equipmentForm, lastServiceDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Next Service Date *</label>
+                    <input
+                      type="date"
+                      value={equipmentForm.nextServiceDate}
+                      onChange={(e) => setEquipmentForm({ ...equipmentForm, nextServiceDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
                   </div>
                 </div>
               </div>
@@ -1922,120 +1941,12 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                   {editingEquipmentId ? 'Save Changes' : 'Add Record'}
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+</form>
+           </div>
+         </div>
+       )}
 
-      {/* ── Safety Modal ── */}
-      {isSafetyModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h3 className="text-sm font-extrabold text-slate-800">
-                  {editingSafetyId ? 'Edit Safety Record' : 'Add Safety Record'}
-                </h3>
-                <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Safety Metrics</p>
-              </div>
-              <button
-                onClick={() => { setIsSafetyModalOpen(false); setEditingSafetyId(null); }}
-                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4 text-slate-500" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveSafety} className="space-y-5">
-              {/* Reporting Period */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Reporting Period</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Month *</label>
-                    <select
-                      value={safetyForm.month}
-                      onChange={(e) => setSafetyForm({ ...safetyForm, month: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                      {MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Year *</label>
-                    <input
-                      type="number"
-                      value={safetyForm.year}
-                      onChange={(e) => setSafetyForm({ ...safetyForm, year: parseInt(e.target.value) || 2025 })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Safety Compliance */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Safety Compliance</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <NumField label="PPE Compliance %" field="ppeCompliance" form={safetyForm} setForm={setSafetyForm} step="0.1" />
-                  <NumField label="Hand Hygiene Compliance %" field="handHygieneCompliance" form={safetyForm} setForm={setSafetyForm} step="0.1" />
-                  <NumField label="Fire Safety Compliance %" field="fireSafetyCompliance" form={safetyForm} setForm={setSafetyForm} step="0.1" />
-                  <NumField label="BMW Compliance %" field="bmwCompliance" form={safetyForm} setForm={setSafetyForm} step="0.1" />
-                </div>
-              </div>
-
-              {/* Incident Counts */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Incident Counts</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <NumField label="Needle Stick Incidents" field="needleStickIncidents" form={safetyForm} setForm={setSafetyForm} />
-                  <NumField label="Biohazard Spill Incidents" field="biohazardSpillIncidents" form={safetyForm} setForm={setSafetyForm} />
-                  <NumField label="Chemical Spill Incidents" field="chemicalSpillIncidents" form={safetyForm} setForm={setSafetyForm} />
-                </div>
-              </div>
-
-              {/* Status */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Status</p>
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
-                    <select
-                      value={safetyForm.status}
-                      onChange={(e) => setSafetyForm({ ...safetyForm, status: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => { setIsSafetyModalOpen(false); setEditingSafetyId(null); }}
-                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ backgroundColor: hospital.themeColor }}
-                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
-                >
-                  {editingSafetyId ? 'Save Changes' : 'Add Record'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── Audit Modal ── */}
+      {/* ── Audit Checklist Modal ── */}
       {isAuditModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
@@ -2044,7 +1955,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                 <h3 className="text-sm font-extrabold text-slate-800">
                   {editingAuditId ? 'Edit Audit Record' : 'Add Audit Record'}
                 </h3>
-                <p className="text-[9px] text-slate-400 mt-0.5">Laboratory Internal Audit</p>
+                <p className="text-[9px] text-slate-400 mt-0.5">CathLab Department — Audit Checklist</p>
               </div>
               <button
                 onClick={() => { setIsAuditModalOpen(false); setEditingAuditId(null); }}
@@ -2055,10 +1966,10 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
             </div>
 
             <form onSubmit={handleSaveAudit} className="space-y-5">
-              {/* Reporting Period */}
+              {/* Reporting Period & Audit Area */}
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Reporting Period</p>
-                <div className="grid grid-cols-2 gap-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Reporting Period & Audit Area</p>
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Month *</label>
                     <select
@@ -2078,13 +1989,6 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Audit Details */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Audit Details</p>
-                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit Area *</label>
                     <select
@@ -2092,10 +1996,32 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       onChange={(e) => setAuditForm({ ...auditForm, auditArea: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
-                      {AUDIT_AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                      <option value="Care of Patients">Care of Patients</option>
+                      <option value="Radiation Safety">Radiation Safety</option>
+                      <option value="Infection Control">Infection Control</option>
+                      <option value="Medication Management">Medication Management</option>
+                      <option value="Equipment Management">Equipment Management</option>
                     </select>
                   </div>
+                </div>
+              </div>
+
+              {/* Audit Metrics */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Audit Metrics</p>
+                <div className="grid grid-cols-2 gap-3">
                   <NumField label="Compliance Score %" field="complianceScore" form={auditForm} setForm={setAuditForm} step="0.1" />
+                  <NumField label="Findings" field="findings" form={auditForm} setForm={setAuditForm} />
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Corrective Action *</label>
+                    <input
+                      type="text"
+                      value={auditForm.correctiveAction}
+                      onChange={(e) => setAuditForm({ ...auditForm, correctiveAction: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      placeholder="e.g., Updated sterilization protocols"
+                    />
+                  </div>
                   <div>
                     <label className="block text-[9px] font-medium text-slate-600 mb-1">Auditor *</label>
                     <input
@@ -2103,7 +2029,7 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       value={auditForm.auditor}
                       onChange={(e) => setAuditForm({ ...auditForm, auditor: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      placeholder="Enter auditor name"
+                      placeholder="e.g., Dr. Sharma"
                     />
                   </div>
                   <div>
@@ -2113,33 +2039,6 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
                       value={auditForm.auditDate}
                       onChange={(e) => setAuditForm({ ...auditForm, auditDate: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Findings */}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Findings</p>
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Findings</label>
-                    <textarea
-                      value={auditForm.findings}
-                      onChange={(e) => setAuditForm({ ...auditForm, findings: e.target.value })}
-                      rows="2"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      placeholder="Enter findings"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Corrective Action</label>
-                    <textarea
-                      value={auditForm.correctiveAction}
-                      onChange={(e) => setAuditForm({ ...auditForm, correctiveAction: e.target.value })}
-                      rows="2"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      placeholder="Enter corrective action"
                     />
                   </div>
                 </div>
@@ -2189,4 +2088,4 @@ const LaboratoryQualityWorkspace = ({ onBack }) => {
   );
 };
 
-export default LaboratoryQualityWorkspace;
+export default CathLabWorkspace;

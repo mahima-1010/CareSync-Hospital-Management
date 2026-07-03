@@ -5,6 +5,7 @@ import DashboardLayout from './components/DashboardLayout';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Policies from './pages/Policies';
+import EmergencyWorkspace from './pages/EmergencyWorkspace';
 import CSSDWorkspace from './pages/CSSDWorkspace';
 import FeedbackWorkspace from './pages/FeedbackWorkspace';
 import PharmacyWorkspace from './pages/PharmacyWorkspace';
@@ -24,6 +25,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="policies" element={<Policies />} />
+            <Route path="emergency" element={<EmergencyWorkspace onBack={() => window.history.back()} />} />
           </Route>
 
           {/* Fallback Catch-All */}

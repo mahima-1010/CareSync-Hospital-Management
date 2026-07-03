@@ -7,6 +7,12 @@ import FeedbackWorkspace from './FeedbackWorkspace';
 import PharmacyWorkspace from './PharmacyWorkspace';
 import LaboratoryQualityWorkspace from './LaboratoryQualityWorkspace';
 import FemaleWardWorkspace from './FemaleWardWorkspace';
+import MaleWardWorkspace from './MaleWardWorkspace';
+import MICUWorkspace from './MICUWorkspace';
+import SICUWorkspace from './SICUWorkspace';
+import EndoscopyWorkspace from './EndoscopyWorkspace';
+import OperationTheatreWorkspace from './OperationTheatreWorkspace';
+import CathLabWorkspace from './CathLabWorkspace';
 import { 
   BookOpen, 
   Award, 
@@ -51,7 +57,7 @@ const Policies = () => {
   const [editingPolicy, setEditingPolicy] = useState(null); // Active document for editing
 
   // Special workspace routing — dedicated pages for specific departments
-  const SPECIALIZED_DEPTS = ['radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 'female-ward'];
+  const SPECIALIZED_DEPTS = ['radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 'female-ward', 'micu', 'sicu', 'endoscopy', 'cathlab', 'operation-theatre'];
   
   // Search queries
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,6 +171,24 @@ const Policies = () => {
   }
   if (selectedDeptId === 'female-ward') {
     return <FemaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'male-ward') {
+    return <MaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'micu') {
+    return <MICUWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'sicu') {
+    return <SICUWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'endoscopy') {
+    return <EndoscopyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'cathlab') {
+    return <CathLabWorkspace onBack={() => setSelectedDeptId(null)} />;
+  }
+  if (selectedDeptId === 'operation-theatre') {
+    return <OperationTheatreWorkspace onBack={() => setSelectedDeptId(null)} />;
   }
 
   return (
