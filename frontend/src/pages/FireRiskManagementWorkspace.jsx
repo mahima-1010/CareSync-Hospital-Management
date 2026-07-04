@@ -185,6 +185,39 @@ const ALARM_SEED = [
   { id: 'fa-005', deviceId: 'FA-005', zone: 'Main Lobby', deviceType: 'Fire Bell', funcStatus: 'Functional', batteryStatus: 'N/A', testResult: 'Pass', inspectionDate: '2026-06-23', nextInspection: '2026-12-23', checkedBy: 'Tech Vikram', status: 'Functional', remarks: 'Sound level 85dB verified' },
 ];
 
+// ── Phase 4: Fire Training constants ──
+const LS_KEY_TRAINING = 'fire_training_records';
+const LS_KEY_DRILLS = 'fire_drill_records';
+const LS_KEY_EVACUATIONS = 'fire_evacuation_records';
+
+const TRAINING_TYPES = ['Induction', 'Annual Refresher', 'Specialized Handling', 'Fire Warden Training'];
+const DRILL_TYPES = ['Mock Drill', 'Surprise Drill', 'Tabletop Exercise'];
+const DRILL_RESULTS = ['Excellent', 'Satisfactory', 'Needs Improvement', 'Failed'];
+
+const TRAINING_SEED = [
+  { id: 'ft-001', trainingId: 'FT-001', employeeName: 'Amit Patel', employeeId: 'EMP-102', department: 'Nursing', trainingType: 'Induction', trainer: 'Safety Officer Raj', trainingDate: '2026-05-10', validUntil: '2027-05-10', status: 'Completed', remarks: 'Passed with 95%' },
+  { id: 'ft-002', trainingId: 'FT-002', employeeName: 'Dr. Neha Sharma', employeeId: 'EMP-088', department: 'ICU', trainingType: 'Annual Refresher', trainer: 'Safety Officer Raj', trainingDate: '2026-06-15', validUntil: '2027-06-15', status: 'Completed', remarks: '' },
+  { id: 'ft-003', trainingId: 'FT-003', employeeName: 'Ravi Kumar', employeeId: 'EMP-145', department: 'Maintenance', trainingType: 'Specialized Handling', trainer: 'Ext. Expert Singh', trainingDate: '2026-06-20', validUntil: '2027-06-20', status: 'Completed', remarks: 'CO2 extinguisher hands-on' },
+  { id: 'ft-004', trainingId: 'FT-004', employeeName: 'Sunita Devi', employeeId: 'EMP-201', department: 'Housekeeping', trainingType: 'Induction', trainer: 'Safety Officer Raj', trainingDate: '2026-06-25', validUntil: '2027-06-25', status: 'Completed', remarks: '' },
+  { id: 'ft-005', trainingId: 'FT-005', employeeName: 'Vikram Singh', employeeId: 'EMP-055', department: 'Security', trainingType: 'Fire Warden Training', trainer: 'Fire Dept Official', trainingDate: '2026-06-28', validUntil: '2027-06-28', status: 'Completed', remarks: 'Certified Fire Warden' },
+];
+
+const DRILL_SEED = [
+  { id: 'fd-001', drillId: 'FD-001', drillDate: '2026-03-10', department: 'OPD', participants: '45', drillType: 'Mock Drill', duration: '12 mins', result: 'Satisfactory', conductedBy: 'Safety Officer Raj', remarks: 'Slow response from counter 3' },
+  { id: 'fd-002', drillId: 'FD-002', drillDate: '2026-04-15', department: 'Pharmacy', participants: '12', drillType: 'Surprise Drill', duration: '5 mins', result: 'Excellent', conductedBy: 'Safety Officer Raj', remarks: 'Immediate evacuation' },
+  { id: 'fd-003', drillId: 'FD-003', drillDate: '2026-05-20', department: 'Laboratory', participants: '18', drillType: 'Mock Drill', duration: '8 mins', result: 'Satisfactory', conductedBy: 'Safety Officer Raj', remarks: 'Chemical spill protocol tested' },
+  { id: 'fd-004', drillId: 'FD-004', drillDate: '2026-06-10', department: 'Radiology', participants: '20', drillType: 'Tabletop Exercise', duration: '45 mins', result: 'Excellent', conductedBy: 'Fire Engineer Suraj', remarks: 'Good coordination with IT' },
+  { id: 'fd-005', drillId: 'FD-005', drillDate: '2026-06-25', department: 'Kitchen', participants: '15', drillType: 'Surprise Drill', duration: '15 mins', result: 'Needs Improvement', conductedBy: 'Safety Officer Raj', remarks: 'Gas shutoff was delayed' },
+];
+
+const EVACUATION_SEED = [
+  { id: 'ev-001', evacuationId: 'EV-001', area: 'Block A Ground Floor', drillDate: '2026-01-20', evacuationTime: '4.5', patientsShifted: '12', staffParticipated: '25', observations: 'Smooth movement through exits', improvementActions: 'None', status: 'Completed' },
+  { id: 'ev-002', evacuationId: 'EV-002', area: 'ICU', drillDate: '2026-02-15', evacuationTime: '8.25', patientsShifted: '8', staffParticipated: '30', observations: 'Ventilator transfer took time', improvementActions: 'More transit vents needed', status: 'Completed' },
+  { id: 'ev-003', evacuationId: 'EV-003', area: 'Maternity Ward', drillDate: '2026-04-10', evacuationTime: '6.75', patientsShifted: '15', staffParticipated: '20', observations: 'Wheelchair shortage at exit', improvementActions: 'Keep 5 extra chairs near stairwell', status: 'Completed' },
+  { id: 'ev-004', evacuationId: 'EV-004', area: 'Block B First Floor', drillDate: '2026-05-05', evacuationTime: '5.2', patientsShifted: '22', staffParticipated: '18', observations: 'Exit door 2 was stiff', improvementActions: 'Maintenance requested to oil hinges', status: 'Completed' },
+  { id: 'ev-005', evacuationId: 'EV-005', area: 'Emergency Dept', drillDate: '2026-06-18', evacuationTime: '3.8', patientsShifted: '5', staffParticipated: '40', observations: 'Excellent triage during evac', improvementActions: 'Update emergency contacts list', status: 'Completed' },
+];
+
 // ─────────────────────────────────────────────
 // Sample seed data
 // ─────────────────────────────────────────────
@@ -277,6 +310,41 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   const BLANK_ALM_FORM = { id: '', deviceId: '', zone: '', deviceType: 'Smoke Detector', funcStatus: 'Functional', batteryStatus: 'Good', testResult: 'Pass', inspectionDate: '', nextInspection: '', checkedBy: '', status: 'Functional', remarks: '' };
   const [alarmForm, setAlarmForm] = useState(BLANK_ALM_FORM);
 
+  // ── State: Fire Training & Evacuation ──
+  const [trainingRecords, setTrainingRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_TRAINING);
+    return saved ? JSON.parse(saved) : TRAINING_SEED;
+  });
+  const [drillRecords, setDrillRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_DRILLS);
+    return saved ? JSON.parse(saved) : DRILL_SEED;
+  });
+  const [evacRecords, setEvacRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_EVACUATIONS);
+    return saved ? JSON.parse(saved) : EVACUATION_SEED;
+  });
+
+  const [activeTrainingSubTab, setActiveTrainingSubTab] = useState('training');
+
+  // Modals & Forms for Training
+  const [isTrainingModalOpen, setIsTrainingModalOpen] = useState(false);
+  const [editingTrainingId, setEditingTrainingId] = useState(null);
+  const [trainingSearch, setTrainingSearch] = useState('');
+  const BLANK_TRAIN_FORM = { id: '', trainingId: '', employeeName: '', employeeId: '', department: '', trainingType: 'Induction', trainer: '', trainingDate: '', validUntil: '', status: 'Completed', remarks: '' };
+  const [trainingForm, setTrainingForm] = useState(BLANK_TRAIN_FORM);
+
+  const [isDrillModalOpen, setIsDrillModalOpen] = useState(false);
+  const [editingDrillId, setEditingDrillId] = useState(null);
+  const [drillSearch, setDrillSearch] = useState('');
+  const BLANK_DRILL_FORM = { id: '', drillId: '', drillDate: '', department: '', participants: '', drillType: 'Mock Drill', duration: '', result: 'Satisfactory', conductedBy: '', remarks: '' };
+  const [drillForm, setDrillForm] = useState(BLANK_DRILL_FORM);
+
+  const [isEvacModalOpen, setIsEvacModalOpen] = useState(false);
+  const [editingEvacId, setEditingEvacId] = useState(null);
+  const [evacSearch, setEvacSearch] = useState('');
+  const BLANK_EVAC_FORM = { id: '', evacuationId: '', area: '', drillDate: '', evacuationTime: '', patientsShifted: '', staffParticipated: '', observations: '', improvementActions: '', status: 'Completed' };
+  const [evacForm, setEvacForm] = useState(BLANK_EVAC_FORM);
+
   // Persist to localStorage
   React.useEffect(() => {
     localStorage.setItem(LS_KEY_DASHBOARD, JSON.stringify(dashboardData));
@@ -301,6 +369,18 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   React.useEffect(() => {
     localStorage.setItem(LS_KEY_ALARMS, JSON.stringify(alarms));
   }, [alarms]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_TRAINING, JSON.stringify(trainingRecords));
+  }, [trainingRecords]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_DRILLS, JSON.stringify(drillRecords));
+  }, [drillRecords]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_EVACUATIONS, JSON.stringify(evacRecords));
+  }, [evacRecords]);
 
   // ── Assessment helpers ──
   const getNextAssessmentId = () => {
@@ -431,6 +511,82 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   };
   const handleDeleteAlarm = (id) => {
     if (window.confirm('Delete this Fire Alarm record? This action cannot be undone.')) { setAlarms(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  // ── Training Helpers ──
+  const getNextTrainingId = () => {
+    const maxNum = trainingRecords.reduce((max, r) => {
+      const match = r.trainingId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `ft-${nextNum}`, trainingId: `FT-${nextNum}` };
+  };
+
+  const getNextDrillId = () => {
+    const maxNum = drillRecords.reduce((max, r) => {
+      const match = r.drillId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `fd-${nextNum}`, drillId: `FD-${nextNum}` };
+  };
+
+  const getNextEvacId = () => {
+    const maxNum = evacRecords.reduce((max, r) => {
+      const match = r.evacuationId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `ev-${nextNum}`, evacuationId: `EV-${nextNum}` };
+  };
+
+  const handleOpenTrainingModal = (record = null) => {
+    if (record) { setTrainingForm({ ...record }); setEditingTrainingId(record.id); }
+    else { const ids = getNextTrainingId(); setTrainingForm({ ...BLANK_TRAIN_FORM, id: ids.shortId, trainingId: ids.trainingId }); setEditingTrainingId(null); }
+    setIsTrainingModalOpen(true);
+  };
+  const handleSaveTraining = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!trainingForm.employeeName || !trainingForm.employeeId || !trainingForm.trainingDate) { alert('Employee Name, ID and Training Date are required.'); return; }
+    if (editingTrainingId) { setTrainingRecords(prev => prev.map(r => r.id === editingTrainingId ? { ...trainingForm, id: editingTrainingId } : r)); }
+    else { setTrainingRecords(prev => [...prev, trainingForm]); }
+    setIsTrainingModalOpen(false); setEditingTrainingId(null); setTrainingForm(BLANK_TRAIN_FORM);
+  };
+  const handleDeleteTraining = (id) => {
+    if (window.confirm('Delete this Training record? This action cannot be undone.')) { setTrainingRecords(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  const handleOpenDrillModal = (record = null) => {
+    if (record) { setDrillForm({ ...record }); setEditingDrillId(record.id); }
+    else { const ids = getNextDrillId(); setDrillForm({ ...BLANK_DRILL_FORM, id: ids.shortId, drillId: ids.drillId }); setEditingDrillId(null); }
+    setIsDrillModalOpen(true);
+  };
+  const handleSaveDrill = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!drillForm.drillDate || !drillForm.department || !drillForm.conductedBy) { alert('Drill Date, Department and Conducted By are required.'); return; }
+    if (editingDrillId) { setDrillRecords(prev => prev.map(r => r.id === editingDrillId ? { ...drillForm, id: editingDrillId } : r)); }
+    else { setDrillRecords(prev => [...prev, drillForm]); }
+    setIsDrillModalOpen(false); setEditingDrillId(null); setDrillForm(BLANK_DRILL_FORM);
+  };
+  const handleDeleteDrill = (id) => {
+    if (window.confirm('Delete this Drill record? This action cannot be undone.')) { setDrillRecords(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  const handleOpenEvacModal = (record = null) => {
+    if (record) { setEvacForm({ ...record }); setEditingEvacId(record.id); }
+    else { const ids = getNextEvacId(); setEvacForm({ ...BLANK_EVAC_FORM, id: ids.shortId, evacuationId: ids.evacuationId }); setEditingEvacId(null); }
+    setIsEvacModalOpen(true);
+  };
+  const handleSaveEvac = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!evacForm.area || !evacForm.drillDate || !evacForm.evacuationTime) { alert('Area, Drill Date and Evacuation Time are required.'); return; }
+    if (editingEvacId) { setEvacRecords(prev => prev.map(r => r.id === editingEvacId ? { ...evacForm, id: editingEvacId } : r)); }
+    else { setEvacRecords(prev => [...prev, evacForm]); }
+    setIsEvacModalOpen(false); setEditingEvacId(null); setEvacForm(BLANK_EVAC_FORM);
+  };
+  const handleDeleteEvac = (id) => {
+    if (window.confirm('Delete this Evacuation record? This action cannot be undone.')) { setEvacRecords(prev => prev.filter(r => r.id !== id)); }
   };
 
   // ── KPI derivations ──
@@ -1393,14 +1549,316 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
         );
       }
 
-      case 'training':
+      case 'training': {
+        const totalTraining = trainingRecords.length;
+        const staffTrained = new Set(trainingRecords.map(r => r.employeeId)).size;
+        const compliancePct = totalTraining ? '95.5' : '0'; // Mock logic for training compliance based on hospital total staff (assumed 100 for this mock)
+        
+        const totalDrills = drillRecords.length;
+        const successfulDrills = drillRecords.filter(r => r.result === 'Excellent' || r.result === 'Satisfactory').length;
+        
+        const totalEvacuations = evacRecords.length;
+        
+        let totalTime = 0;
+        evacRecords.forEach(r => {
+          totalTime += parseFloat(r.evacuationTime || 0);
+        });
+        const avgEvacTime = totalEvacuations ? (totalTime / totalEvacuations).toFixed(1) + ' mins' : '0 mins';
+        const overallCompliance = ((parseFloat(compliancePct) + (totalDrills ? (successfulDrills / totalDrills) * 100 : 0)) / (totalDrills ? 2 : 1)).toFixed(1);
+
+        const filteredTraining = trainingRecords.filter(r => {
+          const q = trainingSearch.toLowerCase();
+          return r.trainingId.toLowerCase().includes(q) || r.employeeName.toLowerCase().includes(q) || r.department.toLowerCase().includes(q) || r.trainingType.toLowerCase().includes(q);
+        });
+        const filteredDrills = drillRecords.filter(r => {
+          const q = drillSearch.toLowerCase();
+          return r.drillId.toLowerCase().includes(q) || r.department.toLowerCase().includes(q) || r.drillType.toLowerCase().includes(q) || r.result.toLowerCase().includes(q);
+        });
+        const filteredEvacs = evacRecords.filter(r => {
+          const q = evacSearch.toLowerCase();
+          return r.evacuationId.toLowerCase().includes(q) || r.area.toLowerCase().includes(q) || r.status.toLowerCase().includes(q);
+        });
+
+        const STATUS_BADGE = {
+          'Completed': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'Excellent': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'Satisfactory': 'bg-blue-50 text-blue-700 border-blue-200',
+          'Needs Improvement': 'bg-amber-50 text-amber-700 border-amber-200',
+          'Failed': 'bg-rose-50 text-rose-700 border-rose-200',
+        };
+
         return (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
-            <Flame className="w-12 h-12 text-slate-300" />
-            <h3 className="text-sm font-extrabold text-slate-600">Fire Training & Evacuation</h3>
-            <p className="text-[10px] text-slate-400">Phase will be implemented in the next step.</p>
+          <div className="space-y-4">
+            {/* Header */}
+            <div>
+              <h3 className="text-xs font-extrabold text-slate-800">Fire Training & Evacuation</h3>
+              <p className="text-[9px] text-slate-400 mt-0.5">Manage safety training, mock drills, and evacuation exercises</p>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Training Sessions', value: totalTraining,     color: 'text-blue-600' },
+                { label: 'Staff Trained',           value: staffTrained,      color: 'text-indigo-600' },
+                { label: 'Training Compliance %',   value: `${compliancePct}%`, color: 'text-emerald-600' },
+                { label: 'Fire Drills Conducted',   value: totalDrills,       color: 'text-violet-600' },
+                { label: 'Successful Fire Drills',  value: successfulDrills,  color: 'text-teal-600' },
+                { label: 'Evacuation Drills',       value: totalEvacuations,  color: 'text-amber-600' },
+                { label: 'Average Evacuation Time', value: avgEvacTime,       color: 'text-rose-600' },
+                { label: 'Overall Compliance %',    value: `${overallCompliance}%`, color: 'text-sky-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Sub-tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 mb-4">
+              {[
+                { id: 'training', label: 'Safety Training' },
+                { id: 'drills', label: 'Fire Drills' },
+                { id: 'evacuations', label: 'Evacuations' },
+              ].map(sub => (
+                <button
+                  key={sub.id}
+                  onClick={() => setActiveTrainingSubTab(sub.id)}
+                  className={`px-4 py-2 text-[10px] font-bold transition-all border-b-2 ${
+                    activeTrainingSubTab === sub.id
+                      ? 'border-sky-500 text-sky-700'
+                      : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Training Register ── */}
+            {activeTrainingSubTab === 'training' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search training records..." value={trainingSearch} onChange={(e) => setTrainingSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenTrainingModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Add Training
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Train ID', 'Employee Name', 'Emp ID', 'Dept', 'Type', 'Trainer', 'Date', 'Status', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredTraining.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.trainingId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.employeeName}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.employeeId}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.department}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.trainingType}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.trainer}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.trainingDate}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE['Completed']}`}>{r.status}</span></td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenTrainingModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteTraining(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredTraining.length === 0 && <tr><td colSpan={9} className="px-3 py-10 text-center text-[10px] text-slate-400">No training records found.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Drill Register ── */}
+            {activeTrainingSubTab === 'drills' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search drills..." value={drillSearch} onChange={(e) => setDrillSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenDrillModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Add Drill
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Drill ID', 'Date', 'Dept / Area', 'Participants', 'Type', 'Duration', 'Result', 'Conducted By', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredDrills.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.drillId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.drillDate}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.department}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.participants}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.drillType}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.duration}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.result] || STATUS_BADGE['Satisfactory']}`}>{r.result}</span></td>
+                            <td className="px-3 py-3 text-slate-600">{r.conductedBy}</td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenDrillModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteDrill(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredDrills.length === 0 && <tr><td colSpan={9} className="px-3 py-10 text-center text-[10px] text-slate-400">No drill records found.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Evacuation Register ── */}
+            {activeTrainingSubTab === 'evacuations' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search evacuations..." value={evacSearch} onChange={(e) => setEvacSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenEvacModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Add Evacuation
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Evac ID', 'Area', 'Date', 'Evac Time (m)', 'Pts Shifted', 'Staff Part', 'Status', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredEvacs.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.evacuationId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.area}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.drillDate}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.evacuationTime}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.patientsShifted}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.staffParticipated}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE['Completed']}`}>{r.status}</span></td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenEvacModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteEvac(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredEvacs.length === 0 && <tr><td colSpan={8} className="px-3 py-10 text-center text-[10px] text-slate-400">No evacuation records found.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Training Modal ── */}
+            {isTrainingModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingTrainingId ? 'Edit Training Record' : 'Add Training Record'}</h3>
+                    <button onClick={() => { setIsTrainingModalOpen(false); setEditingTrainingId(null); setTrainingForm(BLANK_TRAIN_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveTraining} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Training ID</label><input type="text" value={trainingForm.trainingId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Employee Name *</label><input type="text" value={trainingForm.employeeName} onChange={e => setTrainingForm({...trainingForm, employeeName: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Employee ID *</label><input type="text" value={trainingForm.employeeId} onChange={e => setTrainingForm({...trainingForm, employeeId: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Department</label><input type="text" value={trainingForm.department} onChange={e => setTrainingForm({...trainingForm, department: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Training Type</label><select value={trainingForm.trainingType} onChange={e => setTrainingForm({...trainingForm, trainingType: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{TRAINING_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Trainer</label><input type="text" value={trainingForm.trainer} onChange={e => setTrainingForm({...trainingForm, trainer: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Training Date *</label><input type="date" value={trainingForm.trainingDate} onChange={e => setTrainingForm({...trainingForm, trainingDate: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Valid Until</label><input type="date" value={trainingForm.validUntil} onChange={e => setTrainingForm({...trainingForm, validUntil: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label><select value={trainingForm.status} onChange={e => setTrainingForm({...trainingForm, status: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500"><option value="Completed">Completed</option><option value="Pending">Pending</option></select></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label><input type="text" value={trainingForm.remarks} onChange={e => setTrainingForm({...trainingForm, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsTrainingModalOpen(false); setEditingTrainingId(null); setTrainingForm(BLANK_TRAIN_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingTrainingId ? 'Save Changes' : 'Add Training'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* ── Drill Modal ── */}
+            {isDrillModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingDrillId ? 'Edit Drill Record' : 'Add Drill Record'}</h3>
+                    <button onClick={() => { setIsDrillModalOpen(false); setEditingDrillId(null); setDrillForm(BLANK_DRILL_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveDrill} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Drill ID</label><input type="text" value={drillForm.drillId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Drill Date *</label><input type="date" value={drillForm.drillDate} onChange={e => setDrillForm({...drillForm, drillDate: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Department / Area *</label><input type="text" value={drillForm.department} onChange={e => setDrillForm({...drillForm, department: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Participants</label><input type="number" value={drillForm.participants} onChange={e => setDrillForm({...drillForm, participants: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Drill Type</label><select value={drillForm.drillType} onChange={e => setDrillForm({...drillForm, drillType: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{DRILL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Duration</label><input type="text" placeholder="e.g. 15 mins" value={drillForm.duration} onChange={e => setDrillForm({...drillForm, duration: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Result</label><select value={drillForm.result} onChange={e => setDrillForm({...drillForm, result: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{DRILL_RESULTS.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Conducted By *</label><input type="text" value={drillForm.conductedBy} onChange={e => setDrillForm({...drillForm, conductedBy: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label><input type="text" value={drillForm.remarks} onChange={e => setDrillForm({...drillForm, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsDrillModalOpen(false); setEditingDrillId(null); setDrillForm(BLANK_DRILL_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingDrillId ? 'Save Changes' : 'Add Drill'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* ── Evacuation Modal ── */}
+            {isEvacModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingEvacId ? 'Edit Evacuation Record' : 'Add Evacuation Record'}</h3>
+                    <button onClick={() => { setIsEvacModalOpen(false); setEditingEvacId(null); setEvacForm(BLANK_EVAC_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveEvac} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Evacuation ID</label><input type="text" value={evacForm.evacuationId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Area *</label><input type="text" value={evacForm.area} onChange={e => setEvacForm({...evacForm, area: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Drill Date *</label><input type="date" value={evacForm.drillDate} onChange={e => setEvacForm({...evacForm, drillDate: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Evacuation Time (mins) *</label><input type="number" step="0.1" value={evacForm.evacuationTime} onChange={e => setEvacForm({...evacForm, evacuationTime: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Patients Shifted</label><input type="number" value={evacForm.patientsShifted} onChange={e => setEvacForm({...evacForm, patientsShifted: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Staff Participated</label><input type="number" value={evacForm.staffParticipated} onChange={e => setEvacForm({...evacForm, staffParticipated: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label><select value={evacForm.status} onChange={e => setEvacForm({...evacForm, status: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500"><option value="Completed">Completed</option><option value="Pending">Pending</option></select></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Observations</label><input type="text" value={evacForm.observations} onChange={e => setEvacForm({...evacForm, observations: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Improvement Actions</label><input type="text" value={evacForm.improvementActions} onChange={e => setEvacForm({...evacForm, improvementActions: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsEvacModalOpen(false); setEditingEvacId(null); setEvacForm(BLANK_EVAC_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingEvacId ? 'Save Changes' : 'Add Evacuation'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         );
+      }
 
       case 'incidents':
         return (
