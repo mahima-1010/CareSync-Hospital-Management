@@ -2670,14 +2670,162 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
         );
       }
 
-      case 'reports':
+      case 'reports': {
+        const totalAssessments = assessments.length;
+        const totalEquip = extinguishers.length + hydrants.length + alarms.length;
+        const funcEquip = extinguishers.filter(e => e.status === 'Functional').length +
+                          hydrants.filter(h => h.status === 'Functional').length +
+                          alarms.filter(a => a.status === 'Functional').length;
+        const equipCompliance = totalEquip ? Math.round((funcEquip / totalEquip) * 100) : 0;
+        
+        const goodDrills = drillRecords.filter(d => ['Satisfactory', 'Excellent'].includes(d.result)).length;
+        const drillCompliance = drillRecords.length ? Math.round((goodDrills / drillRecords.length) * 100) : 0;
+        
+        const goodTraining = trainingRecords.filter(t => t.status === 'Completed').length;
+        const trainingCompliance = trainingRecords.length ? Math.round((goodTraining / trainingRecords.length) * 100) : 0;
+
+        const resolvedIncidents = incidents.filter(i => i.status === 'Closed').length;
+        const incidentResolution = incidents.length ? Math.round((resolvedIncidents / incidents.length) * 100) : 0;
+
+        const auditComplianceAvg = audits.length ? Math.round(audits.reduce((sum, a) => sum + (parseFloat(a.compliance) || 0), 0) / audits.length) : 0;
+        const openCapas = capas.filter(c => c.status !== 'Closed').length;
+        
+        const overallPerformance = Math.round((equipCompliance + drillCompliance + trainingCompliance + incidentResolution + auditComplianceAvg) / 5) || 0;
+
+        const reportKpis = [
+          { label: 'Total Risk Assessments', value: totalAssessments, icon: ClipboardList, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { label: 'Equipment Compliance %', value: `${equipCompliance}%`, icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Fire Drill Compliance %', value: `${drillCompliance}%`, icon: LayoutDashboard, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Training Compliance %', value: `${trainingCompliance}%`, icon: Flame, color: 'text-sky-600', bg: 'bg-sky-50' },
+          { label: 'Incident Resolution %', value: `${incidentResolution}%`, icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50' },
+          { label: 'Audit Compliance %', value: `${auditComplianceAvg}%`, icon: ClipboardCheck, color: 'text-teal-600', bg: 'bg-teal-50' },
+          { label: 'Open CAPAs', value: openCapas, icon: FileText, color: 'text-fuchsia-600', bg: 'bg-fuchsia-50' },
+          { label: 'Overall Performance %', value: `${overallPerformance}%`, icon: ShieldCheck, color: 'text-violet-600', bg: 'bg-violet-50' },
+        ];
+
+        // Chart Data
+        const drillTrend = dashboardData.map(r => ({ month: r.month.slice(0, 3), drills: r.drills }));
+        
+        const riskCats = assessments.reduce((acc, a) => {
+          acc[a.riskCategory] = (acc[a.riskCategory] || 0) + 1;
+          return acc;
+        }, {});
+        const riskCategoryData = Object.keys(riskCats).map(k => ({ name: k, value: riskCats[k] }));
+        const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#7c3aed'];
+
+        const equipTrend = dashboardData.map(r => ({ month: r.month.slice(0, 3), compliance: r.equipmentCompliance }));
+        
+        const incStatus = incidents.reduce((acc, i) => {
+          acc[i.status] = (acc[i.status] || 0) + 1;
+          return acc;
+        }, {});
+        const incidentStatusData = Object.keys(incStatus).map(k => ({ name: k, value: incStatus[k] }));
+
+        const trainingTrend = dashboardData.map(r => ({ month: r.month.slice(0, 3), compliance: r.trainingCompliance }));
+        const auditTrend = dashboardData.map(r => ({ month: r.month.slice(0, 3), compliance: r.overallCompliance }));
+
+        // Export Actions
+        const handleExportCSV = () => {
+          const headers = ['Month', 'Risk Assessments', 'Fire Drills', 'Equipment Compliance %', 'Fire Incidents', 'Audit Compliance %', 'Overall Performance %'];
+          const rows = dashboardData.map(r => [
+            r.month, r.highRiskAreas, r.drills, r.equipmentCompliance, r.incidents, r.overallCompliance, Math.round((r.equipmentCompliance + r.overallCompliance) / 2)
+          ]);
+          const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join("\\n");
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "fire_safety_report.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
         return (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
-            <FileText className="w-12 h-12 text-slate-300" />
-            <h3 className="text-sm font-extrabold text-slate-600">Reports & Analytics</h3>
-            <p className="text-[10px] text-slate-400">Phase will be implemented in the next step.</p>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-800">Reports & Analytics</h2>
+                <p className="text-xs text-slate-500 mt-1">Comprehensive fire safety performance metrics and compliance history.</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleExportCSV} className="px-3 py-2 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-xl hover:bg-slate-50 transition-colors">Export CSV</button>
+                <button onClick={() => alert('PDF Export functionality placeholder')} className="px-3 py-2 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-xl hover:bg-slate-50 transition-colors">Export PDF</button>
+                <button onClick={() => alert('Print functionality placeholder')} className="px-3 py-2 bg-slate-800 text-white text-[10px] font-bold rounded-xl hover:bg-slate-700 transition-colors">Print Report</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {reportKpis.map((kpi, idx) => (
+                <div key={idx} className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${kpi.bg}`}>
+                    <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
+                    <p className="text-xl font-extrabold text-slate-800">{kpi.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Monthly Fire Drill Trend</h4>
+                <ResponsiveContainer width="100%" height={200}><LineChart data={drillTrend}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} /><Line type="monotone" dataKey="drills" stroke={hospital.themeColor} strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} /></LineChart></ResponsiveContainer>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Fire Risk Category Distribution</h4>
+                <ResponsiveContainer width="100%" height={200}><PieChart><Pie data={riskCategoryData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">{riskCategoryData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><Tooltip /><Legend wrapperStyle={{ fontSize: '10px' }} /></PieChart></ResponsiveContainer>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Equipment Compliance Trend</h4>
+                <ResponsiveContainer width="100%" height={200}><BarChart data={equipTrend}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} /><Bar dataKey="compliance" fill="#10b981" radius={[4, 4, 0, 0]} barSize={24} /></BarChart></ResponsiveContainer>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Incident Status</h4>
+                <ResponsiveContainer width="100%" height={200}><PieChart><Pie data={incidentStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">{incidentStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><Tooltip /><Legend wrapperStyle={{ fontSize: '10px' }} /></PieChart></ResponsiveContainer>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Training Compliance Trend</h4>
+                <ResponsiveContainer width="100%" height={200}><BarChart data={trainingTrend}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} /><Bar dataKey="compliance" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={24} /></BarChart></ResponsiveContainer>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-3">Audit Compliance Trend</h4>
+                <ResponsiveContainer width="100%" height={200}><LineChart data={auditTrend}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} /><Line type="monotone" dataKey="compliance" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} /></LineChart></ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-6">
+              <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 className="text-xs font-extrabold text-slate-800">Monthly Summary Table</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px]">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      {['Month', 'Risk Assessments', 'Fire Drills', 'Equipment Compliance %', 'Fire Incidents', 'Audit Compliance %', 'Overall Performance %'].map(h => <th key={h} className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {dashboardData.map((r, i) => (
+                      <tr key={i} className="hover:bg-slate-50/60 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-slate-700">{r.month}</td>
+                        <td className="px-4 py-3 text-slate-600">{r.highRiskAreas}</td>
+                        <td className="px-4 py-3 text-slate-600">{r.drills}</td>
+                        <td className="px-4 py-3 font-bold text-slate-700">{r.equipmentCompliance}%</td>
+                        <td className="px-4 py-3 text-slate-600">{r.incidents}</td>
+                        <td className="px-4 py-3 text-slate-600">{r.overallCompliance}%</td>
+                        <td className="px-4 py-3 font-bold" style={{ color: hospital.themeColor }}>{Math.round((r.equipmentCompliance + r.overallCompliance) / 2)}%</td>
+                      </tr>
+                    ))}
+                    {dashboardData.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400">No monthly data available.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         );
+      }
 
       default:
         return null;
