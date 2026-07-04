@@ -57,6 +57,8 @@ const LS_KEY_FINANCIAL_COUNSELLING = 'admission_financial_counselling';
 const LS_KEY_INITIAL_ASSESSMENTS = 'admission_initial_assessments';
 const LS_KEY_REFERRALS = 'admission_referrals';
 const LS_KEY_PATIENT_COMPLAINTS = 'admission_patient_complaints';
+const LS_KEY_INTERNAL_AUDITS = 'admission_internal_audits';
+const LS_KEY_CAPA_RECORDS = 'admission_capa_records';
 
 const WARD_TYPES = ['General Ward', 'ICU', 'CCU', 'NICU', 'Pediatric', 'Maternity', 'Surgery'];
 const REGISTRATION_TYPES = ['New', 'Follow-up', 'Emergency', 'Referral'];
@@ -734,6 +736,139 @@ const AdmissionRegistrationWorkspace = ({ onBack }) => {
   const handleDeleteComplaint = (id) => {
     if (window.confirm('Delete this complaint record?')) {
       setPatientComplaints(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const [internalAudits, setInternalAudits] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INTERNAL_AUDITS);
+    return saved ? JSON.parse(saved) : [
+      { id: 'iaudit-001', auditId: 'AUD-2025-001', auditDate: '2025-01-15', auditType: 'Routine', auditArea: 'Registration Desk', auditor: 'Alice Smith', compliancePercent: 95, findings: 'Minor documentation issues.', status: 'Completed', followupDate: '2025-02-15' },
+      { id: 'iaudit-002', auditId: 'AUD-2025-002', auditDate: '2025-01-20', auditType: 'Surprise', auditArea: 'IPD Ward', auditor: 'Bob Johnson', compliancePercent: 88, findings: 'Bed allocation delays.', status: 'Action Required', followupDate: '2025-02-10' },
+      { id: 'iaudit-003', auditId: 'AUD-2025-003', auditDate: '2025-02-01', auditType: 'NABH', auditArea: 'Billing', auditor: 'Dr. Lee', compliancePercent: 98, findings: 'Excellent compliance.', status: 'Completed', followupDate: '' },
+      { id: 'iaudit-004', auditId: 'AUD-2025-004', auditDate: '2025-02-10', auditType: 'Routine', auditArea: 'OPD Registration', auditor: 'Carol Davis', compliancePercent: 92, findings: 'Form delays noted.', status: 'Completed', followupDate: '2025-03-10' },
+      { id: 'iaudit-005', auditId: 'AUD-2025-005', auditDate: '2025-02-15', auditType: 'Internal', auditArea: 'Bed Management', auditor: 'David Wilson', compliancePercent: 85, findings: 'Tracking system update needed.', status: 'Pending', followupDate: '' },
+    ];
+  });
+  const [isInternalAuditModalOpen, setIsInternalAuditModalOpen] = useState(false);
+  const [editingInternalAuditId, setEditingInternalAuditId] = useState(null);
+  const [internalAuditForm, setInternalAuditForm] = useState({ id: '', auditId: '', auditDate: '', auditType: 'Routine', auditArea: 'Registration Desk', auditor: '', compliancePercent: 100, findings: '', status: 'Completed', followupDate: '' });
+  const [internalAuditSearch, setInternalAuditSearch] = useState('');
+
+  const [capaRecords, setCapaRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_CAPA_RECORDS);
+    return saved ? JSON.parse(saved) : [
+      { id: 'icap-001', capaId: 'CAPA-2025-001', auditId: 'AUD-2025-002', observation: 'Bed allocation delays.', correctiveAction: 'Added buffer beds.', preventiveAction: 'Real-time tracking implemented.', responsiblePerson: 'Ward Supervisor', targetDate: '2025-03-10', completionDate: '2025-03-05', status: 'Closed' },
+      { id: 'icap-002', capaId: 'CAPA-2025-002', auditId: 'AUD-2025-005', observation: 'Tracking system update needed.', correctiveAction: 'Procure new software.', preventiveAction: 'Monthly audits of system.', responsiblePerson: 'IT Manager', targetDate: '2025-03-30', completionDate: '', status: 'Open' },
+      { id: 'icap-003', capaId: 'CAPA-2025-003', auditId: 'AUD-2025-001', observation: 'Documentation gaps.', correctiveAction: 'Re-trained staff.', preventiveAction: 'Weekly checks.', responsiblePerson: 'Quality Officer', targetDate: '2025-04-15', completionDate: '2025-04-10', status: 'Closed' },
+      { id: 'icap-004', capaId: 'CAPA-2025-004', auditId: 'AUD-2025-004', observation: 'Form processing delays.', correctiveAction: 'Digital forms.', preventiveAction: 'Process optimization.', responsiblePerson: 'Admin Lead', targetDate: '2025-04-01', completionDate: '', status: 'Open' },
+      { id: 'icap-005', capaId: 'CAPA-2025-005', auditId: 'AUD-2025-003', observation: 'Minor compliance issues.', correctiveAction: 'Updated protocols.', preventiveAction: 'Quarterly training.', responsiblePerson: 'Nurse Manager', targetDate: '2025-04-15', completionDate: '2025-04-12', status: 'Closed' },
+    ];
+  });
+  const [isCapaModalOpen, setIsCapaModalOpen] = useState(false);
+  const [editingCapaId, setEditingCapaId] = useState(null);
+  const [capaForm, setCapaForm] = useState({ id: '', capaId: '', auditId: '', observation: '', correctiveAction: '', preventiveAction: '', responsiblePerson: '', targetDate: '', completionDate: '', status: 'Open' });
+  const [capaSearch, setCapaSearch] = useState('');
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_INTERNAL_AUDITS, JSON.stringify(internalAudits));
+  }, [internalAudits]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_CAPA_RECORDS, JSON.stringify(capaRecords));
+  }, [capaRecords]);
+
+  const AUDIT_TYPES = ['Routine', 'Surprise', 'NABH', 'Internal', 'External'];
+  const AUDIT_AREAS = ['Registration Desk', 'IPD Ward', 'Billing', 'Bed Management', 'Patient Services'];
+  const CAPA_STATUSES = ['Open', 'Closed', 'In Progress'];
+
+  const totalAudits = internalAudits.length;
+  const completedAudits = internalAudits.filter(r => r.status === 'Completed').length;
+  const pendingAudits = internalAudits.filter(r => r.status !== 'Completed').length;
+  const avgAuditCompliance = internalAudits.length ? (internalAudits.reduce((s, r) => s + (r.compliancePercent || 0), 0) / internalAudits.length).toFixed(1) : 0;
+  const openCapas = capaRecords.filter(r => r.status === 'Open').length;
+  const closedCapas = capaRecords.filter(r => r.status === 'Closed').length;
+  const followupCompliance = internalAudits.filter(r => r.followupDate).length ? (internalAudits.filter(r => r.followupDate && r.status === 'Completed').length / internalAudits.filter(r => r.followupDate).length * 100).toFixed(1) : 0;
+  const overallAuditScore = ((parseFloat(avgAuditCompliance) + parseFloat(followupCompliance)) / 2).toFixed(1);
+
+  const getNextInternalAuditId = () => {
+    const maxNum = internalAudits.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `iaudit-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenInternalAuditModal = (record = null) => {
+    if (record) {
+      setInternalAuditForm({ ...record });
+      setEditingInternalAuditId(record.id);
+    } else {
+      setInternalAuditForm({ ...internalAuditForm, id: getNextInternalAuditId(), auditId: `AUD-2025-${String(Date.now()).slice(-3)}` });
+      setEditingInternalAuditId(null);
+    }
+    setIsInternalAuditModalOpen(true);
+  };
+
+  const handleSaveInternalAudit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!internalAuditForm.auditor || !internalAuditForm.auditArea) {
+      alert('Auditor and Audit Area are required.');
+      return;
+    }
+    if (editingInternalAuditId) {
+      setInternalAudits(prev => prev.map(r => (r.id === editingInternalAuditId ? { ...internalAuditForm, id: editingInternalAuditId } : r)));
+    } else {
+      setInternalAudits(prev => [...prev, { ...internalAuditForm }]);
+    }
+    setIsInternalAuditModalOpen(false);
+    setEditingInternalAuditId(null);
+  };
+
+  const handleDeleteInternalAudit = (id) => {
+    if (window.confirm('Delete this internal audit record?')) {
+      setInternalAudits(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const getNextCapaId = () => {
+    const maxNum = capaRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `icap-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenCapaModal = (record = null) => {
+    if (record) {
+      setCapaForm({ ...record });
+      setEditingCapaId(record.id);
+    } else {
+      setCapaForm({ ...capaForm, id: getNextCapaId(), capaId: `CAPA-2025-${String(Date.now()).slice(-3)}` });
+      setEditingCapaId(null);
+    }
+    setIsCapaModalOpen(true);
+  };
+
+  const handleSaveCapa = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!capaForm.observation || !capaForm.responsiblePerson) {
+      alert('Observation and Responsible Person are required.');
+      return;
+    }
+    if (editingCapaId) {
+      setCapaRecords(prev => prev.map(r => (r.id === editingCapaId ? { ...capaForm, id: editingCapaId } : r)));
+    } else {
+      setCapaRecords(prev => [...prev, { ...capaForm }]);
+    }
+    setIsCapaModalOpen(false);
+    setEditingCapaId(null);
+  };
+
+  const handleDeleteCapa = (id) => {
+    if (window.confirm('Delete this CAPA record?')) {
+      setCapaRecords(prev => prev.filter(r => r.id !== id));
     }
   };
 
@@ -1991,6 +2126,251 @@ const regAccuracy = registrationAccuracy?.actual || 0;
         );
         return ServicesTabContent();
 
+      case 'audit':
+        const filteredInternalAudits = internalAudits.filter((r) => {
+          const q = internalAuditSearch.toLowerCase();
+          return (
+            r.auditId.toLowerCase().includes(q) ||
+            r.auditArea.toLowerCase().includes(q) ||
+            r.auditor.toLowerCase().includes(q) ||
+            r.status.toLowerCase().includes(q)
+          );
+        });
+
+        const filteredCapas = capaRecords.filter((r) => {
+          const q = capaSearch.toLowerCase();
+          return (
+            r.capaId.toLowerCase().includes(q) ||
+            r.auditId.toLowerCase().includes(q) ||
+            r.observation.toLowerCase().includes(q) ||
+            r.responsiblePerson.toLowerCase().includes(q) ||
+            r.status.toLowerCase().includes(q)
+          );
+        });
+
+        const AUDIT_TH_COLS = ['Audit ID', 'Date', 'Type', 'Area', 'Auditor', 'Compliance %', 'Findings', 'Status', 'Follow-up Date', 'Actions'];
+        const CAPA_TH_COLS = ['CAPA ID', 'Audit ID', 'Observation', 'Corrective Action', 'Responsible Person', 'Target Date', 'Completion Date', 'Status', 'Actions'];
+
+        const AuditTabContent = () => (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-extrabold text-slate-800">Internal Audit</h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Audit and CAPA tracking for admission processes</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Audits', value: totalAudits, color: 'text-blue-600' },
+                { label: 'Completed Audits', value: completedAudits, color: 'text-emerald-600' },
+                { label: 'Pending Audits', value: pendingAudits, color: 'text-amber-600' },
+                { label: 'Avg Audit Compliance %', value: `${avgAuditCompliance}%`, color: 'text-sky-600' },
+                { label: 'Open CAPAs', value: openCapas, color: 'text-rose-600' },
+                { label: 'Closed CAPAs', value: closedCapas, color: 'text-violet-600' },
+                { label: 'Follow-up Compliance %', value: `${followupCompliance}%`, color: 'text-indigo-600' },
+                { label: 'Overall Audit Score', value: `${overallAuditScore}%`, color: 'text-orange-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 border-b border-slate-200 pb-2 mb-3">
+              <button
+                onClick={() => setActiveTab('audit')}
+                className="px-4 py-2 rounded-xl text-[10px] font-bold transition-all cursor-pointer text-white"
+                style={{ backgroundColor: hospital.themeColor }}
+              >
+                Audits
+              </button>
+              <button
+                onClick={() => setActiveTab('capa')}
+                className="px-4 py-2 rounded-xl text-[10px] font-bold transition-all cursor-pointer text-slate-600 hover:bg-slate-100"
+              >
+                CAPA Tracker
+              </button>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-extrabold text-slate-800 mb-3">Internal Audits</h4>
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => handleOpenInternalAuditModal()}
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Audit
+                </button>
+
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search audits..."
+                    value={internalAuditSearch}
+                    onChange={(e) => setInternalAuditSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[10px]">
+                    <thead className="bg-slate-50 border-b border-slate-200">
+                      <tr>
+                        {AUDIT_TH_COLS.map((h) => (
+                          <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredInternalAudits.map((r) => (
+                        <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.auditId}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.auditDate}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.auditType}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.auditArea}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.auditor}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.compliancePercent}%</td>
+                          <td className="px-3 py-3 text-slate-600 max-w-[150px] truncate" title={r.findings}>{r.findings}</td>
+                          <td className="px-3 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>{r.status}</span>
+                          </td>
+                          <td className="px-3 py-3 text-slate-600">{r.followupDate || '-'}</td>
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => handleOpenInternalAuditModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors" title="Edit"><Edit3 className="w-3 h-3" /></button>
+                              <button onClick={() => handleDeleteInternalAudit(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredInternalAudits.length === 0 && (
+                        <tr><td colSpan={AUDIT_TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">{internalAuditSearch ? 'No records match your search.' : 'No audit records yet.'}</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        return AuditTabContent();
+
+      case 'capa':
+        const CapaTabContent = () => (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-extrabold text-slate-800">CAPA Tracker</h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Corrective and Preventive Action tracking</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Audits', value: totalAudits, color: 'text-blue-600' },
+                { label: 'Completed Audits', value: completedAudits, color: 'text-emerald-600' },
+                { label: 'Pending Audits', value: pendingAudits, color: 'text-amber-600' },
+                { label: 'Avg Audit Compliance %', value: `${avgAuditCompliance}%`, color: 'text-sky-600' },
+                { label: 'Open CAPAs', value: openCapas, color: 'text-rose-600' },
+                { label: 'Closed CAPAs', value: closedCapas, color: 'text-violet-600' },
+                { label: 'Follow-up Compliance %', value: `${followupCompliance}%`, color: 'text-indigo-600' },
+                { label: 'Overall Audit Score', value: `${overallAuditScore}%`, color: 'text-orange-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 border-b border-slate-200 pb-2 mb-3">
+              <button
+                onClick={() => setActiveTab('audit')}
+                className="px-4 py-2 rounded-xl text-[10px] font-bold transition-all cursor-pointer text-slate-600 hover:bg-slate-100"
+              >
+                Audits
+              </button>
+              <button
+                onClick={() => setActiveTab('capa')}
+                className="px-4 py-2 rounded-xl text-[10px] font-bold transition-all cursor-pointer text-white"
+                style={{ backgroundColor: hospital.themeColor }}
+              >
+                CAPA Tracker
+              </button>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-extrabold text-slate-800 mb-3">CAPA Records</h4>
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => handleOpenCapaModal()}
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add CAPA
+                </button>
+
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search CAPA..."
+                    value={capaSearch}
+                    onChange={(e) => setCapaSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[10px]">
+                    <thead className="bg-slate-50 border-b border-slate-200">
+                      <tr>
+                        {CAPA_TH_COLS.map((h) => (
+                          <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredCapas.map((r) => (
+                        <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.capaId}</td>
+                          <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.auditId}</td>
+                          <td className="px-3 py-3 text-slate-600 max-w-[150px] truncate" title={r.observation}>{r.observation}</td>
+                          <td className="px-3 py-3 text-slate-600 max-w-[150px] truncate" title={r.correctiveAction}>{r.correctiveAction}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.responsiblePerson}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.targetDate}</td>
+                          <td className="px-3 py-3 text-slate-600">{r.completionDate || '-'}</td>
+                          <td className="px-3 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE_QUALITY[r.status] || STATUS_BADGE_QUALITY.Achieved}`}>{r.status}</span>
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => handleOpenCapaModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors" title="Edit"><Edit3 className="w-3 h-3" /></button>
+                              <button onClick={() => handleDeleteCapa(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredCapas.length === 0 && (
+                        <tr><td colSpan={CAPA_TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">{capaSearch ? 'No records match your search.' : 'No CAPA records yet.'}</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        return CapaTabContent();
+
        default:
          return null;
      }
@@ -2737,6 +3117,136 @@ const regAccuracy = registrationAccuracy?.actual || 0;
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                   <button type="button" onClick={() => { setIsComplaintModalOpen(false); setEditingComplaintId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
                   <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingComplaintId ? 'Save Changes' : 'Add Record'}</button>
+                </div>
+              </form>
+            </div>
+</div>
+         )}
+
+        {isInternalAuditModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-800">{editingInternalAuditId ? 'Edit Audit' : 'Add Audit'}</h3>
+                  <p className="text-[9px] text-slate-400 mt-0.5">Internal Audit Form</p>
+                </div>
+                <button onClick={() => { setIsInternalAuditModalOpen(false); setEditingInternalAuditId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveInternalAudit} className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit ID *</label>
+                    <input type="text" value={internalAuditForm.auditId} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, auditId: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit Date *</label>
+                    <input type="date" value={internalAuditForm.auditDate} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, auditDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit Type</label>
+                    <select value={internalAuditForm.auditType} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, auditType: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {AUDIT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit Area *</label>
+                    <select value={internalAuditForm.auditArea} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, auditArea: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required>
+                      {AUDIT_AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Auditor *</label>
+                    <input type="text" value={internalAuditForm.auditor} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, auditor: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Compliance %</label>
+                    <input type="number" value={internalAuditForm.compliancePercent} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, compliancePercent: parseFloat(e.target.value) || 0 })} min="0" max="100" step="0.1" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
+                    <select value={internalAuditForm.status} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, status: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      <option value="Completed">Completed</option>
+                      <option value="Action Required">Action Required</option>
+                      <option value="Pending">Pending</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Follow-up Date</label>
+                    <input type="date" value={internalAuditForm.followupDate} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, followupDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-medium text-slate-600 mb-1">Findings</label>
+                  <textarea value={internalAuditForm.findings} onChange={(e) => setInternalAuditForm({ ...internalAuditForm, findings: e.target.value })} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Audit findings" />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsInternalAuditModalOpen(false); setEditingInternalAuditId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingInternalAuditId ? 'Save Changes' : 'Add Record'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isCapaModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-800">{editingCapaId ? 'Edit CAPA' : 'Add CAPA'}</h3>
+                  <p className="text-[9px] text-slate-400 mt-0.5">CAPA Form</p>
+                </div>
+                <button onClick={() => { setIsCapaModalOpen(false); setEditingCapaId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveCapa} className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">CAPA ID *</label>
+                    <input type="text" value={capaForm.capaId} onChange={(e) => setCapaForm({ ...capaForm, capaId: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit ID *</label>
+                    <input type="text" value={capaForm.auditId} onChange={(e) => setCapaForm({ ...capaForm, auditId: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Observation *</label>
+                    <input type="text" value={capaForm.observation} onChange={(e) => setCapaForm({ ...capaForm, observation: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Corrective Action *</label>
+                    <input type="text" value={capaForm.correctiveAction} onChange={(e) => setCapaForm({ ...capaForm, correctiveAction: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Preventive Action *</label>
+                    <input type="text" value={capaForm.preventiveAction} onChange={(e) => setCapaForm({ ...capaForm, preventiveAction: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Responsible Person *</label>
+                    <input type="text" value={capaForm.responsiblePerson} onChange={(e) => setCapaForm({ ...capaForm, responsiblePerson: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Target Date</label>
+                    <input type="date" value={capaForm.targetDate} onChange={(e) => setCapaForm({ ...capaForm, targetDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Completion Date</label>
+                    <input type="date" value={capaForm.completionDate} onChange={(e) => setCapaForm({ ...capaForm, completionDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
+                    <select value={capaForm.status} onChange={(e) => setCapaForm({ ...capaForm, status: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {CAPA_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsCapaModalOpen(false); setEditingCapaId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingCapaId ? 'Save Changes' : 'Add Record'}</button>
                 </div>
               </form>
             </div>
