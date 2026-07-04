@@ -54,6 +54,9 @@ const LS_KEY_BED_ALLOCATIONS = 'admission_bed_allocations';
 const LS_KEY_BILLING = 'admission_billing';
 const LS_KEY_TPA_CLAIMS = 'admission_tpa_claims';
 const LS_KEY_FINANCIAL_COUNSELLING = 'admission_financial_counselling';
+const LS_KEY_INITIAL_ASSESSMENTS = 'admission_initial_assessments';
+const LS_KEY_REFERRALS = 'admission_referrals';
+const LS_KEY_PATIENT_COMPLAINTS = 'admission_patient_complaints';
 
 const WARD_TYPES = ['General Ward', 'ICU', 'CCU', 'NICU', 'Pediatric', 'Maternity', 'Surgery'];
 const REGISTRATION_TYPES = ['New', 'Follow-up', 'Emergency', 'Referral'];
@@ -148,6 +151,37 @@ const SAMPLE_RECENT_ACTIVITY = [
   { id: 'act-007', date: '2025-06-12', patient: 'David Brown', uhid: 'UHID12351', registrationType: 'OPD', status: 'Completed' },
   { id: 'act-008', date: '2025-06-12', patient: 'Sarah Miller', uhid: 'UHID12352', registrationType: 'IPD', status: 'Pending' },
 ];
+
+const INITIAL_ASSESSMENTS_SEED = [
+  { id: 'assess-001', assessmentId: 'ASSESS-2025-001', uhid: 'UHID12345', patientName: 'John Smith', assessmentType: 'Initial', assessedBy: 'Nurse Sarah', assessmentDate: '2025-01-15', priority: 'High', status: 'Completed', remarks: 'Admitted for pneumonia' },
+  { id: 'assess-002', assessmentId: 'ASSESS-2025-002', uhid: 'UHID12346', patientName: 'Mary Johnson', assessmentType: 'Comprehensive', assessedBy: 'Nurse Raj', assessmentDate: '2025-01-16', priority: 'Medium', status: 'Completed', remarks: '' },
+  { id: 'assess-003', assessmentId: 'ASSESS-2025-003', uhid: 'UHID12347', patientName: 'Robert Davis', assessmentType: 'Routine', assessedBy: 'Nurse Priya', assessmentDate: '2025-01-17', priority: 'Low', status: 'In Progress', remarks: 'Waiting for lab results' },
+  { id: 'assess-004', assessmentId: 'ASSESS-2025-004', uhid: 'UHID12348', patientName: 'Lisa Anderson', assessmentType: 'Initial', assessedBy: 'Nurse Amit', assessmentDate: '2025-01-18', priority: 'High', status: 'Pending', remarks: '' },
+  { id: 'assess-005', assessmentId: 'ASSESS-2025-005', uhid: 'UHID12349', patientName: 'Michael Clark', assessmentType: 'Comprehensive', assessedBy: 'Nurse Sarah', assessmentDate: '2025-01-19', priority: 'Medium', status: 'Completed', remarks: 'Neurological assessment done' },
+];
+
+const REFERRALS_SEED = [
+  { id: 'ref-001', referralId: 'REF-2025-001', uhid: 'UHID12345', patientName: 'John Smith', referralType: 'Internal', referredTo: 'Cardiology', reason: 'Chest pain evaluation', transferDate: '2025-01-15', status: 'Completed', remarks: '' },
+  { id: 'ref-002', referralId: 'REF-2025-002', uhid: 'UHID12346', patientName: 'Mary Johnson', referralType: 'External', referredTo: 'City Hospital', reason: 'Specialist consultation', transferDate: '2025-01-16', status: 'Pending', remarks: 'Awaiting approval' },
+  { id: 'ref-003', referralId: 'REF-2025-003', uhid: 'UHID12347', patientName: 'Robert Davis', referralType: 'Internal', referredTo: 'Neurology', reason: 'Stroke follow-up', transferDate: '2025-01-17', status: 'Completed', remarks: '' },
+  { id: 'ref-004', referralId: 'REF-2025-004', uhid: 'UHID12348', patientName: 'Lisa Anderson', referralType: 'Internal', referredTo: 'Orthopedics', reason: 'Surgical review', transferDate: '2025-01-18', status: 'In Progress', remarks: 'Patient stable' },
+  { id: 'ref-005', referralId: 'REF-2025-005', uhid: 'UHID12349', patientName: 'Michael Clark', referralType: 'External', referredTo: 'Rehab Center', reason: 'Post-stroke rehab', transferDate: '2025-01-19', status: 'Pending', remarks: '' },
+];
+
+const PATIENT_COMPLAINTS_SEED = [
+  { id: 'comp-001', complaintId: 'COMP-2025-001', uhid: 'UHID12345', patientName: 'John Smith', complaintCategory: 'Food Quality', complaintDate: '2025-01-15', assignedTo: 'Dietary Manager', resolutionStatus: 'Resolved', closedDate: '2025-01-16', remarks: 'Menu changed per request' },
+  { id: 'comp-002', complaintId: 'COMP-2025-002', uhid: 'UHID12346', patientName: 'Mary Johnson', complaintCategory: 'Nursing Care', complaintDate: '2025-01-16', assignedTo: 'Nurse Raj', resolutionStatus: 'In Progress', closedDate: '', remarks: '' },
+  { id: 'comp-003', complaintId: 'COMP-2025-003', uhid: 'UHID12347', patientName: 'Robert Davis', complaintCategory: 'Room Condition', complaintDate: '2025-01-17', assignedTo: 'Maintenance', resolutionStatus: 'Resolved', closedDate: '2025-01-18', remarks: 'AC repaired' },
+  { id: 'comp-004', complaintId: 'COMP-2025-004', uhid: 'UHID12348', patientName: 'Lisa Anderson', complaintCategory: 'Billing', complaintDate: '2025-01-18', assignedTo: 'Billing Dept', resolutionStatus: 'Pending', closedDate: '', remarks: 'Insurance claim dispute' },
+  { id: 'comp-005', complaintId: 'COMP-2025-005', uhid: 'UHID12349', patientName: 'Michael Clark', complaintCategory: 'Waiting Time', complaintDate: '2025-01-19', assignedTo: 'Outpatient Manager', resolutionStatus: 'Resolved', closedDate: '2025-01-20', remarks: 'Apology issued' },
+];
+
+const ASSESSMENT_TYPES = ['Initial', 'Comprehensive', 'Routine', 'Specialist'];
+const ASSESSMENT_PRIORITIES = ['High', 'Medium', 'Low'];
+const REFERRAL_TYPES = ['Internal', 'External'];
+const REFERRAL_STATUSES = ['Completed', 'Pending', 'In Progress'];
+const COMPLAINT_CATEGORIES = ['Food Quality', 'Nursing Care', 'Room Condition', 'Billing', 'Waiting Time', 'Other'];
+const COMPLAINT_STATUSES = ['Resolved', 'In Progress', 'Pending'];
 
 const AdmissionRegistrationWorkspace = ({ onBack }) => {
   const { hospital } = useHospital();
@@ -528,6 +562,180 @@ const AdmissionRegistrationWorkspace = ({ onBack }) => {
 
   const BILLING_TABS = ['billing', 'claims', 'counselling'];
   const [activeBillingTab, setActiveBillingTab] = useState('billing');
+
+  const [initialAssessments, setInitialAssessments] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INITIAL_ASSESSMENTS);
+    return saved ? JSON.parse(saved) : INITIAL_ASSESSMENTS_SEED;
+  });
+  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
+  const [editingAssessmentId, setEditingAssessmentId] = useState(null);
+  const [assessmentForm, setAssessmentForm] = useState({ id: '', assessmentId: '', uhid: '', patientName: '', assessmentType: 'Initial', assessedBy: '', assessmentDate: '', priority: 'Medium', status: 'Completed', remarks: '' });
+  const [assessmentSearch, setAssessmentSearch] = useState('');
+
+  const [referrals, setReferrals] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_REFERRALS);
+    return saved ? JSON.parse(saved) : REFERRALS_SEED;
+  });
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [editingReferralId, setEditingReferralId] = useState(null);
+  const [referralForm, setReferralForm] = useState({ id: '', referralId: '', uhid: '', patientName: '', referralType: 'Internal', referredTo: '', reason: '', transferDate: '', status: 'Pending', remarks: '' });
+  const [referralSearch, setReferralSearch] = useState('');
+
+  const [patientComplaints, setPatientComplaints] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_PATIENT_COMPLAINTS);
+    return saved ? JSON.parse(saved) : PATIENT_COMPLAINTS_SEED;
+  });
+  const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
+  const [editingComplaintId, setEditingComplaintId] = useState(null);
+  const [complaintForm, setComplaintForm] = useState({ id: '', complaintId: '', uhid: '', patientName: '', complaintCategory: 'Other', complaintDate: '', assignedTo: '', resolutionStatus: 'Pending', closedDate: '', remarks: '' });
+  const [complaintSearch, setComplaintSearch] = useState('');
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_INITIAL_ASSESSMENTS, JSON.stringify(initialAssessments));
+  }, [initialAssessments]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_REFERRALS, JSON.stringify(referrals));
+  }, [referrals]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_PATIENT_COMPLAINTS, JSON.stringify(patientComplaints));
+  }, [patientComplaints]);
+
+  const SERVICE_TABS = ['assessments', 'referrals', 'complaints'];
+  const [activeServiceTab, setActiveServiceTab] = useState('assessments');
+
+  const totalAssessments = initialAssessments.length;
+  const completedAssessments = initialAssessments.filter(r => r.status === 'Completed').length;
+  const totalReferrals = referrals.length;
+  const pendingReferrals = referrals.filter(r => r.status === 'Pending').length;
+  const totalComplaints = patientComplaints.length;
+  const resolvedComplaints = patientComplaints.filter(r => r.resolutionStatus === 'Resolved').length;
+  const patientSatisfactionPct = totalComplaints ? ((totalComplaints - resolvedComplaints) / totalComplaints * 100).toFixed(1) : 0;
+  const serviceCompliancePct = initialAssessments.length ? ((initialAssessments.filter(r => r.status === 'Completed').length / initialAssessments.length) * 100).toFixed(1) : 0;
+
+  const getNextAssessmentId = () => {
+    const maxNum = initialAssessments.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `assess-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenAssessmentModal = (record = null) => {
+    if (record) {
+      setAssessmentForm({ ...record });
+      setEditingAssessmentId(record.id);
+    } else {
+      setAssessmentForm({ ...assessmentForm, id: getNextAssessmentId(), assessmentId: `ASSESS-2025-${String(Date.now()).slice(-3)}` });
+      setEditingAssessmentId(null);
+    }
+    setIsAssessmentModalOpen(true);
+  };
+
+  const handleSaveAssessment = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!assessmentForm.patientName || !assessmentForm.uhid) {
+      alert('Patient Name and UHID are required.');
+      return;
+    }
+    if (editingAssessmentId) {
+      setInitialAssessments(prev => prev.map(r => (r.id === editingAssessmentId ? { ...assessmentForm, id: editingAssessmentId } : r)));
+    } else {
+      setInitialAssessments(prev => [...prev, { ...assessmentForm }]);
+    }
+    setIsAssessmentModalOpen(false);
+    setEditingAssessmentId(null);
+  };
+
+  const handleDeleteAssessment = (id) => {
+    if (window.confirm('Delete this assessment record?')) {
+      setInitialAssessments(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const getNextReferralId = () => {
+    const maxNum = referrals.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `ref-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenReferralModal = (record = null) => {
+    if (record) {
+      setReferralForm({ ...record });
+      setEditingReferralId(record.id);
+    } else {
+      setReferralForm({ ...referralForm, id: getNextReferralId(), referralId: `REF-2025-${String(Date.now()).slice(-3)}` });
+      setEditingReferralId(null);
+    }
+    setIsReferralModalOpen(true);
+  };
+
+  const handleSaveReferral = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!referralForm.patientName || !referralForm.uhid) {
+      alert('Patient Name and UHID are required.');
+      return;
+    }
+    if (editingReferralId) {
+      setReferrals(prev => prev.map(r => (r.id === editingReferralId ? { ...referralForm, id: editingReferralId } : r)));
+    } else {
+      setReferrals(prev => [...prev, { ...referralForm }]);
+    }
+    setIsReferralModalOpen(false);
+    setEditingReferralId(null);
+  };
+
+  const handleDeleteReferral = (id) => {
+    if (window.confirm('Delete this referral record?')) {
+      setReferrals(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const getNextComplaintId = () => {
+    const maxNum = patientComplaints.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `comp-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenComplaintModal = (record = null) => {
+    if (record) {
+      setComplaintForm({ ...record });
+      setEditingComplaintId(record.id);
+    } else {
+      setComplaintForm({ ...complaintForm, id: getNextComplaintId(), complaintId: `COMP-2025-${String(Date.now()).slice(-3)}` });
+      setEditingComplaintId(null);
+    }
+    setIsComplaintModalOpen(true);
+  };
+
+  const handleSaveComplaint = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!complaintForm.patientName || !complaintForm.uhid) {
+      alert('Patient Name and UHID are required.');
+      return;
+    }
+    if (editingComplaintId) {
+      setPatientComplaints(prev => prev.map(r => (r.id === editingComplaintId ? { ...complaintForm, id: editingComplaintId } : r)));
+    } else {
+      setPatientComplaints(prev => [...prev, { ...complaintForm }]);
+    }
+    setIsComplaintModalOpen(false);
+    setEditingComplaintId(null);
+  };
+
+  const handleDeleteComplaint = (id) => {
+    if (window.confirm('Delete this complaint record?')) {
+      setPatientComplaints(prev => prev.filter(r => r.id !== id));
+    }
+  };
 
   const getNextQualityId = () => {
     const maxNum = qualityIndicators.reduce((max, r) => {
@@ -1504,6 +1712,285 @@ const regAccuracy = registrationAccuracy?.actual || 0;
         );
         return BillingTabContent();
 
+      case 'services':
+        const filteredAssessments = initialAssessments.filter((r) => {
+          const q = assessmentSearch.toLowerCase();
+          return (
+            r.assessmentId.toLowerCase().includes(q) ||
+            r.patientName.toLowerCase().includes(q) ||
+            r.uhid.toLowerCase().includes(q) ||
+            r.assessmentType.toLowerCase().includes(q) ||
+            r.status.toLowerCase().includes(q)
+          );
+        });
+
+        const filteredReferrals = referrals.filter((r) => {
+          const q = referralSearch.toLowerCase();
+          return (
+            r.referralId.toLowerCase().includes(q) ||
+            r.patientName.toLowerCase().includes(q) ||
+            r.uhid.toLowerCase().includes(q) ||
+            r.referralType.toLowerCase().includes(q) ||
+            r.status.toLowerCase().includes(q)
+          );
+        });
+
+        const filteredComplaints = patientComplaints.filter((r) => {
+          const q = complaintSearch.toLowerCase();
+          return (
+            r.complaintId.toLowerCase().includes(q) ||
+            r.patientName.toLowerCase().includes(q) ||
+            r.uhid.toLowerCase().includes(q) ||
+            r.complaintCategory.toLowerCase().includes(q) ||
+            r.resolutionStatus.toLowerCase().includes(q)
+          );
+        });
+
+        const ASSESSMENT_TH_COLS = ['Assessment ID', 'Patient', 'UHID', 'Type', 'Assessed By', 'Date', 'Priority', 'Status', 'Actions'];
+        const REFERRAL_TH_COLS = ['Referral ID', 'Patient', 'UHID', 'Type', 'Referred To', 'Reason', 'Date', 'Status', 'Actions'];
+        const COMPLAINT_TH_COLS = ['Complaint ID', 'Patient', 'UHID', 'Category', 'Date', 'Assigned To', 'Status', 'Closed Date', 'Actions'];
+
+        const ServicesTabContent = () => (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-extrabold text-slate-800">Patient Services</h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Initial assessments, referrals, and patient complaints management</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Initial Assessments', value: totalAssessments, color: 'text-blue-600' },
+                { label: 'Completed Assessments', value: completedAssessments, color: 'text-emerald-600' },
+                { label: 'Total Referrals', value: totalReferrals, color: 'text-sky-600' },
+                { label: 'Pending Referrals', value: pendingReferrals, color: 'text-amber-600' },
+                { label: 'Total Complaints', value: totalComplaints, color: 'text-violet-600' },
+                { label: 'Resolved Complaints', value: resolvedComplaints, color: 'text-rose-600' },
+                { label: 'Patient Satisfaction %', value: `${(100 - parseFloat(patientSatisfactionPct)).toFixed(1)}%`, color: 'text-indigo-600' },
+                { label: 'Service Compliance %', value: `${serviceCompliancePct}%`, color: 'text-orange-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 border-b border-slate-200 pb-2 mb-3">
+              {SERVICE_TABS.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveServiceTab(tab)}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeServiceTab === tab ? 'text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                  style={activeServiceTab === tab ? { backgroundColor: hospital.themeColor } : {}}
+                >
+                  {tab === 'assessments' ? 'Initial Assessments' : tab === 'referrals' ? 'Referrals' : 'Complaints'}
+                </button>
+              ))}
+            </div>
+
+            {activeServiceTab === 'assessments' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold text-slate-800">Initial Assessments</h4>
+                  <button
+                    onClick={() => handleOpenAssessmentModal()}
+                    style={{ backgroundColor: hospital.themeColor }}
+                    className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Assessment
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search assessments..."
+                    value={assessmentSearch}
+                    onChange={(e) => setAssessmentSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          {ASSESSMENT_TH_COLS.map((h) => (
+                            <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredAssessments.map((r) => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.assessmentId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhid}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.assessmentType}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.assessedBy}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.assessmentDate}</td>
+                            <td className="px-3 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${r.priority === 'High' ? 'bg-rose-50 text-rose-700 border-rose-200' : r.priority === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>{r.priority}</span>
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>{r.status}</span>
+                            </td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenAssessmentModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors" title="Edit"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteAssessment(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredAssessments.length === 0 && (
+                          <tr><td colSpan={ASSESSMENT_TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">{assessmentSearch ? 'No records match your search.' : 'No assessment records yet.'}</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeServiceTab === 'referrals' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold text-slate-800">Referral Registry</h4>
+                  <button
+                    onClick={() => handleOpenReferralModal()}
+                    style={{ backgroundColor: hospital.themeColor }}
+                    className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Referral
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search referrals..."
+                    value={referralSearch}
+                    onChange={(e) => setReferralSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          {REFERRAL_TH_COLS.map((h) => (
+                            <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredReferrals.map((r) => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.referralId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhid}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.referralType}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.referredTo}</td>
+                            <td className="px-3 py-3 text-slate-600 max-w-[150px] truncate">{r.reason}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.transferDate}</td>
+                            <td className="px-3 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>{r.status}</span>
+                            </td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenReferralModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors" title="Edit"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteReferral(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredReferrals.length === 0 && (
+                          <tr><td colSpan={REFERRAL_TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">{referralSearch ? 'No records match your search.' : 'No referral records yet.'}</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeServiceTab === 'complaints' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold text-slate-800">Patient Complaints & Grievances</h4>
+                  <button
+                    onClick={() => handleOpenComplaintModal()}
+                    style={{ backgroundColor: hospital.themeColor }}
+                    className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Complaint
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search complaints..."
+                    value={complaintSearch}
+                    onChange={(e) => setComplaintSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          {COMPLAINT_TH_COLS.map((h) => (
+                            <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredComplaints.map((r) => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.complaintId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhid}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.complaintCategory}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.complaintDate}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.assignedTo}</td>
+                            <td className="px-3 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.resolutionStatus] || STATUS_BADGE.Pending}`}>{r.resolutionStatus}</span>
+                            </td>
+                            <td className="px-3 py-3 text-slate-600">{r.closedDate || '-'}</td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenComplaintModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors" title="Edit"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteComplaint(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredComplaints.length === 0 && (
+                          <tr><td colSpan={COMPLAINT_TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">{complaintSearch ? 'No records match your search.' : 'No complaint records yet.'}</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        );
+        return ServicesTabContent();
+
        default:
          return null;
      }
@@ -2068,6 +2555,188 @@ const regAccuracy = registrationAccuracy?.actual || 0;
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                   <button type="button" onClick={() => { setIsFcModalOpen(false); setEditingFcId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
                   <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingFcId ? 'Save Changes' : 'Add Record'}</button>
+                </div>
+              </form>
+            </div>
+</div>
+         )}
+
+        {isAssessmentModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-800">{editingAssessmentId ? 'Edit Assessment' : 'Add Assessment'}</h3>
+                  <p className="text-[9px] text-slate-400 mt-0.5">Initial Assessment Form</p>
+                </div>
+                <button onClick={() => { setIsAssessmentModalOpen(false); setEditingAssessmentId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveAssessment} className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input type="text" value={assessmentForm.patientName} onChange={(e) => setAssessmentForm({ ...assessmentForm, patientName: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input type="text" value={assessmentForm.uhid} onChange={(e) => setAssessmentForm({ ...assessmentForm, uhid: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessment Type</label>
+                    <select value={assessmentForm.assessmentType} onChange={(e) => setAssessmentForm({ ...assessmentForm, assessmentType: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {ASSESSMENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessed By</label>
+                    <input type="text" value={assessmentForm.assessedBy} onChange={(e) => setAssessmentForm({ ...assessmentForm, assessedBy: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessment Date</label>
+                    <input type="date" value={assessmentForm.assessmentDate} onChange={(e) => setAssessmentForm({ ...assessmentForm, assessmentDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Priority</label>
+                    <select value={assessmentForm.priority} onChange={(e) => setAssessmentForm({ ...assessmentForm, priority: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {ASSESSMENT_PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
+                    <select value={assessmentForm.status} onChange={(e) => setAssessmentForm({ ...assessmentForm, status: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {REFERRAL_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                  <textarea value={assessmentForm.remarks} onChange={(e) => setAssessmentForm({ ...assessmentForm, remarks: e.target.value })} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Optional remarks" />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsAssessmentModalOpen(false); setEditingAssessmentId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingAssessmentId ? 'Save Changes' : 'Add Record'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isReferralModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-800">{editingReferralId ? 'Edit Referral' : 'Add Referral'}</h3>
+                  <p className="text-[9px] text-slate-400 mt-0.5">Referral & Transfer Form</p>
+                </div>
+                <button onClick={() => { setIsReferralModalOpen(false); setEditingReferralId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveReferral} className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input type="text" value={referralForm.patientName} onChange={(e) => setReferralForm({ ...referralForm, patientName: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input type="text" value={referralForm.uhid} onChange={(e) => setReferralForm({ ...referralForm, uhid: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Referral Type</label>
+                    <select value={referralForm.referralType} onChange={(e) => setReferralForm({ ...referralForm, referralType: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {REFERRAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Referred To</label>
+                    <input type="text" value={referralForm.referredTo} onChange={(e) => setReferralForm({ ...referralForm, referredTo: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Reason</label>
+                    <input type="text" value={referralForm.reason} onChange={(e) => setReferralForm({ ...referralForm, reason: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Transfer Date</label>
+                    <input type="date" value={referralForm.transferDate} onChange={(e) => setReferralForm({ ...referralForm, transferDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label>
+                    <select value={referralForm.status} onChange={(e) => setReferralForm({ ...referralForm, status: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {REFERRAL_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                  <textarea value={referralForm.remarks} onChange={(e) => setReferralForm({ ...referralForm, remarks: e.target.value })} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Optional remarks" />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsReferralModalOpen(false); setEditingReferralId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingReferralId ? 'Save Changes' : 'Add Record'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isComplaintModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-800">{editingComplaintId ? 'Edit Complaint' : 'Add Complaint'}</h3>
+                  <p className="text-[9px] text-slate-400 mt-0.5">Patient Complaint Form</p>
+                </div>
+                <button onClick={() => { setIsComplaintModalOpen(false); setEditingComplaintId(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveComplaint} className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input type="text" value={complaintForm.patientName} onChange={(e) => setComplaintForm({ ...complaintForm, patientName: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input type="text" value={complaintForm.uhid} onChange={(e) => setComplaintForm({ ...complaintForm, uhid: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Complaint Category</label>
+                    <select value={complaintForm.complaintCategory} onChange={(e) => setComplaintForm({ ...complaintForm, complaintCategory: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {COMPLAINT_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Complaint Date</label>
+                    <input type="date" value={complaintForm.complaintDate} onChange={(e) => setComplaintForm({ ...complaintForm, complaintDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assigned To</label>
+                    <input type="text" value={complaintForm.assignedTo} onChange={(e) => setComplaintForm({ ...complaintForm, assignedTo: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Resolution Status</label>
+                    <select value={complaintForm.resolutionStatus} onChange={(e) => setComplaintForm({ ...complaintForm, resolutionStatus: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      {COMPLAINT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Closed Date</label>
+                    <input type="date" value={complaintForm.closedDate} onChange={(e) => setComplaintForm({ ...complaintForm, closedDate: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                  <textarea value={complaintForm.remarks} onChange={(e) => setComplaintForm({ ...complaintForm, remarks: e.target.value })} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Optional remarks" />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="button" onClick={() => { setIsComplaintModalOpen(false); setEditingComplaintId(null); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Cancel</button>
+                  <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm">{editingComplaintId ? 'Save Changes' : 'Add Record'}</button>
                 </div>
               </form>
             </div>
