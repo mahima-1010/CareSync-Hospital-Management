@@ -218,6 +218,39 @@ const EVACUATION_SEED = [
   { id: 'ev-005', evacuationId: 'EV-005', area: 'Emergency Dept', drillDate: '2026-06-18', evacuationTime: '3.8', patientsShifted: '5', staffParticipated: '40', observations: 'Excellent triage during evac', improvementActions: 'Update emergency contacts list', status: 'Completed' },
 ];
 
+// ── Phase 5: Fire Incidents constants ──
+const LS_KEY_INCIDENTS = 'fire_incidents';
+const LS_KEY_NEARMISS = 'fire_near_miss';
+const LS_KEY_EMERGENCY = 'fire_emergency_response';
+
+const INCIDENT_TYPES = ['Electrical Fire', 'Chemical Fire', 'Gas Leak', 'Equipment Fire', 'Other'];
+const SEVERITY_LEVELS = ['Low', 'Medium', 'High'];
+const INCIDENT_STATUS = ['Open', 'Under Investigation', 'Closed'];
+
+const INCIDENT_SEED = [
+  { id: 'fi-001', incidentId: 'FI-001', incidentDate: '2025-11-12', incidentTime: '14:30', area: 'Electrical Room', incidentType: 'Electrical Fire', severity: 'High', rootCause: 'Short circuit', immediateActionTaken: 'Power isolated, fire extinguished', reportedBy: 'Tech Ramesh', status: 'Closed', remarks: 'Panel replaced' },
+  { id: 'fi-002', incidentId: 'FI-002', incidentDate: '2026-02-15', incidentTime: '09:15', area: 'Kitchen', incidentType: 'Gas Leak', severity: 'Medium', rootCause: 'Valve failure', immediateActionTaken: 'Main valve shut off', reportedBy: 'Chef Kumar', status: 'Closed', remarks: 'Valve serviced' },
+  { id: 'fi-003', incidentId: 'FI-003', incidentDate: '2026-04-10', incidentTime: '18:45', area: 'Server Room', incidentType: 'Equipment Fire', severity: 'Medium', rootCause: 'UPS overheating', immediateActionTaken: 'Activated gas suppression', reportedBy: 'IT Staff', status: 'Closed', remarks: 'Cooling improved' },
+  { id: 'fi-004', incidentId: 'FI-004', incidentDate: '2026-06-05', incidentTime: '11:20', area: 'Pharmacy', incidentType: 'Chemical Fire', severity: 'Low', rootCause: 'Spilled solvent', immediateActionTaken: 'Cleaned up, area ventilated', reportedBy: 'Pharmacist Priya', status: 'Closed', remarks: 'SOP updated' },
+  { id: 'fi-005', incidentId: 'FI-005', incidentDate: '2026-07-02', incidentTime: '15:00', area: 'Laundry', incidentType: 'Electrical Fire', severity: 'High', rootCause: 'Overloaded circuit', immediateActionTaken: 'Evacuated area, extinguisher used', reportedBy: 'Staff Sunita', status: 'Open', remarks: 'Pending electrical audit' },
+];
+
+const NEARMISS_SEED = [
+  { id: 'nm-001', nearMissId: 'NM-001', date: '2026-01-20', area: 'ICU Corridor', hazard: 'Blocked fire exit', potentialConsequence: 'Delayed evacuation', reportedBy: 'Nurse Anjali', correctiveAction: 'Cleared boxes', status: 'Closed', remarks: 'Daily checks enforced' },
+  { id: 'nm-002', nearMissId: 'NM-002', date: '2026-03-05', area: 'OT 3', hazard: 'Frayed wire near oxygen line', potentialConsequence: 'Explosion', reportedBy: 'Tech Vikram', correctiveAction: 'Replaced wire immediately', status: 'Closed', remarks: 'Checked all OTs' },
+  { id: 'nm-003', nearMissId: 'NM-003', date: '2026-05-12', area: 'Generator Room', hazard: 'Diesel spill', potentialConsequence: 'Fire hazard', reportedBy: 'Maint. Staff', correctiveAction: 'Sand applied, cleaned', status: 'Closed', remarks: 'Drip tray installed' },
+  { id: 'nm-004', nearMissId: 'NM-004', date: '2026-06-18', area: 'Basement', hazard: 'Smoking in non-smoking zone', potentialConsequence: 'Accidental fire', reportedBy: 'Security Guard', correctiveAction: 'Warning issued', status: 'Closed', remarks: 'Increased patrols' },
+  { id: 'nm-005', nearMissId: 'NM-005', date: '2026-07-01', area: 'Lab', hazard: 'Chemicals stored near heat source', potentialConsequence: 'Chemical fire', reportedBy: 'Lab Tech', correctiveAction: 'Relocated chemicals', status: 'Closed', remarks: 'Training provided' },
+];
+
+const EMERGENCY_SEED = [
+  { id: 'er-001', responseId: 'ER-001', incidentId: 'FI-001', responseStartTime: '14:32', responseEndTime: '14:45', teamLeader: 'Safety Officer Raj', fireBrigadeInformed: 'No', patientsEvacuated: '0', staffInvolved: '5', outcome: 'Controlled', remarks: 'Quick response' },
+  { id: 'er-002', responseId: 'ER-002', incidentId: 'FI-002', responseStartTime: '09:16', responseEndTime: '09:30', teamLeader: 'Safety Officer Raj', fireBrigadeInformed: 'No', patientsEvacuated: '0', staffInvolved: '3', outcome: 'Controlled', remarks: '' },
+  { id: 'er-003', responseId: 'ER-003', incidentId: 'FI-003', responseStartTime: '18:46', responseEndTime: '19:00', teamLeader: 'Fire Engineer Suraj', fireBrigadeInformed: 'No', patientsEvacuated: '0', staffInvolved: '4', outcome: 'Controlled', remarks: '' },
+  { id: 'er-004', responseId: 'ER-004', incidentId: 'FI-004', responseStartTime: '11:22', responseEndTime: '11:35', teamLeader: 'Safety Officer Raj', fireBrigadeInformed: 'No', patientsEvacuated: '0', staffInvolved: '2', outcome: 'Controlled', remarks: '' },
+  { id: 'er-005', responseId: 'ER-005', incidentId: 'FI-005', responseStartTime: '15:02', responseEndTime: '15:25', teamLeader: 'Fire Engineer Suraj', fireBrigadeInformed: 'Yes', patientsEvacuated: '10', staffInvolved: '8', outcome: 'Controlled', remarks: 'Fire brigade arrived in 12 mins' },
+];
+
 // ─────────────────────────────────────────────
 // Sample seed data
 // ─────────────────────────────────────────────
@@ -345,6 +378,41 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   const BLANK_EVAC_FORM = { id: '', evacuationId: '', area: '', drillDate: '', evacuationTime: '', patientsShifted: '', staffParticipated: '', observations: '', improvementActions: '', status: 'Completed' };
   const [evacForm, setEvacForm] = useState(BLANK_EVAC_FORM);
 
+  // ── State: Fire Incidents & Emergency Response ──
+  const [incidents, setIncidents] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INCIDENTS);
+    return saved ? JSON.parse(saved) : INCIDENT_SEED;
+  });
+  const [nearMisses, setNearMisses] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_NEARMISS);
+    return saved ? JSON.parse(saved) : NEARMISS_SEED;
+  });
+  const [emergencyResponses, setEmergencyResponses] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_EMERGENCY);
+    return saved ? JSON.parse(saved) : EMERGENCY_SEED;
+  });
+
+  const [activeIncidentSubTab, setActiveIncidentSubTab] = useState('incidents');
+
+  // Modals & Forms for Incidents
+  const [isIncidentModalOpen, setIsIncidentModalOpen] = useState(false);
+  const [editingIncidentId, setEditingIncidentId] = useState(null);
+  const [incidentSearch, setIncidentSearch] = useState('');
+  const BLANK_INCIDENT_FORM = { id: '', incidentId: '', incidentDate: '', incidentTime: '', area: '', incidentType: 'Electrical Fire', severity: 'Medium', rootCause: '', immediateActionTaken: '', reportedBy: '', status: 'Open', remarks: '' };
+  const [incidentForm, setIncidentForm] = useState(BLANK_INCIDENT_FORM);
+
+  const [isNearMissModalOpen, setIsNearMissModalOpen] = useState(false);
+  const [editingNearMissId, setEditingNearMissId] = useState(null);
+  const [nearMissSearch, setNearMissSearch] = useState('');
+  const BLANK_NEARMISS_FORM = { id: '', nearMissId: '', date: '', area: '', hazard: '', potentialConsequence: '', reportedBy: '', correctiveAction: '', status: 'Open', remarks: '' };
+  const [nearMissForm, setNearMissForm] = useState(BLANK_NEARMISS_FORM);
+
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+  const [editingEmergencyId, setEditingEmergencyId] = useState(null);
+  const [emergencySearch, setEmergencySearch] = useState('');
+  const BLANK_EMERGENCY_FORM = { id: '', responseId: '', incidentId: '', responseStartTime: '', responseEndTime: '', teamLeader: '', fireBrigadeInformed: 'No', patientsEvacuated: '', staffInvolved: '', outcome: 'Controlled', remarks: '' };
+  const [emergencyForm, setEmergencyForm] = useState(BLANK_EMERGENCY_FORM);
+
   // Persist to localStorage
   React.useEffect(() => {
     localStorage.setItem(LS_KEY_DASHBOARD, JSON.stringify(dashboardData));
@@ -381,6 +449,18 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   React.useEffect(() => {
     localStorage.setItem(LS_KEY_EVACUATIONS, JSON.stringify(evacRecords));
   }, [evacRecords]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_INCIDENTS, JSON.stringify(incidents));
+  }, [incidents]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_NEARMISS, JSON.stringify(nearMisses));
+  }, [nearMisses]);
+
+  React.useEffect(() => {
+    localStorage.setItem(LS_KEY_EMERGENCY, JSON.stringify(emergencyResponses));
+  }, [emergencyResponses]);
 
   // ── Assessment helpers ──
   const getNextAssessmentId = () => {
@@ -587,6 +667,82 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
   };
   const handleDeleteEvac = (id) => {
     if (window.confirm('Delete this Evacuation record? This action cannot be undone.')) { setEvacRecords(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  // ── Incident Helpers ──
+  const getNextIncidentId = () => {
+    const maxNum = incidents.reduce((max, r) => {
+      const match = r.incidentId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `fi-${nextNum}`, incidentId: `FI-${nextNum}` };
+  };
+
+  const getNextNearMissId = () => {
+    const maxNum = nearMisses.reduce((max, r) => {
+      const match = r.nearMissId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `nm-${nextNum}`, nearMissId: `NM-${nextNum}` };
+  };
+
+  const getNextEmergencyId = () => {
+    const maxNum = emergencyResponses.reduce((max, r) => {
+      const match = r.responseId.match(/(\d+)$/);
+      return Math.max(max, match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const nextNum = String(maxNum + 1).padStart(3, '0');
+    return { shortId: `er-${nextNum}`, responseId: `ER-${nextNum}` };
+  };
+
+  const handleOpenIncidentModal = (record = null) => {
+    if (record) { setIncidentForm({ ...record }); setEditingIncidentId(record.id); }
+    else { const ids = getNextIncidentId(); setIncidentForm({ ...BLANK_INCIDENT_FORM, id: ids.shortId, incidentId: ids.incidentId }); setEditingIncidentId(null); }
+    setIsIncidentModalOpen(true);
+  };
+  const handleSaveIncident = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!incidentForm.incidentDate || !incidentForm.area || !incidentForm.incidentType) { alert('Incident Date, Area and Incident Type are required.'); return; }
+    if (editingIncidentId) { setIncidents(prev => prev.map(r => r.id === editingIncidentId ? { ...incidentForm, id: editingIncidentId } : r)); }
+    else { setIncidents(prev => [...prev, incidentForm]); }
+    setIsIncidentModalOpen(false); setEditingIncidentId(null); setIncidentForm(BLANK_INCIDENT_FORM);
+  };
+  const handleDeleteIncident = (id) => {
+    if (window.confirm('Delete this Fire Incident? This action cannot be undone.')) { setIncidents(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  const handleOpenNearMissModal = (record = null) => {
+    if (record) { setNearMissForm({ ...record }); setEditingNearMissId(record.id); }
+    else { const ids = getNextNearMissId(); setNearMissForm({ ...BLANK_NEARMISS_FORM, id: ids.shortId, nearMissId: ids.nearMissId }); setEditingNearMissId(null); }
+    setIsNearMissModalOpen(true);
+  };
+  const handleSaveNearMiss = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!nearMissForm.date || !nearMissForm.area || !nearMissForm.hazard) { alert('Date, Area and Hazard are required.'); return; }
+    if (editingNearMissId) { setNearMisses(prev => prev.map(r => r.id === editingNearMissId ? { ...nearMissForm, id: editingNearMissId } : r)); }
+    else { setNearMisses(prev => [...prev, nearMissForm]); }
+    setIsNearMissModalOpen(false); setEditingNearMissId(null); setNearMissForm(BLANK_NEARMISS_FORM);
+  };
+  const handleDeleteNearMiss = (id) => {
+    if (window.confirm('Delete this Near Miss record? This action cannot be undone.')) { setNearMisses(prev => prev.filter(r => r.id !== id)); }
+  };
+
+  const handleOpenEmergencyModal = (record = null) => {
+    if (record) { setEmergencyForm({ ...record }); setEditingEmergencyId(record.id); }
+    else { const ids = getNextEmergencyId(); setEmergencyForm({ ...BLANK_EMERGENCY_FORM, id: ids.shortId, responseId: ids.responseId }); setEditingEmergencyId(null); }
+    setIsEmergencyModalOpen(true);
+  };
+  const handleSaveEmergency = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!emergencyForm.incidentId || !emergencyForm.responseStartTime) { alert('Incident ID and Response Start Time are required.'); return; }
+    if (editingEmergencyId) { setEmergencyResponses(prev => prev.map(r => r.id === editingEmergencyId ? { ...emergencyForm, id: editingEmergencyId } : r)); }
+    else { setEmergencyResponses(prev => [...prev, emergencyForm]); }
+    setIsEmergencyModalOpen(false); setEditingEmergencyId(null); setEmergencyForm(BLANK_EMERGENCY_FORM);
+  };
+  const handleDeleteEmergency = (id) => {
+    if (window.confirm('Delete this Emergency Response record? This action cannot be undone.')) { setEmergencyResponses(prev => prev.filter(r => r.id !== id)); }
   };
 
   // ── KPI derivations ──
@@ -1860,14 +2016,327 @@ const FireRiskManagementWorkspace = ({ onBack }) => {
         );
       }
 
-      case 'incidents':
+      case 'incidents': {
+        const totalIncidents = incidents.length;
+        const highSeverity = incidents.filter(r => r.severity === 'High').length;
+        const totalNearMisses = nearMisses.length;
+        const openIncidents = incidents.filter(r => r.status === 'Open' || r.status === 'Under Investigation').length;
+        const closedIncidents = incidents.filter(r => r.status === 'Closed').length;
+        
+        let totalResponseTime = 0;
+        let validResponseCount = 0;
+        emergencyResponses.forEach(r => {
+          if (r.responseStartTime && r.responseEndTime) {
+            const startParts = r.responseStartTime.split(':').map(Number);
+            const endParts = r.responseEndTime.split(':').map(Number);
+            const diff = (endParts[0] * 60 + endParts[1]) - (startParts[0] * 60 + startParts[1]);
+            if (diff > 0) { totalResponseTime += diff; validResponseCount++; }
+          }
+        });
+        const avgResponseTime = validResponseCount ? Math.round(totalResponseTime / validResponseCount) + ' mins' : '0 mins';
+        
+        const totalResponses = emergencyResponses.length;
+        const successfulResponses = emergencyResponses.filter(r => r.outcome === 'Controlled').length;
+        const responseSuccessPct = totalResponses ? Math.round((successfulResponses / totalResponses) * 100) : 0;
+        const overallCompliance = (totalIncidents ? Math.round((closedIncidents / totalIncidents) * 100) : 100);
+
+        const filteredIncidents = incidents.filter(r => {
+          const q = incidentSearch.toLowerCase();
+          return r.incidentId.toLowerCase().includes(q) || r.area.toLowerCase().includes(q) || r.incidentType.toLowerCase().includes(q) || r.status.toLowerCase().includes(q);
+        });
+        const filteredNearMisses = nearMisses.filter(r => {
+          const q = nearMissSearch.toLowerCase();
+          return r.nearMissId.toLowerCase().includes(q) || r.area.toLowerCase().includes(q) || r.hazard.toLowerCase().includes(q);
+        });
+        const filteredEmergencies = emergencyResponses.filter(r => {
+          const q = emergencySearch.toLowerCase();
+          return r.responseId.toLowerCase().includes(q) || r.incidentId.toLowerCase().includes(q) || r.teamLeader.toLowerCase().includes(q);
+        });
+
+        const STATUS_BADGE = {
+          'Closed': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'Controlled': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'Open': 'bg-rose-50 text-rose-700 border-rose-200',
+          'Under Investigation': 'bg-amber-50 text-amber-700 border-amber-200',
+          'High': 'bg-rose-50 text-rose-700 border-rose-200',
+          'Medium': 'bg-amber-50 text-amber-700 border-amber-200',
+          'Low': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        };
+
         return (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
-            <AlertTriangle className="w-12 h-12 text-slate-300" />
-            <h3 className="text-sm font-extrabold text-slate-600">Fire Incidents & Emergency Response</h3>
-            <p className="text-[10px] text-slate-400">Phase will be implemented in the next step.</p>
+          <div className="space-y-4">
+            {/* Header */}
+            <div>
+              <h3 className="text-xs font-extrabold text-slate-800">Fire Incidents & Emergency Response</h3>
+              <p className="text-[9px] text-slate-400 mt-0.5">Track fire incidents, near misses, and emergency responses</p>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Fire Incidents',       value: totalIncidents,     color: 'text-rose-600' },
+                { label: 'High Severity Incidents',    value: highSeverity,       color: 'text-red-600' },
+                { label: 'Near Miss Reports',          value: totalNearMisses,    color: 'text-amber-600' },
+                { label: 'Open Incidents',             value: openIncidents,      color: 'text-orange-600' },
+                { label: 'Closed Incidents',           value: closedIncidents,    color: 'text-emerald-600' },
+                { label: 'Average Response Time',      value: avgResponseTime,    color: 'text-blue-600' },
+                { label: 'Emergency Response Success %', value: `${responseSuccessPct}%`, color: 'text-teal-600' },
+                { label: 'Overall Compliance %',       value: `${overallCompliance}%`, color: 'text-sky-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Sub-tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 mb-4">
+              {[
+                { id: 'incidents', label: 'Fire Incidents' },
+                { id: 'nearmiss', label: 'Near Misses' },
+                { id: 'emergency', label: 'Emergency Responses' },
+              ].map(sub => (
+                <button
+                  key={sub.id}
+                  onClick={() => setActiveIncidentSubTab(sub.id)}
+                  className={`px-4 py-2 text-[10px] font-bold transition-all border-b-2 ${
+                    activeIncidentSubTab === sub.id
+                      ? 'border-sky-500 text-sky-700'
+                      : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Fire Incident Register ── */}
+            {activeIncidentSubTab === 'incidents' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search incidents..." value={incidentSearch} onChange={(e) => setIncidentSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenIncidentModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Report Incident
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Incident ID', 'Date & Time', 'Area', 'Type', 'Severity', 'Root Cause', 'Reported By', 'Status', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredIncidents.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.incidentId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.incidentDate} <span className="text-slate-400 font-normal">{r.incidentTime}</span></td>
+                            <td className="px-3 py-3 text-slate-600">{r.area}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.incidentType}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.severity] || STATUS_BADGE['Medium']}`}>{r.severity}</span></td>
+                            <td className="px-3 py-3 text-slate-600 truncate max-w-[120px]" title={r.rootCause}>{r.rootCause}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.reportedBy}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE['Open']}`}>{r.status}</span></td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenIncidentModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteIncident(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredIncidents.length === 0 && <tr><td colSpan={9} className="px-3 py-10 text-center text-[10px] text-slate-400">No fire incidents found.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Near Miss Register ── */}
+            {activeIncidentSubTab === 'nearmiss' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search near misses..." value={nearMissSearch} onChange={(e) => setNearMissSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenNearMissModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Report Near Miss
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Near Miss ID', 'Date', 'Area', 'Hazard', 'Potential Consequence', 'Corrective Action', 'Reported By', 'Status', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredNearMisses.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.nearMissId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.date}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.area}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.hazard}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.potentialConsequence}</td>
+                            <td className="px-3 py-3 text-slate-600 truncate max-w-[120px]" title={r.correctiveAction}>{r.correctiveAction}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.reportedBy}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE['Open']}`}>{r.status}</span></td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenNearMissModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteNearMiss(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredNearMisses.length === 0 && <tr><td colSpan={9} className="px-3 py-10 text-center text-[10px] text-slate-400">No near miss records found.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Emergency Response Log ── */}
+            {activeIncidentSubTab === 'emergency' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <input type="text" placeholder="Search responses..." value={emergencySearch} onChange={(e) => setEmergencySearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400" />
+                  </div>
+                  <button onClick={() => handleOpenEmergencyModal()} style={{ backgroundColor: hospital.themeColor }} className="px-3 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-1.5 hover:brightness-95 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" /> Log Response
+                  </button>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>{['Response ID', 'Incident ID', 'Start Time', 'End Time', 'Team Leader', 'FB Informed', 'Outcome', 'Actions'].map(h => <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase">{h}</th>)}</tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredEmergencies.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.responseId}</td>
+                            <td className="px-3 py-3 font-semibold text-slate-700">{r.incidentId}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.responseStartTime}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.responseEndTime}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.teamLeader}</td>
+                            <td className="px-3 py-3 text-slate-600">{r.fireBrigadeInformed}</td>
+                            <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.outcome] || STATUS_BADGE['Closed']}`}>{r.outcome}</span></td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleOpenEmergencyModal(r)} className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"><Edit3 className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteEmergency(r.id)} className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredEmergencies.length === 0 && <tr><td colSpan={8} className="px-3 py-10 text-center text-[10px] text-slate-400">No emergency responses logged.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Incident Modal ── */}
+            {isIncidentModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingIncidentId ? 'Edit Incident' : 'Report Incident'}</h3>
+                    <button onClick={() => { setIsIncidentModalOpen(false); setEditingIncidentId(null); setIncidentForm(BLANK_INCIDENT_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveIncident} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Incident ID</label><input type="text" value={incidentForm.incidentId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Incident Date *</label><input type="date" value={incidentForm.incidentDate} onChange={e => setIncidentForm({...incidentForm, incidentDate: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Incident Time</label><input type="time" value={incidentForm.incidentTime} onChange={e => setIncidentForm({...incidentForm, incidentTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Area / Location *</label><input type="text" value={incidentForm.area} onChange={e => setIncidentForm({...incidentForm, area: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Incident Type *</label><select value={incidentForm.incidentType} onChange={e => setIncidentForm({...incidentForm, incidentType: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{INCIDENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Severity</label><select value={incidentForm.severity} onChange={e => setIncidentForm({...incidentForm, severity: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{SEVERITY_LEVELS.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Reported By</label><input type="text" value={incidentForm.reportedBy} onChange={e => setIncidentForm({...incidentForm, reportedBy: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label><select value={incidentForm.status} onChange={e => setIncidentForm({...incidentForm, status: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500">{INCIDENT_STATUS.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Root Cause</label><input type="text" value={incidentForm.rootCause} onChange={e => setIncidentForm({...incidentForm, rootCause: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Immediate Action Taken</label><input type="text" value={incidentForm.immediateActionTaken} onChange={e => setIncidentForm({...incidentForm, immediateActionTaken: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label><input type="text" value={incidentForm.remarks} onChange={e => setIncidentForm({...incidentForm, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsIncidentModalOpen(false); setEditingIncidentId(null); setIncidentForm(BLANK_INCIDENT_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingIncidentId ? 'Save Changes' : 'Report Incident'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* ── Near Miss Modal ── */}
+            {isNearMissModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingNearMissId ? 'Edit Near Miss' : 'Report Near Miss'}</h3>
+                    <button onClick={() => { setIsNearMissModalOpen(false); setEditingNearMissId(null); setNearMissForm(BLANK_NEARMISS_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveNearMiss} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Near Miss ID</label><input type="text" value={nearMissForm.nearMissId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Date *</label><input type="date" value={nearMissForm.date} onChange={e => setNearMissForm({...nearMissForm, date: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Area *</label><input type="text" value={nearMissForm.area} onChange={e => setNearMissForm({...nearMissForm, area: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Hazard *</label><input type="text" value={nearMissForm.hazard} onChange={e => setNearMissForm({...nearMissForm, hazard: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Potential Consequence</label><input type="text" value={nearMissForm.potentialConsequence} onChange={e => setNearMissForm({...nearMissForm, potentialConsequence: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Corrective Action</label><input type="text" value={nearMissForm.correctiveAction} onChange={e => setNearMissForm({...nearMissForm, correctiveAction: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Reported By</label><input type="text" value={nearMissForm.reportedBy} onChange={e => setNearMissForm({...nearMissForm, reportedBy: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Status</label><select value={nearMissForm.status} onChange={e => setNearMissForm({...nearMissForm, status: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500"><option value="Open">Open</option><option value="Closed">Closed</option></select></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label><input type="text" value={nearMissForm.remarks} onChange={e => setNearMissForm({...nearMissForm, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsNearMissModalOpen(false); setEditingNearMissId(null); setNearMissForm(BLANK_NEARMISS_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingNearMissId ? 'Save Changes' : 'Report Near Miss'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* ── Emergency Response Modal ── */}
+            {isEmergencyModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-extrabold text-slate-800">{editingEmergencyId ? 'Edit Emergency Response' : 'Log Emergency Response'}</h3>
+                    <button onClick={() => { setIsEmergencyModalOpen(false); setEditingEmergencyId(null); setEmergencyForm(BLANK_EMERGENCY_FORM); }} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4 text-slate-500" /></button>
+                  </div>
+                  <form onSubmit={handleSaveEmergency} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Response ID</label><input type="text" value={emergencyForm.responseId} readOnly className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[10px] text-slate-500 bg-slate-50" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Incident ID *</label><input type="text" value={emergencyForm.incidentId} onChange={e => setEmergencyForm({...emergencyForm, incidentId: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Start Time *</label><input type="time" value={emergencyForm.responseStartTime} onChange={e => setEmergencyForm({...emergencyForm, responseStartTime: e.target.value})} required className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">End Time</label><input type="time" value={emergencyForm.responseEndTime} onChange={e => setEmergencyForm({...emergencyForm, responseEndTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Team Leader</label><input type="text" value={emergencyForm.teamLeader} onChange={e => setEmergencyForm({...emergencyForm, teamLeader: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Fire Brigade Informed</label><select value={emergencyForm.fireBrigadeInformed} onChange={e => setEmergencyForm({...emergencyForm, fireBrigadeInformed: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Patients Evacuated</label><input type="number" value={emergencyForm.patientsEvacuated} onChange={e => setEmergencyForm({...emergencyForm, patientsEvacuated: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Staff Involved</label><input type="number" value={emergencyForm.staffInvolved} onChange={e => setEmergencyForm({...emergencyForm, staffInvolved: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                      <div><label className="block text-[9px] font-medium text-slate-600 mb-1">Outcome</label><select value={emergencyForm.outcome} onChange={e => setEmergencyForm({...emergencyForm, outcome: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500"><option value="Controlled">Controlled</option><option value="Escalated">Escalated</option><option value="Ongoing">Ongoing</option></select></div>
+                      <div className="col-span-2"><label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label><input type="text" value={emergencyForm.remarks} onChange={e => setEmergencyForm({...emergencyForm, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] focus:ring-2 focus:ring-sky-500" /></div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <button type="button" onClick={() => { setIsEmergencyModalOpen(false); setEditingEmergencyId(null); setEmergencyForm(BLANK_EMERGENCY_FORM); }} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold">Cancel</button>
+                      <button type="submit" style={{ backgroundColor: hospital.themeColor }} className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 shadow-sm">{editingEmergencyId ? 'Save Changes' : 'Log Response'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         );
+      }
 
       case 'audit':
         return (
