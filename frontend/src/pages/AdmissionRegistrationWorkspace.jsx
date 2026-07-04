@@ -2371,6 +2371,217 @@ const regAccuracy = registrationAccuracy?.actual || 0;
         );
         return CapaTabContent();
 
+      case 'reports':
+        const regTrend = dashboardData.map(r => ({
+          month: r.month || '',
+          registrations: r.opdRegistrations || 0,
+          admissions: r.ipdAdmissions || 0,
+        }));
+
+        const opdVipdDist = [
+          { name: 'OPD Registrations', value: totalOpdRegistrations, color: '#3b82f6' },
+          { name: 'IPD Admissions', value: dashboardData.reduce((s, r) => s + (r.ipdAdmissions || 0), 0), color: '#10b981' },
+        ];
+
+        const billingTrend = [
+          { month: 'Jan', collection: 125000, claims: 35000, paid: 90000 },
+          { month: 'Feb', collection: 118000, claims: 32000, paid: 86000 },
+          { month: 'Mar', collection: 132000, claims: 38000, paid: 94000 },
+        ];
+
+        const claimStatusDist = [
+          { name: 'Approved', value: tpaClaims.filter(r => r.claimStatus === 'Approved').length, color: '#10b981' },
+          { name: 'Pending', value: tpaClaims.filter(r => r.claimStatus === 'Pending').length, color: '#f59e0b' },
+          { name: 'Rejected', value: tpaClaims.filter(r => r.claimStatus === 'Rejected').length, color: '#ef4444' },
+        ];
+
+        const serviceTrend = initialAssessments.map((r, i) => ({
+          month: `Record ${i + 1}`,
+          completed: initialAssessments.slice(0, i + 1).filter(a => a.status === 'Completed').length,
+        }));
+
+        const auditTrend = internalAudits.map((r, i) => ({
+          month: `Audit ${i + 1}`,
+          compliance: r.compliancePercent || 0,
+        }));
+
+        const totalRegistrations = totalOpdRegistrations + dashboardData.reduce((s, r) => s + (r.ipdAdmissions || 0), 0);
+        const billingCollectionPercent = dashboardData.reduce((s, r) => s + (r.billingCollection || 0), 0) / totalRegistrations || 0;
+        const insuranceClaimSuccess = tpaClaims.length ? (tpaClaims.filter(r => r.claimStatus === 'Approved').reduce((s, r) => s + (r.claimAmount || 0), 0) / totalClaimsAmount * 100).toFixed(1) : 0;
+        const serviceCompliancePercent = initialAssessments.length ? (completedAssessments / initialAssessments.length * 100).toFixed(1) : 0;
+        const auditCompliancePercent = avgAuditCompliance;
+        const overallPerformance = ((parseFloat(serviceCompliancePercent) + parseFloat(auditCompliancePercent)) / 2).toFixed(1);
+
+        const monthlySummary = dashboardData.map(r => ({
+          month: r.month,
+          registrations: r.opdRegistrations || 0,
+          admissions: r.ipdAdmissions || 0,
+          billing: r.billingCollection || 0,
+          claims: r.insuranceCases || 0,
+          audit: r.avgRegistrationTime || 0,
+          performance: r.patientSatisfaction || 0,
+        }));
+
+        const ReportsTabContent = () => (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-extrabold text-slate-800">Reports & Analytics</h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Comprehensive admission department reporting</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Export CSV</button>
+                <button className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Export PDF</button>
+                <button className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all">Print</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: 'Total Registrations', value: totalRegistrations, color: 'text-blue-600' },
+                { label: 'Total Admissions', value: dashboardData.reduce((s, r) => s + (r.ipdAdmissions || 0), 0), color: 'text-emerald-600' },
+                { label: 'Billing Collection %', value: `${parseFloat(billingCollectionPercent).toFixed(1)}%`, color: 'text-sky-600' },
+                { label: 'Insurance Claim Success %', value: `${insuranceClaimSuccess}%`, color: 'text-violet-600' },
+                { label: 'Patient Service Compliance %', value: `${serviceCompliancePercent}%`, color: 'text-rose-600' },
+                { label: 'Internal Audit Compliance %', value: `${auditCompliancePercent}%`, color: 'text-indigo-600' },
+                { label: 'Open CAPAs', value: openCapas, color: 'text-amber-600' },
+                { label: 'Overall Performance %', value: `${overallPerformance}%`, color: 'text-orange-600' },
+              ].map((kpi) => (
+                <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                  <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">Monthly Registration Trend</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={regTrend}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="registrations" stroke={hospital.themeColor} strokeWidth={3} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="admissions" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">OPD vs IPD Distribution</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={opdVipdDist} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                        {opdVipdDist.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                      </Pie>
+                      <Tooltip />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">Billing Collection Trend</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={billingTrend}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <Tooltip />
+                      <Bar dataKey="collection" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="claims" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">Insurance Claims Status</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={claimStatusDist} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                        {claimStatusDist.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                      </Pie>
+                      <Tooltip />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">Patient Services Compliance</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={serviceTrend}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <Tooltip />
+                      <Bar dataKey="completed" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-800 mb-4">Internal Audit Compliance Trend</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={auditTrend}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="compliance" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+              <h4 className="text-xs font-extrabold text-slate-800 p-4 border-b border-slate-200">Monthly Summary</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px]">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      {['Month', 'Registrations', 'Admissions', 'Billing Collection', 'Claims Approved', 'Audit Compliance %', 'Overall Performance %'].map((h) => (
+                        <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {monthlySummary.map((r) => (
+                      <tr key={r.month} className="hover:bg-slate-50/60 transition-colors">
+                        <td className="px-3 py-3 font-semibold text-slate-700">{r.month}</td>
+                        <td className="px-3 py-3 text-blue-600 font-bold">{r.registrations}</td>
+                        <td className="px-3 py-3 text-emerald-600 font-bold">{r.admissions}</td>
+                        <td className="px-3 py-3 text-violet-600 font-bold">${r.billing.toLocaleString()}</td>
+                        <td className="px-3 py-3 text-cyan-600 font-bold">{r.claims}</td>
+                        <td className="px-3 py-3 text-indigo-600 font-bold">{r.audit}%</td>
+                        <td className="px-3 py-3 text-orange-600 font-bold">{r.performance}%</td>
+                      </tr>
+                    ))}
+                    {monthlySummary.length === 0 && (
+                      <tr><td colSpan={7} className="px-3 py-10 text-center text-[10px] text-slate-400">No monthly summary data available.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+        return ReportsTabContent();
+
        default:
          return null;
      }
