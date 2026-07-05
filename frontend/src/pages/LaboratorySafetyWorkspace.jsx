@@ -1362,6 +1362,201 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     </div>
   );
 
+  const renderReportsAnalytics = () => {
+    const totalRiskAssessments = riskAssessments.length;
+    const equipComp = equipments.length ? Math.round((equipments.filter(e => e.calibrationStatus === 'Valid').length / equipments.length) * 100) : 0;
+    const chemComp = chemicals.length ? Math.round((chemicals.filter(c => c.storageCompliance === 'Compliant').length / chemicals.length) * 100) : 0;
+    const ppeComp = ppeRecords.length ? Math.round((ppeRecords.filter(p => p.complianceStatus === 'Compliant').length / ppeRecords.length) * 100) : 0;
+    const trainComp = trainings.length ? Math.round((trainings.filter(t => t.competencyStatus === 'Competent').length / trainings.length) * 100) : 0;
+    const incRes = incidents.length ? Math.round((incidents.filter(i => i.followUpStatus === 'Closed').length / incidents.length) * 100) : 0;
+    const auditComp = audits.length ? Math.round(audits.reduce((sum, a) => sum + a.complianceScore, 0) / audits.length) : 0;
+    const overallScore = Math.round((equipComp + chemComp + ppeComp + trainComp + incRes + auditComp) / 6) || 0;
+
+    const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+    const riskCategories = riskAssessments.reduce((acc, r) => { acc[r.hazardCategory] = (acc[r.hazardCategory] || 0) + 1; return acc; }, {});
+    const riskData = Object.keys(riskCategories).map(k => ({ name: k, value: riskCategories[k] }));
+
+    const equipmentData = [
+      { name: 'Compliant', value: equipments.filter(e => e.calibrationStatus === 'Valid').length },
+      { name: 'Non-Compliant', value: equipments.filter(e => e.calibrationStatus !== 'Valid').length }
+    ];
+
+    const incidentStatus = incidents.reduce((acc, r) => { acc[r.followUpStatus] = (acc[r.followUpStatus] || 0) + 1; return acc; }, {});
+    const incidentData = Object.keys(incidentStatus).map(k => ({ name: k, value: incidentStatus[k] }));
+
+    const trainingPpeData = [
+      { name: 'PPE', Compliant: ppeRecords.filter(p => p.complianceStatus === 'Compliant').length, NonCompliant: ppeRecords.filter(p => p.complianceStatus !== 'Compliant').length },
+      { name: 'Training', Compliant: trainings.filter(t => t.competencyStatus === 'Competent').length, NonCompliant: trainings.filter(t => t.competencyStatus !== 'Competent').length }
+    ];
+
+    const auditData = audits.map(a => ({ name: a.id, compliance: a.complianceScore }));
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+    const tableData = months.map(m => ({
+      month: m,
+      risks: totalRiskAssessments,
+      equip: equipComp,
+      train: trainComp,
+      incidents: incidents.length,
+      audit: auditComp,
+      overall: overallScore
+    }));
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-extrabold text-slate-800">Reports & Analytics</h3>
+            <p className="text-[9px] text-slate-400 mt-0.5">Comprehensive view of laboratory safety performance and compliance metrics</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => alert("CSV Export placeholder")} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition-colors">Export CSV</button>
+            <button onClick={() => alert("PDF Export placeholder")} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition-colors">Export PDF</button>
+            <button onClick={() => alert("Print placeholder")} className="px-3 py-1.5 bg-sky-500 text-white rounded-lg text-[10px] font-bold hover:bg-sky-600 transition-colors">Print Report</button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: 'Total Risk Assessments', value: totalRiskAssessments, color: 'text-blue-600' },
+            { label: 'Equip. Compliance %', value: `${equipComp}%`, color: 'text-emerald-600' },
+            { label: 'Chem. Compliance %', value: `${chemComp}%`, color: 'text-sky-600' },
+            { label: 'PPE Compliance %', value: `${ppeComp}%`, color: 'text-indigo-600' },
+            { label: 'Training Compliance %', value: `${trainComp}%`, color: 'text-amber-600' },
+            { label: 'Incident Resolution %', value: `${incRes}%`, color: 'text-rose-600' },
+            { label: 'Audit Compliance %', value: `${auditComp}%`, color: 'text-teal-600' },
+            { label: 'Overall Performance %', value: `${overallScore}%`, color: 'text-violet-600' },
+          ].map((kpi, idx) => (
+            <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">1. Monthly Safety Trend</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyComplianceData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <YAxis style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Line type="monotone" dataKey="compliance" stroke="#0ea5e9" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">2. Risk Category Distribution</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={riskData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value">
+                    {riskData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '9px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">3. Equipment Compliance</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={equipmentData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <YAxis style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">4. Incident Status</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={incidentData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value">
+                    {incidentData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[(index+2) % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '9px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">5. Training & PPE Compliance</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={trainingPpeData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <YAxis style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '9px' }} />
+                  <Bar dataKey="Compliant" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="NonCompliant" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 className="text-[10px] font-bold text-slate-700 mb-4">6. Audit Compliance Trend</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={auditData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <YAxis style={{ fontSize: '9px' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px' }} />
+                  <Line type="monotone" dataKey="compliance" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-200">
+            <h3 className="text-xs font-bold text-slate-800">Monthly Summary Table</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[10px]">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  {['Month', 'Risk Assessments', 'Equipment Compliance %', 'Training Compliance %', 'Incidents', 'Audit Compliance %', 'Overall Performance %'].map((h) => (
+                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {tableData.map((r, i) => (
+                  <tr key={i} className="hover:bg-slate-50/60">
+                    <td className="px-3 py-2 font-semibold text-slate-700">{r.month}</td>
+                    <td className="px-3 py-2 text-slate-600">{r.risks}</td>
+                    <td className="px-3 py-2 text-slate-600">{r.equip}%</td>
+                    <td className="px-3 py-2 text-slate-600">{r.train}%</td>
+                    <td className="px-3 py-2 text-slate-600">{r.incidents}</td>
+                    <td className="px-3 py-2 text-slate-600">{r.audit}%</td>
+                    <td className="px-3 py-2 font-bold text-sky-600">{r.overall}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 bg-slate-50 flex flex-col z-50 overflow-hidden">
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
@@ -1415,6 +1610,8 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               renderIncidentManagement()
             ) : activeTab === 'internal_audit' ? (
               renderInternalAudit()
+            ) : activeTab === 'reports' ? (
+              renderReportsAnalytics()
             ) : (
               <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
                 <p className="text-sm font-medium text-slate-500">Phase will be implemented in the next step.</p>
