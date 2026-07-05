@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { useHospital } from '../context/HospitalContext';
 import RadiologyWorkspace from './RadiologyWorkspace';
-import SafetyWorkspace from './SafetyWorkspace';
+import LaboratorySafetyWorkspace from './LaboratorySafetyWorkspace';
 import CSSDWorkspace from './CSSDWorkspace';
 import FeedbackWorkspace from './FeedbackWorkspace';
 import PharmacyWorkspace from './PharmacyWorkspace';
 import LaboratoryQualityWorkspace from './LaboratoryQualityWorkspace';
 import FemaleWardWorkspace from './FemaleWardWorkspace';
 import MaleWardWorkspace from './MaleWardWorkspace';
+import DeluxeWardWorkspace from './DeluxeWardWorkspace';
+import EmergencyWorkspace from './EmergencyWorkspace';
 import MICUWorkspace from './MICUWorkspace';
 import SICUWorkspace from './SICUWorkspace';
-import EndoscopyWorkspace from './EndoscopyWorkspace';
 import OperationTheatreWorkspace from './OperationTheatreWorkspace';
+import EndoscopyWorkspace from './EndoscopyWorkspace';
 import CathLabWorkspace from './CathLabWorkspace';
+import NursingOperationsWorkspace from './NursingOperationsWorkspace';
+import AdmissionRegistrationWorkspace from './AdmissionRegistrationWorkspace';
+import FireRiskManagementWorkspace from './FireRiskManagementWorkspace';
 import { 
   BookOpen, 
   Award, 
@@ -57,7 +62,7 @@ const Policies = () => {
   const [editingPolicy, setEditingPolicy] = useState(null); // Active document for editing
 
   // Special workspace routing — dedicated pages for specific departments
-  const SPECIALIZED_DEPTS = ['radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 'female-ward', 'micu', 'sicu', 'endoscopy', 'cathlab', 'operation-theatre'];
+  const SPECIALIZED_DEPTS = ['radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 'female-ward', 'male-ward', 'deluxe-ward', 'emergency', 'micu', 'sicu', 'endoscopy', 'cathlab', 'operation-theatre', 'nursing-operations', 'admission-registration', 'fire-risk'];
   
   // Search queries
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,45 +156,24 @@ const Policies = () => {
   );
 
   // Render specialized workspaces for dedicated departments
-  if (selectedDeptId === 'radiology') {
-    return <RadiologyWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'safety') {
-    return <SafetyWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'cssd') {
-    return <CSSDWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'feedback') {
-    return <FeedbackWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'pharmacy') {
-    return <PharmacyWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'lab') {
-    return <LaboratoryQualityWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'female-ward') {
-    return <FemaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'male-ward') {
-    return <MaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'micu') {
-    return <MICUWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'sicu') {
-    return <SICUWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'endoscopy') {
-    return <EndoscopyWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'cathlab') {
-    return <CathLabWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
-  if (selectedDeptId === 'operation-theatre') {
-    return <OperationTheatreWorkspace onBack={() => setSelectedDeptId(null)} />;
-  }
+  if (selectedDeptId === 'radiology') return <RadiologyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'safety') return <LaboratorySafetyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'cssd') return <CSSDWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'feedback') return <FeedbackWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'pharmacy') return <PharmacyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'lab') return <LaboratoryQualityWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'female-ward') return <FemaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'male-ward') return <MaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'deluxe-ward') return <DeluxeWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'emergency') return <EmergencyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'micu') return <MICUWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'sicu') return <SICUWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'operation-theatre') return <OperationTheatreWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'endoscopy') return <EndoscopyWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'cathlab') return <CathLabWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'nursing-operations') return <NursingOperationsWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'admission-registration') return <AdmissionRegistrationWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'fire-risk') return <FireRiskManagementWorkspace onBack={() => setSelectedDeptId(null)} />;
 
   return (
     <div className="space-y-6 animate-fade-in">
