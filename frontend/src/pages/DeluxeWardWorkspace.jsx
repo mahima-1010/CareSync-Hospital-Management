@@ -1161,62 +1161,151 @@ const ReportsTab = ({
   bloodRecords,
   infectionRecords,
   patientSafetyRecords,
+  assessments,
+  injuries,
+  preventionRecords,
+  safetyRegisterRecords,
+  fireSafetyRecords,
+  medicationRecords,
+  observationRecords,
+  dischargeRecords,
+  auditRecords,
+  capaRecords,
 }) => {
-  // Aggregate KPIs
+  /* ── Helpers ── */
+  const getMonth = (dateStr) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleString('default', { month: 'long' });
+  };
+
+  const safePct = (part, total) => (total > 0 ? ((part / total) * 100).toFixed(1) : '0.0');
+
+  /* ── KPI Calculations ── */
   const totalQuality = qualityIndicators.length;
-  const totalBlood = bloodRecords.length;
-  const totalInfection = infectionRecords.length;
-  const totalSafety = patientSafetyRecords.length;
+  const totalPatientCare = assessments.length + injuries.length + bloodRecords.length;
+  const completedAssessments = assessments.filter(r => r.status === 'Completed').length;
+  const resolvedInjuries = injuries.filter(r => r.status === 'Resolved').length;
+  const assessmentCompletionPct = safePct(completedAssessments, assessments.length);
+  const injuryResolutionPct = safePct(resolvedInjuries, injuries.length);
+  const patientCareCompliancePct = assessments.length || injuries.length
+    ? (((completedAssessments / (assessments.length || 1)) + (resolvedInjuries / (injuries.length || 1))) / 2 * 100).toFixed(1)
+    : '0.0';
 
-  const totalFalls = patientSafetyRecords.reduce((sum, r) => sum + (r.falls || 0), 0) + qualityIndicators.reduce((sum, r) => sum + (r.falls || 0), 0);
-  const totalMedErrs = patientSafetyRecords.reduce((sum, r) => sum + (r.medicationErrors || 0), 0) + qualityIndicators.reduce((sum, r) => sum + (r.medicationErrors || 0), 0);
-  const totalCauti = infectionRecords.reduce((sum, r) => sum + (r.cauti || 0), 0) + qualityIndicators.reduce((sum, r) => sum + (r.cauti || 0), 0);
-  
-  const totalBloodUnits = bloodRecords.reduce((sum, r) => sum + (r.prbc || 0) + (r.sdp || 0) + (r.rdp || 0) + (r.ffp || 0) + (r.cryo || 0), 0);
-  const totalBloodWastage = bloodRecords.reduce((sum, r) => sum + (r.bloodWastage || 0), 0);
-  const wastagePercent = totalBloodUnits > 0 ? ((totalBloodWastage / totalBloodUnits) * 100).toFixed(1) : '0.0';
+  const infectionCompliant = preventionRecords.filter(r => r.infectionControlStatus === 'Compliant').length;
+  const infectionCompliancePct = safePct(infectionCompliant, preventionRecords.length);
 
-  // Align data by month
-  const monthlyData = MONTHS.map((month) => {
-    const q = qualityIndicators.find(r => r.month === month) || {};
-    const b = bloodRecords.find(r => r.month === month) || {};
-    const i = infectionRecords.find(r => r.month === month) || {};
-    const p = patientSafetyRecords.find(r => r.month === month) || {};
+  const completedObservations = observationRecords.filter(r => r.status === 'Completed').length;
+  const observationCompliancePct = safePct(completedObservations, observationRecords.length);
+  const documentedDischarges = dischargeRecords.filter(r => r.documentationComplete === 'Yes').length;
+  const dischargeDocumentationPct = safePct(documentedDischarges, dischargeRecords.length);
+  const medicationNoError = medicationRecords.filter(r => r.medicationError === 'No').length;
+  const medicationSafetyPct = safePct(medicationNoError, medicationRecords.length);
+  const clinicalCompliancePct = observationRecords.length || dischargeRecords.length || medicationRecords.length
+    ? (((observationCompliancePct / 100) + (dischargeDocumentationPct / 100) + (medicationSafetyPct / 100)) / 3 * 100).toFixed(1)
+    : '0.0';
 
-    const falls = (q.falls || 0) + (p.falls || 0);
-    const medErrs = (q.medicationErrors || 0) + (p.medicationErrors || 0);
-    const cauti = (q.cauti || 0) + (i.cauti || 0);
-    const bsi = (q.bloodstreamInfections || 0) + (i.bloodstreamInfections || 0);
-    const bloodUnits = (b.prbc || 0) + (b.sdp || 0) + (b.rdp || 0) + (b.ffp || 0) + (b.cryo || 0);
-    const bloodWastage = b.bloodWastage || 0;
+  const auditCompliant = auditRecords.filter(r => r.complianceStatus === 'Compliant').length;
+  const auditCompliancePct = safePct(auditCompliant, auditRecords.length);
 
-    return {
-      month,
-      falls,
-      medErrs,
-      cauti,
-      bsi,
-      bloodUnits,
-      bloodWastage,
-      status: q.status || b.status || i.status || p.status || 'Inactive'
-    };
-  }).filter(d => d.falls > 0 || d.medErrs > 0 || d.cauti > 0 || d.bsi > 0 || d.bloodUnits > 0 || d.bloodWastage > 0);
+  const closedCapas = capaRecords.filter(r => r.status === 'Closed').length;
+  const capaClosurePct = safePct(closedCapas, capaRecords.length);
 
-  const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  const activeSafety = safetyRegisterRecords.filter(r => r.status === 'Active' || r.status === 'Resolved').length;
+  const safetyCompliancePct = safePct(activeSafety, safetyRegisterRecords.length);
+  const activeFire = fireSafetyRecords.filter(r => r.status === 'Active').length;
+  const fireCompliancePct = safePct(activeFire, fireSafetyRecords.length);
+  const patientSafetyCompliancePct = safetyRegisterRecords.length || fireSafetyRecords.length
+    ? (((safePct(activeSafety, safetyRegisterRecords.length) / 100) + (safePct(activeFire, fireSafetyRecords.length) / 100)) / 2 * 100).toFixed(1)
+    : '0.0';
 
-  const infectionPie = [
-    { name: 'CAUTI', value: totalCauti },
-    { name: 'BSI', value: infectionRecords.reduce((sum, r) => sum + (r.bloodstreamInfections || 0), 0) + qualityIndicators.reduce((sum, r) => sum + (r.bloodstreamInfections || 0), 0) },
-    { name: 'SSI', value: infectionRecords.reduce((sum, r) => sum + (r.ssi || 0), 0) }
+  const overallPerformancePct = (
+    (parseFloat(patientCareCompliancePct) +
+      parseFloat(infectionCompliancePct) +
+      parseFloat(clinicalCompliancePct) +
+      parseFloat(auditCompliancePct) +
+      parseFloat(capaClosurePct) +
+      parseFloat(patientSafetyCompliancePct)) / 6
+  ).toFixed(1);
+
+  /* ── Monthly Data Aggregation ── */
+  const monthSet = Array.from(new Set([
+    ...qualityIndicators.map(r => r.month),
+    ...assessments.map(r => getMonth(r.assessmentDate)).filter(Boolean),
+    ...injuries.map(r => getMonth(r.assessmentDate)).filter(Boolean),
+    ...preventionRecords.map(r => getMonth(r.auditDate)).filter(Boolean),
+    ...auditRecords.map(r => getMonth(r.auditDate)).filter(Boolean),
+  ]));
+
+  const monthlyData = MONTHS.filter(m => monthSet.includes(m)).map((month) => {
+    const qMonths = qualityIndicators.filter(r => r.month === month);
+    const qCount = qMonths.length;
+    const qAvgStatus = qMonths.length
+      ? (qMonths.filter(r => r.status === 'Active').length / qMonths.length * 100).toFixed(1)
+      : '0.0';
+
+    const assessCount = assessments.filter(r => getMonth(r.assessmentDate) === month).length;
+    const assessCompleted = assessments.filter(r => getMonth(r.assessmentDate) === month && r.status === 'Completed').length;
+    const assessPct = safePct(assessCompleted, assessCount);
+
+    const prevCount = preventionRecords.filter(r => getMonth(r.auditDate) === month).length;
+    const prevCompliant = preventionRecords.filter(r => getMonth(r.auditDate) === month && r.infectionControlStatus === 'Compliant').length;
+    const prevPct = safePct(prevCompliant, prevCount);
+
+    const obsCount = observationRecords.filter(r => getMonth(r.observationDate) === month).length;
+    const obsCompleted = observationRecords.filter(r => getMonth(r.observationDate) === month && r.status === 'Completed').length;
+    const obsPct = safePct(obsCompleted, obsCount);
+
+    const audCount = auditRecords.filter(r => getMonth(r.auditDate) === month).length;
+    const audCompliant = auditRecords.filter(r => getMonth(r.auditDate) === month && r.complianceStatus === 'Compliant').length;
+    const audPct = safePct(audCompliant, audCount);
+
+    const vals = [parseFloat(qAvgStatus), parseFloat(assessPct), parseFloat(prevPct), parseFloat(obsPct), parseFloat(audPct)].filter(v => !isNaN(v));
+    const overall = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : '0.0';
+
+    return { month, qualityIndicators: qCount, patientCare: assessPct, infectionPrevention: prevPct, clinicalMonitoring: obsPct, auditCompliance: audPct, overall: overall };
+  });
+
+  /* ── Pie Data ── */
+  const patientCarePie = [
+    { name: 'Assessments', value: assessments.length },
+    { name: 'Pressure Injuries', value: injuries.length },
+    { name: 'Blood Transfusions', value: bloodRecords.length },
   ].filter(d => d.value > 0);
 
-  const bloodPie = [
-    { name: 'PRBC', value: bloodRecords.reduce((sum, r) => sum + (r.prbc || 0), 0) },
-    { name: 'SDP', value: bloodRecords.reduce((sum, r) => sum + (r.sdp || 0), 0) },
-    { name: 'RDP', value: bloodRecords.reduce((sum, r) => sum + (r.rdp || 0), 0) },
-    { name: 'FFP', value: bloodRecords.reduce((sum, r) => sum + (r.ffp || 0), 0) },
-    { name: 'CRYO', value: bloodRecords.reduce((sum, r) => sum + (r.cryo || 0), 0) },
-  ].filter(d => d.value > 0);
+  const overallPerfPie = [
+    { name: 'Patient Care', value: parseFloat(patientCareCompliancePct) || 0 },
+    { name: 'Infection Prevention', value: parseFloat(infectionCompliancePct) || 0 },
+    { name: 'Clinical Monitoring', value: parseFloat(clinicalCompliancePct) || 0 },
+    { name: 'Internal Audit', value: parseFloat(auditCompliancePct) || 0 },
+    { name: 'Patient Safety', value: parseFloat(patientSafetyCompliancePct) || 0 },
+  ];
+
+  const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316'];
+
+  /* ── Export Handlers ── */
+  const handleExportCSV = () => {
+    const headers = ['Month', 'Quality Indicators Count', 'Patient Care Compliance %', 'Infection Prevention Compliance %', 'Clinical Monitoring Compliance %', 'Audit Compliance %', 'Overall Performance %'];
+    const rows = monthlyData.map(r => [r.month, r.qualityIndicators, r.patientCare, r.infectionPrevention, r.clinicalMonitoring, r.auditCompliance, r.overall]);
+    const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'Deluxe_Ward_Reports.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportPDF = () => {
+    alert('PDF export will be available in the next version.');
+  };
+
+  const handlePrint = () => {
+    alert('Print report will be available in the next version.');
+  };
 
   return (
     <div className="space-y-6">
@@ -1227,13 +1316,14 @@ const ReportsTab = ({
           <p className="text-[9px] text-slate-400 mt-0.5">Comprehensive overview of Deluxe Ward performance</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 hover:border-slate-300 text-[9px] font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+          <button onClick={handleExportCSV} className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 hover:border-slate-300 text-[9px] font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
             <FileDown className="w-3.5 h-3.5" /> Export CSV
           </button>
-          <button className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 hover:border-slate-300 text-[9px] font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+          <button onClick={handleExportPDF} className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 hover:border-slate-300 text-[9px] font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
             <Download className="w-3.5 h-3.5" /> Export PDF
           </button>
           <button
+            onClick={handlePrint}
             style={{ backgroundColor: hospital.themeColor }}
             className="px-3 py-1.5 rounded-xl text-white text-[9px] font-bold flex items-center gap-1.5 hover:brightness-95 transition-all shadow-sm cursor-pointer"
           >
@@ -1242,17 +1332,17 @@ const ReportsTab = ({
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* 8 KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Quality Records', value: totalQuality, color: 'text-blue-600' },
-          { label: 'Total Blood Records', value: totalBlood, color: 'text-rose-600' },
-          { label: 'Total Infection Records', value: totalInfection, color: 'text-emerald-600' },
-          { label: 'Total Safety Records', value: totalSafety, color: 'text-purple-600' },
-          { label: 'Total Falls', value: totalFalls, color: 'text-orange-600' },
-          { label: 'Total Medication Errors', value: totalMedErrs, color: 'text-amber-600' },
-          { label: 'Total CAUTI Cases', value: totalCauti, color: 'text-red-600' },
-          { label: 'Blood Wastage', value: `${wastagePercent}%`, color: 'text-indigo-600' },
+          { label: 'Total Quality Indicators', value: totalQuality, color: 'text-blue-600' },
+          { label: 'Patient Care Compliance %', value: `${patientCareCompliancePct}%`, color: 'text-emerald-600' },
+          { label: 'Infection Prevention Compliance %', value: `${infectionCompliancePct}%`, color: 'text-teal-600' },
+          { label: 'Clinical Monitoring Compliance %', value: `${clinicalCompliancePct}%`, color: 'text-indigo-600' },
+          { label: 'Internal Audit Compliance %', value: `${auditCompliancePct}%`, color: 'text-orange-600' },
+          { label: 'CAPA Closure %', value: `${capaClosurePct}%`, color: 'text-purple-600' },
+          { label: 'Patient Safety Compliance %', value: `${patientSafetyCompliancePct}%`, color: 'text-amber-600' },
+          { label: 'Overall Deluxe Ward Performance %', value: `${overallPerformancePct}%`, color: 'text-rose-600' },
         ].map(kpi => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -1261,11 +1351,11 @@ const ReportsTab = ({
         ))}
       </div>
 
-      {/* Charts Grid */}
+      {/* 6 Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Monthly Falls Trend */}
+        {/* 1. Monthly Quality Indicator Trend */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Monthly Falls Trend</h4>
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Monthly Quality Indicator Trend</h4>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyData}>
@@ -1273,15 +1363,31 @@ const ReportsTab = ({
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Line type="monotone" dataKey="falls" name="Falls" stroke="#f97316" strokeWidth={3} dot={{ r: 4, fill: '#f97316', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="qualityIndicators" name="Quality Records" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Medication Errors Trend */}
+        {/* 2. Patient Care Distribution */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Medication Errors</h4>
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Patient Care Distribution</h4>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={patientCarePie} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={2} dataKey="value">
+                  {patientCarePie.map((entry, index) => <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '9px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 3. Infection Prevention Compliance Trend */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Infection Prevention Compliance Trend</h4>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyData}>
@@ -1289,60 +1395,56 @@ const ReportsTab = ({
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{ fill: '#f1f5f9' }} />
-                <Bar dataKey="medErrs" name="Med Errors" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="infectionPrevention" name="Infection Prevention %" fill="#14b8a6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Infection Distribution */}
+        {/* 4. Clinical Monitoring Trend */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Infection Distribution</h4>
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Clinical Monitoring Trend</h4>
           <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={infectionPie} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={2} dataKey="value">
-                  {infectionPie.map((entry, index) => <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '9px' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Blood Products Distribution */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Blood Products Distribution</h4>
-          <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={bloodPie} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={2} dataKey="value">
-                  {bloodPie.map((entry, index) => <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '9px' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        
-        {/* Patient Safety Events Summary */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm lg:col-span-2">
-          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Monthly Quality Summary</h4>
-          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
                 <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '9px', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="falls" name="Falls" stroke="#f97316" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="medErrs" name="Med Errors" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="cauti" name="CAUTI" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="bsi" name="BSI" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="clinicalMonitoring" name="Clinical Monitoring %" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }} activeDot={{ r: 6 }} />
               </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 5. Internal Audit Compliance Trend */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Internal Audit Compliance Trend</h4>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b' }} />
+                <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{ fill: '#f1f5f9' }} />
+                <Bar dataKey="auditCompliance" name="Audit Compliance %" fill="#f97316" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 6. Overall Performance Trend */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <h4 className="text-[10px] font-bold text-slate-600 mb-4">Overall Performance Trend</h4>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={overallPerfPie} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={2} dataKey="value" nameKey="name">
+                  {overallPerfPie.map((entry, index) => <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '9px' }} />
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -1357,7 +1459,7 @@ const ReportsTab = ({
           <table className="w-full text-[10px]">
             <thead className="bg-white border-b border-slate-200">
               <tr>
-                {['Month', 'Falls', 'Med Errors', 'CAUTI', 'Bloodstream Inf', 'Blood Units', 'Blood Wastage', 'Status'].map(h => (
+                {['Month', 'Quality Indicators', 'Patient Care Compliance %', 'Infection Prevention Compliance %', 'Clinical Monitoring Compliance %', 'Audit Compliance %', 'Overall Performance %'].map(h => (
                   <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                     {h}
                   </th>
@@ -1368,22 +1470,17 @@ const ReportsTab = ({
               {monthlyData.map((row, i) => (
                 <tr key={i} className="hover:bg-slate-50/60 transition-colors">
                   <td className="px-3 py-3 font-semibold text-slate-700">{row.month}</td>
-                  <td className="px-3 py-3 font-bold text-orange-600">{row.falls}</td>
-                  <td className="px-3 py-3 font-bold text-amber-600">{row.medErrs}</td>
-                  <td className="px-3 py-3 font-bold text-red-600">{row.cauti}</td>
-                  <td className="px-3 py-3 font-bold text-purple-600">{row.bsi}</td>
-                  <td className="px-3 py-3 text-slate-600">{row.bloodUnits}</td>
-                  <td className="px-3 py-3 text-slate-600">{row.bloodWastage}</td>
-                  <td className="px-3 py-3">
-                    <span className="px-2 py-0.5 rounded-full text-[8px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-200">
-                      {row.status}
-                    </span>
-                  </td>
+                  <td className="px-3 py-3 font-bold text-blue-600">{row.qualityIndicators}</td>
+                  <td className="px-3 py-3 font-bold text-emerald-600">{row.patientCare}%</td>
+                  <td className="px-3 py-3 font-bold text-teal-600">{row.infectionPrevention}%</td>
+                  <td className="px-3 py-3 font-bold text-indigo-600">{row.clinicalMonitoring}%</td>
+                  <td className="px-3 py-3 font-bold text-orange-600">{row.auditCompliance}%</td>
+                  <td className="px-3 py-3 font-bold text-rose-600">{row.overall}%</td>
                 </tr>
               ))}
               {monthlyData.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                  <td colSpan={7} className="px-3 py-10 text-center text-[10px] text-slate-400">
                     No data available for reports.
                   </td>
                 </tr>
@@ -2272,6 +2369,16 @@ const DeluxeWardWorkspace = ({ onBack }) => {
             bloodRecords={bloodRecords}
             infectionRecords={infectionRecords}
             patientSafetyRecords={patientSafetyRecords}
+            assessments={assessments}
+            injuries={injuries}
+            preventionRecords={preventionRecords}
+            safetyRegisterRecords={safetyRegisterRecords}
+            fireSafetyRecords={fireSafetyRecords}
+            medicationRecords={medicationRecords}
+            observationRecords={observationRecords}
+            dischargeRecords={dischargeRecords}
+            auditRecords={auditRecords}
+            capaRecords={capaRecords}
           />
         );
       default:
