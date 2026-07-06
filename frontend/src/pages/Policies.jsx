@@ -18,23 +18,23 @@ import CathLabWorkspace from './CathLabWorkspace';
 import NursingOperationsWorkspace from './NursingOperationsWorkspace';
 import AdmissionRegistrationWorkspace from './AdmissionRegistrationWorkspace';
 import FireRiskManagementWorkspace from './FireRiskManagementWorkspace';
-import { 
-  BookOpen, 
-  Award, 
-  Users, 
-  Shield, 
-  Activity, 
-  Wrench, 
-  Folder, 
-  FileText, 
-  Calendar, 
+import {
+  BookOpen,
+  Award,
+  Users,
+  Shield,
+  Activity,
+  Wrench,
+  Folder,
+  FileText,
+  Calendar,
   Layers,
-  Edit3, 
-  Trash2, 
-  Save, 
-  Search, 
-  Plus, 
-  ChevronLeft, 
+  Edit3,
+  Trash2,
+  Save,
+  Search,
+  Plus,
+  ChevronLeft,
   X,
   Sparkles,
   ChevronRight
@@ -55,7 +55,7 @@ const ICON_MAP = {
 
 const Policies = () => {
   const { hospital, addDepartment, deleteDepartment, addPolicy, updatePolicy, deletePolicy } = useHospital();
-  
+
   const seedChecked = React.useRef(false);
   React.useEffect(() => {
     if (seedChecked.current || !hospital || !hospital.departments || !hospital.policies) return;
@@ -134,16 +134,16 @@ const Policies = () => {
 
   // Special workspace routing — dedicated pages for specific departments
   const SPECIALIZED_DEPTS = [
-    'radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 
+    'radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab',
     'female-ward', 'male-ward',
-    'emergency', 'micu', 'sicu', 'endoscopy', 
-    'cathlab', 'cath-lab', 
-    'operation-theatre', 'ot', 
-    'nursing-operations', 'nursing', 
+    'emergency', 'micu', 'sicu', 'endoscopy',
+    'cathlab', 'cath-lab',
+    'operation-theatre', 'ot',
+    'nursing-operations', 'nursing',
     'admission-registration', 'admission', 'admission-discharge', 'admission-&-discharge',
     'fire-risk'
   ];
-  
+
   // Search queries
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -225,12 +225,12 @@ const Policies = () => {
   const activeDept = (hospital.departments || []).find(d => d.id === selectedDeptId);
 
   // Filtered Lists
-  const filteredDepartments = (hospital.departments || []).filter(d => 
+  const filteredDepartments = (hospital.departments || []).filter(d =>
     d.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const folderPolicies = (hospital.policies || []).filter(p => p.deptId === selectedDeptId);
-  const filteredPolicies = folderPolicies.filter(p => 
+  const filteredPolicies = folderPolicies.filter(p =>
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -244,7 +244,7 @@ const Policies = () => {
   if (selectedDeptId === 'lab') return <LaboratoryQualityWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'female-ward') return <FemaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'male-ward') return <MaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'deluxe-ward' || selectedDeptId === 'delux-ward' || selectedDeptId === 'deluxe') return <DeluxeWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'delux') return <DeluxeWardWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'emergency') return <EmergencyWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'micu') return <MICUWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'sicu') return <SICUWorkspace onBack={() => setSelectedDeptId(null)} />;
@@ -261,17 +261,17 @@ const Policies = () => {
       {/* Header Breadcrumbs Bar */}
       <div className="flex items-center justify-between border-b border-slate-150 pb-4">
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-          <span 
+          <span
             onClick={() => { setSelectedDeptId(null); setIsEditing(false); setSearchQuery(''); }}
             className={`cursor-pointer hover:text-slate-800 ${!selectedDeptId ? 'text-slate-900 font-bold' : ''}`}
           >
             Policies Registry
           </span>
-          
+
           {selectedDeptId && (
             <>
               <span className="text-slate-300">/</span>
-              <span 
+              <span
                 onClick={() => { setIsEditing(false); }}
                 className={`cursor-pointer hover:text-slate-800 ${!isEditing ? 'text-slate-900 font-bold' : ''}`}
               >
@@ -346,20 +346,19 @@ const Policies = () => {
           {filteredDepartments.map((dept) => {
             const FolderIcon = ICON_MAP[dept.iconName] || Folder;
             const policyCount = (hospital.policies || []).filter(p => p.deptId === dept.id).length;
-            
+
             return (
               <div
                 key={dept.id}
                 onClick={() => { setSelectedDeptId(dept.id); setSearchQuery(''); }}
-                className={`glass-panel p-4 rounded-xl bg-white border shadow-sm flex flex-col justify-between min-h-[120px] relative group cursor-pointer transition-all duration-150 ${
-                  SPECIALIZED_DEPTS.includes(dept.id)
+                className={`glass-panel p-4 rounded-xl bg-white border shadow-sm flex flex-col justify-between min-h-[120px] relative group cursor-pointer transition-all duration-150 ${SPECIALIZED_DEPTS.includes(dept.id)
                     ? 'border-sky-100 hover:border-sky-300'
                     : 'border-slate-200 hover:border-slate-350'
-                }`}
+                  }`}
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div 
+                    <div
                       style={{ backgroundColor: `${hospital.themeColor}0d`, color: hospital.themeColor }}
                       className="p-2 rounded-lg border border-slate-100 shadow-inner"
                     >
@@ -392,7 +391,7 @@ const Policies = () => {
           })}
 
           {/* Add custom department placeholder */}
-          <div 
+          <div
             onClick={handleOpenDeptModal}
             className="rounded-xl border border-dashed border-slate-200 hover:border-slate-350 bg-slate-50/50 hover:bg-slate-50 flex flex-col items-center justify-center gap-2 p-4 min-h-[120px] cursor-pointer transition-all duration-150 group"
           >
@@ -410,18 +409,17 @@ const Policies = () => {
       {selectedDeptId && !isEditing && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredPolicies.map((policy) => (
-            <div 
-              key={policy.id} 
+            <div
+              key={policy.id}
               className="glass-panel p-5 rounded-2xl flex flex-col justify-between gap-4 bg-white border border-slate-200 shadow-sm group hover:border-slate-300 transition-all duration-150"
             >
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[9px] text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded font-semibold">{policy.code}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border ${
-                    policy.status === 'Published' 
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border ${policy.status === 'Published'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                       : 'bg-amber-50 border-amber-200 text-amber-700'
-                  }`}>
+                    }`}>
                     {policy.status}
                   </span>
                 </div>
@@ -552,18 +550,16 @@ const Policies = () => {
                   <button
                     type="button"
                     onClick={() => setFormStatus('Draft')}
-                    className={`px-3 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${
-                      formStatus === 'Draft' ? 'bg-amber-500/10 text-amber-700 font-bold' : 'text-slate-400 hover:text-slate-600'
-                    }`}
+                    className={`px-3 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${formStatus === 'Draft' ? 'bg-amber-500/10 text-amber-700 font-bold' : 'text-slate-400 hover:text-slate-600'
+                      }`}
                   >
                     Draft
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormStatus('Published')}
-                    className={`px-3 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${
-                      formStatus === 'Published' ? 'bg-emerald-500/10 text-emerald-700 font-bold' : 'text-slate-400 hover:text-slate-600'
-                    }`}
+                    className={`px-3 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${formStatus === 'Published' ? 'bg-emerald-500/10 text-emerald-700 font-bold' : 'text-slate-400 hover:text-slate-600'
+                      }`}
                   >
                     Publish
                   </button>
@@ -587,13 +583,13 @@ const Policies = () => {
       {isDeptModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-lg p-6 space-y-5">
-            
+
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-sky-600" />
                 Add Department Card
               </h3>
-              <button 
+              <button
                 onClick={() => setIsDeptModalOpen(false)}
                 className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
               >
@@ -635,11 +631,10 @@ const Policies = () => {
                         key={iconItem.name}
                         type="button"
                         onClick={() => setDeptIcon(iconItem.name)}
-                        className={`py-1.5 rounded-lg border flex flex-col items-center gap-1 transition-all cursor-pointer ${
-                          isSelected 
-                            ? 'bg-slate-50 border-sky-500 text-sky-950 font-bold' 
+                        className={`py-1.5 rounded-lg border flex flex-col items-center gap-1 transition-all cursor-pointer ${isSelected
+                            ? 'bg-slate-50 border-sky-500 text-sky-950 font-bold'
                             : 'bg-white border-slate-200 text-slate-500 hover:border-slate-350'
-                        }`}
+                          }`}
                       >
                         <TargetIcon className="w-3.5 h-3.5 text-slate-500" />
                         <span className="text-[7.5px] tracking-tight">{iconItem.label}</span>
