@@ -16,7 +16,8 @@ import {
   Search,
   Download,
   Printer,
-  FileDown
+  FileDown,
+  Flame
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -26,6 +27,9 @@ const LS_KEY_INFECTION  = 'deluxeward_infection_control';
 const LS_KEY_PATIENT_SAFETY = 'deluxeward_patient_safety';
 const LS_KEY_INITIAL_ASSESSMENTS = 'deluxe_initial_assessments';
 const LS_KEY_PRESSURE_INJURIES = 'deluxe_pressure_injuries';
+const LS_KEY_INFECTION_PREVENTION = 'deluxe_infection_prevention';
+const LS_KEY_PATIENT_SAFETY_REGISTER = 'deluxe_patient_safety';
+const LS_KEY_FIRE_SAFETY = 'deluxe_fire_safety';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -159,11 +163,76 @@ const SAMPLE_PRESSURE_INJURIES = [
   { id: 'dwpi-005', recordId: 'DWPI-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    riskLevel: 'Medium', stage: 'Stage 2', assessmentDate: '2025-03-06', preventiveMeasures: 'Foam overlay, moisture barrier cream',           status: 'Active',   remarks: 'Re-evaluate in 1 week' },
 ];
 
+const EMPTY_INFECTION_PREVENTION_FORM = {
+  id: '',
+  recordId: '',
+  areaWard: '',
+  auditDate: '2025-01-01',
+  handHygieneCompliance: 0,
+  ppeCompliance: 0,
+  isolationPrecautions: '',
+  environmentalCleaning: '',
+  infectionControlStatus: 'Pending',
+  remarks: '',
+};
+
+const SAMPLE_INFECTION_PREVENTION = [
+  { id: 'dwip-001', recordId: 'DWIP-2501', areaWard: 'General Ward A', auditDate: '2025-01-10', handHygieneCompliance: 88, ppeCompliance: 92, isolationPrecautions: 'Standard', environmentalCleaning: 'Satisfactory', infectionControlStatus: 'Compliant', remarks: 'All staff trained' },
+  { id: 'dwip-002', recordId: 'DWIP-2502', areaWard: 'ICU Bay 1',      auditDate: '2025-01-15', handHygieneCompliance: 95, ppeCompliance: 98, isolationPrecautions: 'Contact + Droplet', environmentalCleaning: 'Excellent', infectionControlStatus: 'Compliant', remarks: 'High compliance' },
+  { id: 'dwip-003', recordId: 'DWIP-2503', areaWard: 'Emergency Dept', auditDate: '2025-02-05', handHygieneCompliance: 76, ppeCompliance: 81, isolationPrecautions: 'Droplet', environmentalCleaning: 'Needs improvement', infectionControlStatus: 'Non-Compliant', remarks: 'Remediation planned' },
+  { id: 'dwip-004', recordId: 'DWIP-2504', areaWard: 'Surgical Ward',  auditDate: '2025-02-20', handHygieneCompliance: 91, ppeCompliance: 94, isolationPrecautions: 'Standard', environmentalCleaning: 'Satisfactory', infectionControlStatus: 'Compliant', remarks: 'Routine audit' },
+  { id: 'dwip-005', recordId: 'DWIP-2505', areaWard: 'Male Ward',      auditDate: '2025-03-08', handHygieneCompliance: 84, ppeCompliance: 87, isolationPrecautions: 'Airborne', environmentalCleaning: 'Satisfactory', infectionControlStatus: 'Compliant', remarks: 'Follow-up due' },
+];
+
+const EMPTY_PATIENT_SAFETY_REGISTER_FORM = {
+  id: '',
+  recordId: '',
+  uhId: '',
+  patientName: '',
+  fallRisk: 'Medium',
+  medicationSafety: 'Verified',
+  patientIdentification: 'Verified',
+  safeSurgeryChecklist: 'Not Applicable',
+  incidentReported: 'No',
+  status: 'Active',
+  remarks: '',
+};
+
+const SAMPLE_PATIENT_SAFETY_REGISTER = [
+  { id: 'dwpsr-001', recordId: 'DWPSR-2501', uhId: 'UH0001', patientName: 'Rahul Menon',    fallRisk: 'Low',      medicationSafety: 'Verified',      patientIdentification: 'Verified', safeSurgeryChecklist: 'Not Applicable', incidentReported: 'No',  status: 'Active',   remarks: 'Routine check' },
+  { id: 'dwpsr-002', recordId: 'DWPSR-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',    fallRisk: 'High',     medicationSafety: 'Double checked', patientIdentification: 'Verified', safeSurgeryChecklist: 'Completed',    incidentReported: 'No',  status: 'Active',   remarks: 'High fall-risk protocol applied' },
+  { id: 'dwpsr-003', recordId: 'DWPSR-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  fallRisk: 'Medium',   medicationSafety: 'Verified',      patientIdentification: 'Verified', safeSurgeryChecklist: 'Not Applicable', incidentReported: 'No',  status: 'Active',   remarks: 'Observation noted' },
+  { id: 'dwpsr-004', recordId: 'DWPSR-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', fallRisk: 'High',     medicationSafety: 'Pending',       patientIdentification: 'Flagged',    safeSurgeryChecklist: 'Completed',    incidentReported: 'Yes', status: 'Under Review', remarks: 'Incident reported for review' },
+  { id: 'dwpsr-005', recordId: 'DWPSR-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    fallRisk: 'Low',      medicationSafety: 'Verified',      patientIdentification: 'Verified', safeSurgeryChecklist: 'Completed',    incidentReported: 'No',  status: 'Active',   remarks: 'Discharged safely' },
+];
+
+const EMPTY_FIRE_SAFETY_FORM = {
+  id: '',
+  recordId: '',
+  area: '',
+  fireSafetyEquipmentChecked: 'Yes',
+  emergencyExitStatus: 'Clear',
+  ppeAvailability: 'Available',
+  hazardIdentified: 'No',
+  correctiveAction: '',
+  status: 'Active',
+  inspectionDate: '2025-01-01',
+  remarks: '',
+};
+
+const SAMPLE_FIRE_SAFETY = [
+  { id: 'dwfs-001', recordId: 'DWFS-2501', area: 'General Ward A', fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-01-11', remarks: 'All equipment functional' },
+  { id: 'dwfs-002', recordId: 'DWFS-2502', area: 'ICU Bay 1',      fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-01-16', remarks: 'Extinguishers checked' },
+  { id: 'dwfs-003', recordId: 'DWFS-2503', area: 'Emergency Dept', fireSafetyEquipmentChecked: 'No',  emergencyExitStatus: 'Blocked', ppeAvailability: 'Partial', hazardIdentified: 'Yes', correctiveAction: 'Clear exit route immediately', status: 'Non-Compliant', inspectionDate: '2025-02-06', remarks: 'Follow-up required' },
+  { id: 'dwfs-004', recordId: 'DWFS-2504', area: 'Surgical Ward',  fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-02-21', remarks: 'Routine inspection passed' },
+  { id: 'dwfs-005', recordId: 'DWFS-2505', area: 'Male Ward',      fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-03-09', remarks: 'Re-inspection due next month' },
+];
+
 const TABS = [
   { id: 'dashboard',      label: 'Dashboard',          icon: LayoutDashboard },
   { id: 'quality',        label: 'Quality Indicators', icon: BarChart3       },
   { id: 'patient_care',   label: 'Patient Care & Blood Management', icon: Droplets    },
-  { id: 'infection',      label: 'Infection Control',  icon: ShieldCheck     },
+  { id: 'infection',      label: 'Infection Prevention & Safety',  icon: ShieldCheck     },
   { id: 'clinical',       label: 'Clinical Monitoring', icon: ClipboardList  },
   { id: 'audit',          label: 'Internal Audit',      icon: CheckSquare    },
   { id: 'reports',        label: 'Reports & Analytics', icon: FileText       },
@@ -1276,6 +1345,36 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   const [injuryForm, setInjuryForm] = useState({ ...EMPTY_PRESSURE_INJURY_FORM });
   const [injurySearch, setInjurySearch] = useState('');
 
+  /* ── Infection Prevention state ── */
+  const [preventionRecords, setPreventionRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INFECTION_PREVENTION);
+    return saved ? JSON.parse(saved) : SAMPLE_INFECTION_PREVENTION;
+  });
+  const [isPreventionModalOpen, setIsPreventionModalOpen] = useState(false);
+  const [editingPreventionId, setEditingPreventionId] = useState(null);
+  const [preventionForm, setPreventionForm] = useState({ ...EMPTY_INFECTION_PREVENTION_FORM });
+  const [preventionSearch, setPreventionSearch] = useState('');
+
+  /* ── Patient Safety Register state ── */
+  const [safetyRegisterRecords, setSafetyRegisterRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_PATIENT_SAFETY_REGISTER);
+    return saved ? JSON.parse(saved) : SAMPLE_PATIENT_SAFETY_REGISTER;
+  });
+  const [isSafetyRegisterModalOpen, setIsSafetyRegisterModalOpen] = useState(false);
+  const [editingSafetyRegisterId, setEditingSafetyRegisterId] = useState(null);
+  const [safetyRegisterForm, setSafetyRegisterForm] = useState({ ...EMPTY_PATIENT_SAFETY_REGISTER_FORM });
+  const [safetyRegisterSearch, setSafetyRegisterSearch] = useState('');
+
+  /* ── Fire Safety state ── */
+  const [fireSafetyRecords, setFireSafetyRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_FIRE_SAFETY);
+    return saved ? JSON.parse(saved) : SAMPLE_FIRE_SAFETY;
+  });
+  const [isFireSafetyModalOpen, setIsFireSafetyModalOpen] = useState(false);
+  const [editingFireSafetyId, setEditingFireSafetyId] = useState(null);
+  const [fireSafetyForm, setFireSafetyForm] = useState({ ...EMPTY_FIRE_SAFETY_FORM });
+  const [fireSafetySearch, setFireSafetySearch] = useState('');
+
   /* ── Persist quality indicators ── */
   useEffect(() => {
     localStorage.setItem(LS_KEY_QUALITY, JSON.stringify(qualityIndicators));
@@ -1305,6 +1404,21 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   useEffect(() => {
     localStorage.setItem(LS_KEY_PRESSURE_INJURIES, JSON.stringify(injuries));
   }, [injuries]);
+
+  /* ── Persist infection prevention records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_INFECTION_PREVENTION, JSON.stringify(preventionRecords));
+  }, [preventionRecords]);
+
+  /* ── Persist patient safety register records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_PATIENT_SAFETY_REGISTER, JSON.stringify(safetyRegisterRecords));
+  }, [safetyRegisterRecords]);
+
+  /* ── Persist fire safety records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_FIRE_SAFETY, JSON.stringify(fireSafetyRecords));
+  }, [fireSafetyRecords]);
 
   /* ── Quality Indicators handlers ── */
   const getNextQualityId = () => {
@@ -1546,6 +1660,126 @@ const DeluxeWardWorkspace = ({ onBack }) => {
     }
   };
 
+  /* ── Infection Prevention handlers ── */
+  const getNextPreventionId = () => {
+    const maxNum = preventionRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwip-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenPreventionModal = (record = null) => {
+    if (record) {
+      setPreventionForm({ ...record });
+      setEditingPreventionId(record.id);
+    } else {
+      setPreventionForm({ ...EMPTY_INFECTION_PREVENTION_FORM, id: getNextPreventionId() });
+      setEditingPreventionId(null);
+    }
+    setIsPreventionModalOpen(true);
+  };
+
+  const handleSavePrevention = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingPreventionId) {
+      setPreventionRecords((prev) =>
+        prev.map((r) => (r.id === editingPreventionId ? { ...preventionForm, id: editingPreventionId } : r))
+      );
+    } else {
+      setPreventionRecords((prev) => [...prev, { ...preventionForm }]);
+    }
+    setIsPreventionModalOpen(false);
+    setEditingPreventionId(null);
+  };
+
+  const handleDeletePrevention = (id) => {
+    if (window.confirm('Delete this infection prevention record?')) {
+      setPreventionRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── Patient Safety Register handlers ── */
+  const getNextSafetyRegisterId = () => {
+    const maxNum = safetyRegisterRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwpsr-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenSafetyRegisterModal = (record = null) => {
+    if (record) {
+      setSafetyRegisterForm({ ...record });
+      setEditingSafetyRegisterId(record.id);
+    } else {
+      setSafetyRegisterForm({ ...EMPTY_PATIENT_SAFETY_REGISTER_FORM, id: getNextSafetyRegisterId() });
+      setEditingSafetyRegisterId(null);
+    }
+    setIsSafetyRegisterModalOpen(true);
+  };
+
+  const handleSaveSafetyRegister = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingSafetyRegisterId) {
+      setSafetyRegisterRecords((prev) =>
+        prev.map((r) => (r.id === editingSafetyRegisterId ? { ...safetyRegisterForm, id: editingSafetyRegisterId } : r))
+      );
+    } else {
+      setSafetyRegisterRecords((prev) => [...prev, { ...safetyRegisterForm }]);
+    }
+    setIsSafetyRegisterModalOpen(false);
+    setEditingSafetyRegisterId(null);
+  };
+
+  const handleDeleteSafetyRegister = (id) => {
+    if (window.confirm('Delete this patient safety register record?')) {
+      setSafetyRegisterRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── Fire Safety handlers ── */
+  const getNextFireSafetyId = () => {
+    const maxNum = fireSafetyRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwfs-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenFireSafetyModal = (record = null) => {
+    if (record) {
+      setFireSafetyForm({ ...record });
+      setEditingFireSafetyId(record.id);
+    } else {
+      setFireSafetyForm({ ...EMPTY_FIRE_SAFETY_FORM, id: getNextFireSafetyId() });
+      setEditingFireSafetyId(null);
+    }
+    setIsFireSafetyModalOpen(true);
+  };
+
+  const handleSaveFireSafety = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingFireSafetyId) {
+      setFireSafetyRecords((prev) =>
+        prev.map((r) => (r.id === editingFireSafetyId ? { ...fireSafetyForm, id: editingFireSafetyId } : r))
+      );
+    } else {
+      setFireSafetyRecords((prev) => [...prev, { ...fireSafetyForm }]);
+    }
+    setIsFireSafetyModalOpen(false);
+    setEditingFireSafetyId(null);
+  };
+
+  const handleDeleteFireSafety = (id) => {
+    if (window.confirm('Delete this fire safety record?')) {
+      setFireSafetyRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
   /* ── Tab renderer ── */
   const renderContent = () => {
     switch (activeTab) {
@@ -1585,13 +1819,24 @@ const DeluxeWardWorkspace = ({ onBack }) => {
         );
       case 'infection':
         return (
-          <InfectionTab
+          <InfectionPreventionSafetyTab
             hospital={hospital}
-            infectionRecords={infectionRecords}
-            infectionSearch={infectionSearch}
-            setInfectionSearch={setInfectionSearch}
-            handleOpenInfectionModal={handleOpenInfectionModal}
-            handleDeleteInfection={handleDeleteInfection}
+            subTab="prevention"
+            preventionRecords={preventionRecords}
+            preventionSearch={preventionSearch}
+            setPreventionSearch={setPreventionSearch}
+            handleOpenPreventionModal={handleOpenPreventionModal}
+            handleDeletePrevention={handleDeletePrevention}
+            safetyRegisterRecords={safetyRegisterRecords}
+            safetyRegisterSearch={safetyRegisterSearch}
+            setSafetyRegisterSearch={setSafetyRegisterSearch}
+            handleOpenSafetyRegisterModal={handleOpenSafetyRegisterModal}
+            handleDeleteSafetyRegister={handleDeleteSafetyRegister}
+            fireSafetyRecords={fireSafetyRecords}
+            fireSafetySearch={fireSafetySearch}
+            setFireSafetySearch={setFireSafetySearch}
+            handleOpenFireSafetyModal={handleOpenFireSafetyModal}
+            handleDeleteFireSafety={handleDeleteFireSafety}
           />
         );
       case 'clinical':
@@ -2395,6 +2640,1070 @@ const DeluxeWardWorkspace = ({ onBack }) => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ── Infection Prevention Modal ── */}
+      {isPreventionModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingPreventionId ? 'Edit Prevention Record' : 'Add Infection Prevention Record'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — NABH Infection Control Audit</p>
+              </div>
+              <button
+                onClick={() => { setIsPreventionModalOpen(false); setEditingPreventionId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePrevention} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Audit Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Record ID *</label>
+                    <input
+                      type="text"
+                      value={preventionForm.recordId}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, recordId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Area / Ward *</label>
+                    <input
+                      type="text"
+                      value={preventionForm.areaWard}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, areaWard: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Audit Date *</label>
+                    <input
+                      type="date"
+                      value={preventionForm.auditDate}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, auditDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Compliance Metrics</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Hand Hygiene Compliance %</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={preventionForm.handHygieneCompliance}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, handHygieneCompliance: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">PPE Compliance %</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={preventionForm.ppeCompliance}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, ppeCompliance: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Infection Control Status *</label>
+                    <select
+                      value={preventionForm.infectionControlStatus}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, infectionControlStatus: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Compliant">Compliant</option>
+                      <option value="Non-Compliant">Non-Compliant</option>
+                      <option value="Pending">Pending</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Observations</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Isolation Precautions</label>
+                    <input
+                      type="text"
+                      value={preventionForm.isolationPrecautions}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, isolationPrecautions: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Environmental Cleaning</label>
+                    <input
+                      type="text"
+                      value={preventionForm.environmentalCleaning}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, environmentalCleaning: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <input
+                      type="text"
+                      value={preventionForm.remarks}
+                      onChange={(e) => setPreventionForm({ ...preventionForm, remarks: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsPreventionModalOpen(false); setEditingPreventionId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingPreventionId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Patient Safety Register Modal ── */}
+      {isSafetyRegisterModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingSafetyRegisterId ? 'Edit Patient Safety Record' : 'Add Patient Safety Record'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Patient Safety &amp; Incident Tracking</p>
+              </div>
+              <button
+                onClick={() => { setIsSafetyRegisterModalOpen(false); setEditingSafetyRegisterId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveSafetyRegister} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Record Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Record ID *</label>
+                    <input
+                      type="text"
+                      value={safetyRegisterForm.recordId}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, recordId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={safetyRegisterForm.uhId}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={safetyRegisterForm.patientName}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Safety Parameters</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Fall Risk *</label>
+                    <select
+                      value={safetyRegisterForm.fallRisk}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, fallRisk: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Medication Safety</label>
+                    <select
+                      value={safetyRegisterForm.medicationSafety}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, medicationSafety: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Verified">Verified</option>
+                      <option value="Double checked">Double checked</option>
+                      <option value="Pending">Pending</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Identification</label>
+                    <select
+                      value={safetyRegisterForm.patientIdentification}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, patientIdentification: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Verified">Verified</option>
+                      <option value="Flagged">Flagged</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Safe Surgery Checklist</label>
+                    <select
+                      value={safetyRegisterForm.safeSurgeryChecklist}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, safeSurgeryChecklist: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Not Applicable">Not Applicable</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Incident Reported</label>
+                    <select
+                      value={safetyRegisterForm.incidentReported}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, incidentReported: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={safetyRegisterForm.status}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="Under Review">Under Review</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Notes</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <textarea
+                      value={safetyRegisterForm.remarks}
+                      onChange={(e) => setSafetyRegisterForm({ ...safetyRegisterForm, remarks: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsSafetyRegisterModalOpen(false); setEditingSafetyRegisterId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingSafetyRegisterId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Fire Safety Modal ── */}
+      {isFireSafetyModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingFireSafetyId ? 'Edit Fire Safety Record' : 'Add Fire Safety Record'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Fire Safety &amp; Occupational Hazard Audit</p>
+              </div>
+              <button
+                onClick={() => { setIsFireSafetyModalOpen(false); setEditingFireSafetyId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveFireSafety} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Record Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Record ID *</label>
+                    <input
+                      type="text"
+                      value={fireSafetyForm.recordId}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, recordId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Area *</label>
+                    <input
+                      type="text"
+                      value={fireSafetyForm.area}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, area: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Inspection Date *</label>
+                    <input
+                      type="date"
+                      value={fireSafetyForm.inspectionDate}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, inspectionDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Safety Checks</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Fire Safety Equipment Checked</label>
+                    <select
+                      value={fireSafetyForm.fireSafetyEquipmentChecked}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, fireSafetyEquipmentChecked: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Emergency Exit Status</label>
+                    <select
+                      value={fireSafetyForm.emergencyExitStatus}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, emergencyExitStatus: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Clear">Clear</option>
+                      <option value="Blocked">Blocked</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">PPE Availability</label>
+                    <select
+                      value={fireSafetyForm.ppeAvailability}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, ppeAvailability: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Available">Available</option>
+                      <option value="Partial">Partial</option>
+                      <option value="Not Available">Not Available</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Hazard Identified</label>
+                    <select
+                      value={fireSafetyForm.hazardIdentified}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, hazardIdentified: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Corrective Action</label>
+                    <input
+                      type="text"
+                      value={fireSafetyForm.correctiveAction}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, correctiveAction: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Status &amp; Remarks</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={fireSafetyForm.status}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Non-Compliant">Non-Compliant</option>
+                      <option value="Pending">Pending</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <input
+                      type="text"
+                      value={fireSafetyForm.remarks}
+                      onChange={(e) => setFireSafetyForm({ ...fireSafetyForm, remarks: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsFireSafetyModalOpen(false); setEditingFireSafetyId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingFireSafetyId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── Infection Prevention Register tab ─── */
+const InfectionPreventionTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.recordId.toLowerCase().includes(q) ||
+      r.areaWard.toLowerCase().includes(q) ||
+      r.infectionControlStatus.toLowerCase().includes(q) ||
+      String(r.handHygieneCompliance).includes(q) ||
+      String(r.ppeCompliance).includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
+
+  const avgHandHygiene = records.length > 0 ? (records.reduce((s, r) => s + (r.handHygieneCompliance || 0), 0) / records.length).toFixed(1) : '0.0';
+  const avgPPE = records.length > 0 ? (records.reduce((s, r) => s + (r.ppeCompliance || 0), 0) / records.length).toFixed(1) : '0.0';
+  const totalCompliant = records.filter((r) => r.infectionControlStatus === 'Compliant').length;
+  const compliancePct = records.length > 0 ? ((totalCompliant / records.length) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Compliant: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'Non-Compliant': 'bg-rose-50 text-rose-700 border-rose-200',
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const TH_COLS = [
+    'Record ID', 'Area / Ward', 'Audit Date', 'Hand Hygiene %', 'PPE %',
+    'Isolation Precautions', 'Environmental Cleaning', 'IC Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Infection Prevention Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH infection control audits — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Avg Hand Hygiene %',     value: `${avgHandHygiene}%`, color: 'text-blue-600'    },
+          { label: 'Avg PPE %',              value: `${avgPPE}%`,        color: 'text-indigo-600'  },
+          { label: 'Compliance %',           value: `${compliancePct}%`, color: 'text-emerald-600' },
+          { label: 'Total Records',          value: records.length,      color: 'text-slate-700'   },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, area, status, or compliance…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.recordId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.areaWard}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.auditDate}</td>
+                  <td className="px-3 py-3 text-blue-600 font-bold">{r.handHygieneCompliance}</td>
+                  <td className="px-3 py-3 text-indigo-600 font-bold">{r.ppeCompliance}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.isolationPrecautions}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.environmentalCleaning}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.infectionControlStatus] || STATUS_BADGE.Pending}`}>
+                      {r.infectionControlStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No infection prevention records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Patient Safety Register tab ─── */
+const PatientSafetyRegisterTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.recordId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      r.incidentReported.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
+
+  const totalRecords = records.length;
+  const incidentsReported = records.filter((r) => r.incidentReported === 'Yes').length;
+  const highFallRisk = records.filter((r) => r.fallRisk === 'High').length;
+
+  const STATUS_BADGE = {
+    Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Resolved: 'bg-sky-50 text-sky-700 border-sky-200',
+    'Under Review': 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const TH_COLS = [
+    'Record ID', 'UHID', 'Patient Name', 'Fall Risk', 'Med Safety',
+    'Patient ID', 'Surgery Checklist', 'Incident', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Patient Safety Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH patient safety &amp; incident tracking — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Records',         value: totalRecords,      color: 'text-blue-600'    },
+          { label: 'Incidents Reported',    value: incidentsReported, color: 'text-rose-600'    },
+          { label: 'High Fall Risk',        value: highFallRisk,      color: 'text-orange-600'  },
+          { label: 'Resolution Rate',       value: `${totalRecords > 0 ? ((1 - incidentsReported / totalRecords) * 100).toFixed(1) : '0.0'}%`, color: 'text-emerald-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, UHID, name, incident, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.recordId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.fallRisk === 'High' ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : r.fallRisk === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.fallRisk}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.medicationSafety}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.patientIdentification}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.safeSurgeryChecklist}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.incidentReported === 'Yes' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.incidentReported}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No patient safety records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Fire & Occupational Safety Register tab ─── */
+const FireSafetyTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.recordId.toLowerCase().includes(q) ||
+      r.area.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q) ||
+      r.emergencyExitStatus.toLowerCase().includes(q) ||
+      r.hazardIdentified.toLowerCase().includes(q)
+    );
+  });
+
+  const totalRecords = records.length;
+  const equipmentChecked = records.filter((r) => r.fireSafetyEquipmentChecked === 'Yes').length;
+  const clearExits = records.filter((r) => r.emergencyExitStatus === 'Clear').length;
+  const compliancePct = totalRecords > 0 ? ((clearExits / totalRecords) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'Non-Compliant': 'bg-rose-50 text-rose-700 border-rose-200',
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const TH_COLS = [
+    'Record ID', 'Area', 'Equipment', 'Exit Status', 'PPE',
+    'Hazard', 'Corrective Action', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Fire &amp; Occupational Safety Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH fire safety &amp; occupational hazard audits — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Fire Compliance %',     value: `${compliancePct}%`, color: 'text-emerald-600' },
+          { label: 'Equipment Checked',      value: equipmentChecked,    color: 'text-blue-600'    },
+          { label: 'Clear Exits',            value: clearExits,          color: 'text-indigo-600'  },
+          { label: 'Open Hazards',           value: records.filter((r) => r.hazardIdentified === 'Yes').length, color: 'text-rose-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, area, hazard, action, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.recordId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.area}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.fireSafetyEquipmentChecked === 'Yes' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                    }`}>
+                      {r.fireSafetyEquipmentChecked}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.emergencyExitStatus === 'Clear' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                    }`}>
+                      {r.emergencyExitStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.ppeAvailability}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.hazardIdentified === 'Yes' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.hazardIdentified}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.correctiveAction}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No fire safety records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Infection Prevention & Safety wrapper tab ─── */
+const InfectionPreventionSafetyTab = ({
+  hospital,
+  preventionRecords,
+  preventionSearch,
+  setPreventionSearch,
+  handleOpenPreventionModal,
+  handleDeletePrevention,
+  safetyRegisterRecords,
+  safetyRegisterSearch,
+  setSafetyRegisterSearch,
+  handleOpenSafetyRegisterModal,
+  handleDeleteSafetyRegister,
+  fireSafetyRecords,
+  fireSafetySearch,
+  setFireSafetySearch,
+  handleOpenFireSafetyModal,
+  handleDeleteFireSafety,
+}) => {
+  const [subTab, setSubTab] = useState('prevention');
+
+  const SUB_TABS = [
+    { id: 'prevention', label: 'Infection Prevention', icon: ShieldCheck },
+    { id: 'safety',     label: 'Patient Safety',      icon: ClipboardList },
+    { id: 'fire',       label: 'Fire Safety',          icon: Flame },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Infection Prevention &amp; Safety</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH-aligned infection control, patient safety, and occupational hazard management</p>
+        </div>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit">
+        {SUB_TABS.map(({ id, label, icon: Icon }) => {
+          const isActive = id === subTab;
+          return (
+            <button
+              key={id}
+              onClick={() => setSubTab(id)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 8 KPI Cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: 'Infection Control Compliance %', value: (() => { const c = preventionRecords.filter(r => r.infectionControlStatus === 'Compliant').length; return preventionRecords.length ? ((c / preventionRecords.length) * 100).toFixed(1) : '0.0'; })(), color: 'text-emerald-600' },
+            { label: 'Avg Hand Hygiene %',  value: `${preventionRecords.length ? (preventionRecords.reduce((s, r) => s + (r.handHygieneCompliance || 0), 0) / preventionRecords.length).toFixed(1) : '0.0'}%`, color: 'text-blue-600' },
+            { label: 'Avg PPE %',           value: `${preventionRecords.length ? (preventionRecords.reduce((s, r) => s + (r.ppeCompliance || 0), 0) / preventionRecords.length).toFixed(1) : '0.0'}%`, color: 'text-indigo-600' },
+            { label: 'Patient Safety Incidents', value: safetyRegisterRecords.filter(r => r.incidentReported === 'Yes').length, color: 'text-rose-600' },
+            { label: 'Fire Safety Compliance %', value: `${fireSafetyRecords.length ? (fireSafetyRecords.filter(r => r.emergencyExitStatus === 'Clear').length / fireSafetyRecords.length * 100).toFixed(1) : '0.0'}%`, color: 'text-emerald-600' },
+            { label: 'Occupational Safety Compliance %', value: `${fireSafetyRecords.length ? (fireSafetyRecords.filter(r => r.fireSafetyEquipmentChecked === 'Yes').length / fireSafetyRecords.length * 100).toFixed(1) : '0.0'}%`, color: 'text-blue-600' },
+            { label: 'Open Safety Observations', value: fireSafetyRecords.filter(r => r.hazardIdentified === 'Yes').length + safetyRegisterRecords.filter(r => r.status === 'Under Review').length, color: 'text-orange-600' },
+            { label: 'Overall Infection &amp; Safety Compliance %', value: `${(() => { const p = preventionRecords.filter(r => r.infectionControlStatus === 'Compliant').length; const f = fireSafetyRecords.filter(r => r.fireSafetyEquipmentChecked === 'Yes').length; const t = preventionRecords.length + fireSafetyRecords.length; return t > 0 ? ((p + f) / t * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-amber-600' },
+          ].map((kpi) => (
+            <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+            </div>
+          ))}
+        </div>
+
+      {subTab === 'prevention' && (
+        <InfectionPreventionTab
+          hospital={hospital}
+          records={preventionRecords}
+          searchQuery={preventionSearch}
+          setSearchQuery={setPreventionSearch}
+          handleOpenModal={handleOpenPreventionModal}
+          handleDelete={handleDeletePrevention}
+        />
+      )}
+
+      {subTab === 'safety' && (
+        <PatientSafetyRegisterTab
+          hospital={hospital}
+          records={safetyRegisterRecords}
+          searchQuery={safetyRegisterSearch}
+          setSearchQuery={setSafetyRegisterSearch}
+          handleOpenModal={handleOpenSafetyRegisterModal}
+          handleDelete={handleDeleteSafetyRegister}
+        />
+      )}
+
+      {subTab === 'fire' && (
+        <FireSafetyTab
+          hospital={hospital}
+          records={fireSafetyRecords}
+          searchQuery={fireSafetySearch}
+          setSearchQuery={setFireSafetySearch}
+          handleOpenModal={handleOpenFireSafetyModal}
+          handleDelete={handleDeleteFireSafety}
+        />
       )}
     </div>
   );
