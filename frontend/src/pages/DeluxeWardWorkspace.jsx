@@ -6,7 +6,8 @@ import {
   BarChart3,
   Droplets,
   ShieldCheck,
-  UserCheck,
+  ClipboardList,
+  CheckSquare,
   FileText,
   Plus,
   Edit3,
@@ -23,6 +24,8 @@ const LS_KEY_QUALITY = 'deluxeward_quality_indicators';
 const LS_KEY_BLOOD      = 'deluxeward_blood_management';
 const LS_KEY_INFECTION  = 'deluxeward_infection_control';
 const LS_KEY_PATIENT_SAFETY = 'deluxeward_patient_safety';
+const LS_KEY_INITIAL_ASSESSMENTS = 'deluxe_initial_assessments';
+const LS_KEY_PRESSURE_INJURIES = 'deluxe_pressure_injuries';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -115,13 +118,55 @@ const SAMPLE_PATIENT_SAFETY_RECORDS = [
   { id: 'dwps-005', month: 'May',      year: 2025, falls: 2, medicationErrors: 3, adverseDrugReactions: 2, initialAssessmentTime: 27, dischargeTime: 44, status: 'Active' },
 ];
 
+const EMPTY_ASSESSMENT_FORM = {
+  id: '',
+  assessmentId: '',
+  uhId: '',
+  patientName: '',
+  assessmentDate: '2025-01-01',
+  nurseAssessmentTime: '',
+  doctorAssessmentTime: '',
+  status: 'Pending',
+  remarks: '',
+};
+
+const SAMPLE_INITIAL_ASSESSMENTS = [
+  { id: 'dwa-001', assessmentId: 'DWA-2501', uhId: 'UH0001', patientName: 'Rahul Menon',     assessmentDate: '2025-01-05', nurseAssessmentTime: '08:30', doctorAssessmentTime: '10:15', status: 'Completed', remarks: 'Stable vitals' },
+  { id: 'dwa-002', assessmentId: 'DWA-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',     assessmentDate: '2025-01-08', nurseAssessmentTime: '09:10', doctorAssessmentTime: '11:00', status: 'Completed', remarks: 'Follow-up required' },
+  { id: 'dwa-003', assessmentId: 'DWA-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',   assessmentDate: '2025-02-02', nurseAssessmentTime: '07:45', doctorAssessmentTime: '09:30', status: 'Completed', remarks: 'Routine screening' },
+  { id: 'dwa-004', assessmentId: 'DWA-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh',  assessmentDate: '2025-02-14', nurseAssessmentTime: '10:00', doctorAssessmentTime: '12:00', status: 'Pending',   remarks: 'Awaiting doctor review' },
+  { id: 'dwa-005', assessmentId: 'DWA-2505', uhId: 'UH0234', patientName: 'Karthik Rao',     assessmentDate: '2025-03-05', nurseAssessmentTime: '08:15', doctorAssessmentTime: '10:45', status: 'Completed', remarks: 'Discharge planned' },
+];
+
+const EMPTY_PRESSURE_INJURY_FORM = {
+  id: '',
+  recordId: '',
+  uhId: '',
+  patientName: '',
+  riskLevel: 'Medium',
+  stage: 'Stage 2',
+  assessmentDate: '2025-01-01',
+  preventiveMeasures: '',
+  status: 'Active',
+  remarks: '',
+};
+
+const SAMPLE_PRESSURE_INJURIES = [
+  { id: 'dwpi-001', recordId: 'DWPI-2501', uhId: 'UH0001', patientName: 'Rahul Menon',    riskLevel: 'High',   stage: 'Stage 2', assessmentDate: '2025-01-06', preventiveMeasures: 'Alternating mattress, 2-hourly turns',         status: 'Active',   remarks: 'Improving' },
+  { id: 'dwpi-002', recordId: 'DWPI-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',    riskLevel: 'Medium', stage: 'Stage 1', assessmentDate: '2025-01-09', preventiveMeasures: 'Cream application, pressure relief cushion',      status: 'Active',   remarks: 'Monitoring' },
+  { id: 'dwpi-003', recordId: 'DWPI-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  riskLevel: 'Low',    stage: 'Stage 1', assessmentDate: '2025-02-03', preventiveMeasures: 'Skin hygiene, repositioning every 3 hours',      status: 'Resolved', remarks: 'Healed' },
+  { id: 'dwpi-004', recordId: 'DWPI-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', riskLevel: 'High',   stage: 'Stage 3', assessmentDate: '2025-02-15', preventiveMeasures: 'Air-fluidised bed, wound care dressing',          status: 'Active',   remarks: 'Wound care ongoing' },
+  { id: 'dwpi-005', recordId: 'DWPI-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    riskLevel: 'Medium', stage: 'Stage 2', assessmentDate: '2025-03-06', preventiveMeasures: 'Foam overlay, moisture barrier cream',           status: 'Active',   remarks: 'Re-evaluate in 1 week' },
+];
+
 const TABS = [
   { id: 'dashboard',      label: 'Dashboard',          icon: LayoutDashboard },
   { id: 'quality',        label: 'Quality Indicators', icon: BarChart3       },
-  { id: 'blood',          label: 'Blood Management',   icon: Droplets        },
+  { id: 'patient_care',   label: 'Patient Care & Blood Management', icon: Droplets    },
   { id: 'infection',      label: 'Infection Control',  icon: ShieldCheck     },
-  { id: 'patient-safety', label: 'Patient Safety',     icon: UserCheck       },
-  { id: 'reports',        label: 'Reports',            icon: FileText        },
+  { id: 'clinical',       label: 'Clinical Monitoring', icon: ClipboardList  },
+  { id: 'audit',          label: 'Internal Audit',      icon: CheckSquare    },
+  { id: 'reports',        label: 'Reports & Analytics', icon: FileText       },
 ];
 
 /* ─── Reusable number field ─── */
@@ -335,39 +380,40 @@ const QualityTab = ({
   );
 };
 
-/* ─── Blood Management tab ─── */
-const BloodTab = ({
+/* ─── Initial Assessment Register tab ─── */
+const InitialAssessmentTab = ({
   hospital,
-  bloodRecords,
-  bloodSearch,
-  setBloodSearch,
-  handleOpenBloodModal,
-  handleDeleteBlood,
+  assessments,
+  searchQuery,
+  setSearchQuery,
+  handleOpenAssessmentModal,
+  handleDeleteAssessment,
 }) => {
-  const filtered = bloodRecords.filter((r) => {
-    const q = bloodSearch.toLowerCase();
+  const filtered = assessments.filter((r) => {
+    const q = searchQuery.toLowerCase();
     return (
-      r.month.toLowerCase().includes(q) ||
-      String(r.year).includes(q) ||
+      r.assessmentId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      String(r.nurseAssessmentTime).includes(q) ||
+      String(r.doctorAssessmentTime).includes(q) ||
       r.status.toLowerCase().includes(q)
     );
   });
 
-  const totalUnits    = bloodRecords.reduce((s, r) => s + (r.prbc || 0) + (r.sdp || 0) + (r.rdp || 0) + (r.ffp || 0) + (r.cryo || 0), 0);
-  const totalPRBC     = bloodRecords.reduce((s, r) => s + (r.prbc || 0), 0);
-  const totalFFP      = bloodRecords.reduce((s, r) => s + (r.ffp  || 0), 0);
-  const totalWastage  = bloodRecords.reduce((s, r) => s + (r.bloodWastage || 0), 0);
-  const wastageRate   = totalUnits > 0 ? ((totalWastage / totalUnits) * 100).toFixed(1) : '0.0';
+  const totalAssessments = assessments.length;
+  const completed = assessments.filter((r) => r.status === 'Completed').length;
+  const completionPct = totalAssessments > 0 ? ((completed / totalAssessments) * 100).toFixed(1) : '0.0';
 
   const STATUS_BADGE = {
-    Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Inactive: 'bg-slate-50 text-slate-500 border-slate-200',
-    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
+    Completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Pending:   'bg-amber-50 text-amber-700 border-amber-200',
+    Incomplete:'bg-rose-50 text-rose-700 border-rose-200',
   };
 
   const TH_COLS = [
-    'Blood ID', 'Month', 'PRBC', 'SDP', 'RDP', 'FFP', 'CRYO',
-    'Blood Wastage', 'Transfusion Reactions', 'TAT (min)', 'Status', 'Actions',
+    'Assessment ID', 'UHID', 'Patient Name', 'Assessment Date',
+    'Nurse Time (min)', 'Doctor Time (min)', 'Status', 'Actions',
   ];
 
   return (
@@ -375,25 +421,25 @@ const BloodTab = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Blood Management Records</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Monthly blood product usage — Deluxe Ward</p>
+          <h3 className="text-xs font-extrabold text-slate-800">Initial Assessment Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">Nurse &amp; Doctor assessment tracking — Deluxe Ward</p>
         </div>
         <button
-          onClick={() => handleOpenBloodModal()}
+          onClick={() => handleOpenAssessmentModal()}
           style={{ backgroundColor: hospital.themeColor }}
           className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Blood Record
+          <Plus className="w-3.5 h-3.5" /> Add Assessment
         </button>
       </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total Blood Units',  value: totalUnits,         color: 'text-blue-600'   },
-          { label: 'PRBC Units',         value: totalPRBC,          color: 'text-rose-600'   },
-          { label: 'FFP Units',          value: totalFFP,           color: 'text-indigo-600' },
-          { label: 'Blood Wastage %',    value: `${wastageRate}%`,  color: 'text-amber-600'  },
+          { label: 'Total Assessments',   value: totalAssessments, color: 'text-blue-600'    },
+          { label: 'Completed',            value: completed,        color: 'text-emerald-600' },
+          { label: 'Completion %',         value: `${completionPct}%`, color: 'text-indigo-600' },
+          { label: 'Remaining',            value: totalAssessments - completed, color: 'text-amber-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -407,9 +453,9 @@ const BloodTab = ({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by month, year, or status…"
-          value={bloodSearch}
-          onChange={(e) => setBloodSearch(e.target.value)}
+          placeholder="Search by ID, UHID, name, time, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
         />
       </div>
@@ -430,40 +476,28 @@ const BloodTab = ({
             <tbody className="divide-y divide-slate-100">
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
-                  <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                  <td className="px-3 py-3 text-rose-600 font-bold">{r.prbc}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.sdp}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.rdp}</td>
-                  <td className="px-3 py-3 text-indigo-600 font-bold">{r.ffp}</td>
-                  <td className="px-3 py-3 text-slate-600">{r.cryo}</td>
-                  <td className="px-3 py-3 text-amber-600 font-bold">{r.bloodWastage}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.assessmentId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.assessmentDate}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.nurseAssessmentTime}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.doctorAssessmentTime}</td>
                   <td className="px-3 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
-                      r.transfusionReactions > 0
-                        ? 'bg-rose-50 text-rose-700 border-rose-200'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    }`}>
-                      {r.transfusionReactions}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 text-slate-600">{r.turnaroundTime} min</td>
-                  <td className="px-3 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>
                       {r.status}
                     </span>
                   </td>
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleOpenBloodModal(r)}
+                        onClick={() => handleOpenAssessmentModal(r)}
                         className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={() => handleDeleteBlood(r.id)}
+                        onClick={() => handleDeleteAssessment(r.id)}
                         className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
                         title="Delete"
                       >
@@ -476,7 +510,7 @@ const BloodTab = ({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
-                    {bloodSearch ? 'No records match your search.' : 'No blood records yet. Click "Add Blood Record" to begin.'}
+                    {searchQuery ? 'No records match your search.' : 'No assessment records yet. Click "Add Assessment" to begin.'}
                   </td>
                 </tr>
               )}
@@ -485,7 +519,7 @@ const BloodTab = ({
         </div>
         <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
           <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {bloodRecords.length} record{bloodRecords.length !== 1 ? 's' : ''}
+            Showing {filtered.length} of {assessments.length} record{assessments.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
@@ -493,39 +527,41 @@ const BloodTab = ({
   );
 };
 
-/* ─── Infection Control tab ─── */
-const InfectionTab = ({
+/* ─── Pressure Injury / Bed Sore Monitoring tab ─── */
+const PressureInjuryTab = ({
   hospital,
-  infectionRecords,
-  infectionSearch,
-  setInfectionSearch,
-  handleOpenInfectionModal,
-  handleDeleteInfection,
+  injuries,
+  searchQuery,
+  setSearchQuery,
+  handleOpenInjuryModal,
+  handleDeleteInjury,
 }) => {
-  const filtered = infectionRecords.filter((r) => {
-    const q = infectionSearch.toLowerCase();
+  const filtered = injuries.filter((r) => {
+    const q = searchQuery.toLowerCase();
     return (
-      r.month.toLowerCase().includes(q) ||
-      String(r.year).includes(q) ||
+      r.recordId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      r.riskLevel.toLowerCase().includes(q) ||
+      r.stage.toLowerCase().includes(q) ||
       r.status.toLowerCase().includes(q)
     );
   });
 
-  const totalCases  = infectionRecords.reduce((s, r) => s + (r.cauti || 0) + (r.bloodstreamInfections || 0) + (r.ssi || 0), 0);
-  const totalCAUTI  = infectionRecords.reduce((s, r) => s + (r.cauti || 0), 0);
-  const totalBSI    = infectionRecords.reduce((s, r) => s + (r.bloodstreamInfections || 0), 0);
-  const totalDays   = infectionRecords.reduce((s, r) => s + (r.patientDays || 0), 0);
-  const overallRate = totalDays > 0 ? ((totalCases / totalDays) * 1000).toFixed(2) : '0.00';
+  const totalInjuries = injuries.length;
+  const activeInjuries = injuries.filter((r) => r.status === 'Active').length;
+  const resolvedInjuries = injuries.filter((r) => r.status === 'Resolved').length;
+  const preventionCompliance = totalInjuries > 0 ? ((resolvedInjuries / totalInjuries) * 100).toFixed(1) : '0.0';
 
   const STATUS_BADGE = {
     Active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Inactive: 'bg-slate-50 text-slate-500 border-slate-200',
-    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
+    Resolved: 'bg-sky-50 text-sky-700 border-sky-200',
+    UnderReview: 'bg-amber-50 text-amber-700 border-amber-200',
   };
 
   const TH_COLS = [
-    'Infection ID', 'Month', 'Patient Days', 'CAUTI',
-    'Bloodstream Inf.', 'SSI', 'Infection Rate', 'Status', 'Actions',
+    'Record ID', 'UHID', 'Patient Name', 'Risk Level', 'Stage',
+    'Assessment Date', 'Preventive Measures', 'Status', 'Actions',
   ];
 
   return (
@@ -533,25 +569,25 @@ const InfectionTab = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-extrabold text-slate-800">Infection Control Records</h3>
-          <p className="text-[9px] text-slate-400 mt-0.5">Monthly HAI surveillance — Deluxe Ward</p>
+          <h3 className="text-xs font-extrabold text-slate-800">Pressure Injury / Bed Sore Monitoring</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">Braden risk assessment &amp; wound tracking — Deluxe Ward</p>
         </div>
         <button
-          onClick={() => handleOpenInfectionModal()}
+          onClick={() => handleOpenInjuryModal()}
           style={{ backgroundColor: hospital.themeColor }}
           className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Infection Record
+          <Plus className="w-3.5 h-3.5" /> Add Record
         </button>
       </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'Total Infection Cases',       value: totalCases,           color: 'text-rose-600'   },
-          { label: 'CAUTI Cases',                 value: totalCAUTI,           color: 'text-orange-600' },
-          { label: 'Bloodstream Inf. Cases',      value: totalBSI,             color: 'text-purple-600' },
-          { label: 'Infection Rate (per 1000)',   value: overallRate,          color: 'text-amber-600'  },
+          { label: 'Total Injury Cases',   value: totalInjuries,      color: 'text-rose-600'   },
+          { label: 'Active Cases',          value: activeInjuries,     color: 'text-orange-600' },
+          { label: 'Resolved Cases',        value: resolvedInjuries,   color: 'text-emerald-600' },
+          { label: 'Prevention Compliance', value: `${preventionCompliance}%`, color: 'text-indigo-600' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
@@ -565,9 +601,9 @@ const InfectionTab = ({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by month, year, or status…"
-          value={infectionSearch}
-          onChange={(e) => setInfectionSearch(e.target.value)}
+          placeholder="Search by ID, UHID, name, risk, stage, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
         />
       </div>
@@ -586,58 +622,54 @@ const InfectionTab = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filtered.map((r) => {
-                const total = (r.cauti || 0) + (r.bloodstreamInfections || 0) + (r.ssi || 0);
-                const rate  = r.patientDays > 0 ? ((total / r.patientDays) * 1000).toFixed(2) : '0.00';
-                return (
-                  <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
-                    <td className="px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">{r.month} {r.year}</td>
-                    <td className="px-3 py-3 text-slate-600">{r.patientDays}</td>
-                    <td className="px-3 py-3 text-orange-600 font-bold">{r.cauti}</td>
-                    <td className="px-3 py-3 text-purple-600 font-bold">{r.bloodstreamInfections}</td>
-                    <td className="px-3 py-3 text-rose-600 font-bold">{r.ssi}</td>
-                    <td className="px-3 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
-                        parseFloat(rate) > 1
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : parseFloat(rate) > 0
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      }`}>
-                        {rate}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
-                        {r.status}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleOpenInfectionModal(r)}
-                          className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
-                          title="Edit"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteInfection(r.id)}
-                          className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.recordId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.riskLevel === 'High'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : r.riskLevel === 'Medium'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.riskLevel}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.stage}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.assessmentDate}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.preventiveMeasures}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Active}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenInjuryModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInjury(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
-                    {infectionSearch ? 'No records match your search.' : 'No infection records yet. Click "Add Infection Record" to begin.'}
+                    {searchQuery ? 'No records match your search.' : 'No pressure injury records yet. Click "Add Record" to begin.'}
                   </td>
                 </tr>
               )}
@@ -646,7 +678,7 @@ const InfectionTab = ({
         </div>
         <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
           <span className="text-[9px] text-slate-400 font-medium">
-            Showing {filtered.length} of {infectionRecords.length} record{infectionRecords.length !== 1 ? 's' : ''}
+            Showing {filtered.length} of {injuries.length} record{injuries.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
@@ -654,7 +686,144 @@ const InfectionTab = ({
   );
 };
 
-/* ─── Patient Safety tab ─── */
+/* ─── Patient Care Dashboard tab ─── */
+const PatientCareDashboard = ({ hospital, assessments, injuries, bloodRecords, bloodSearch, setBloodSearch, handleOpenBloodModal, handleDeleteBlood, assessmentSearch, setAssessmentSearch, handleOpenAssessmentModal, handleDeleteAssessment, injurySearch, setInjurySearch, handleOpenInjuryModal, handleDeleteInjury }) => {
+  const totalAssessments = assessments.length;
+  const completedAssessments = assessments.filter((r) => r.status === 'Completed').length;
+  const completionPct = totalAssessments > 0 ? ((completedAssessments / totalAssessments) * 100).toFixed(1) : '0.0';
+
+  const totalBlood = bloodRecords.length;
+  const bloodReactions = bloodRecords.reduce((s, r) => s + (r.transfusionReactions || 0), 0);
+
+  const totalInjuries = injuries.length;
+  const resolvedInjuries = injuries.filter((r) => r.status === 'Resolved').length;
+  const preventionCompliance = totalInjuries > 0 ? ((resolvedInjuries / totalInjuries) * 100).toFixed(1) : '0.0';
+
+  const overallCompliance = totalAssessments > 0 || totalInjuries > 0
+    ? (((completedAssessments / (totalAssessments || 1)) + (resolvedInjuries / (totalInjuries || 1))) / 2 * 100).toFixed(1)
+    : '0.0';
+
+  const [subTab, setSubTab] = useState('dashboard');
+
+  const SUB_TABS = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'blood',     label: 'Blood Mgmt', icon: Droplets },
+    { id: 'assessment', label: 'Assessments', icon: ClipboardList },
+    { id: 'injury',    label: 'Pressure Injury', icon: ShieldCheck },
+  ];
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Patient Care &amp; Blood Management</span>
+        <h1 className="text-xl font-extrabold text-slate-900 mt-1">Deluxe Ward — Patient Care Overview</h1>
+        <p className="text-xs text-slate-500 mt-2 max-w-3xl leading-relaxed">
+          Unified view of initial assessments, blood product utilisation, and pressure injury prevention.
+        </p>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit">
+        {SUB_TABS.map(({ id, label, icon: Icon }) => {
+          const isActive = id === subTab;
+          return (
+            <button
+              key={id}
+              onClick={() => setSubTab(id)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {subTab === 'dashboard' && (
+        <div className="space-y-5">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {[
+              { label: 'Total Assessments',          value: totalAssessments,       color: 'text-blue-600'    },
+              { label: 'Assessments Completed',      value: completedAssessments,   color: 'text-emerald-600' },
+              { label: 'Assessment Completion %',    value: `${completionPct}%`,    color: 'text-indigo-600'  },
+              { label: 'Blood Transfusions',         value: totalBlood,             color: 'text-rose-600'    },
+              { label: 'Blood Reactions',            value: bloodReactions,         color: 'text-orange-600'  },
+              { label: 'Pressure Injury Cases',      value: totalInjuries,          color: 'text-purple-600'  },
+              { label: 'Prevention Compliance %',    value: `${preventionCompliance}%`, color: 'text-teal-600' },
+              { label: 'Overall Patient Care Compliance %', value: `${overallCompliance}%`, color: 'text-amber-600' },
+            ].map((kpi) => (
+              <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{kpi.label}</span>
+                <p className={`text-2xl font-extrabold ${kpi.color}`}>{kpi.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <h4 className="text-[10px] font-bold text-slate-600 mb-2">Assessments Summary</h4>
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                {completedAssessments} of {totalAssessments} assessments completed this period.
+              </p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <h4 className="text-[10px] font-bold text-slate-600 mb-2">Blood Safety</h4>
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                {bloodReactions} transfusion reaction{bloodReactions !== 1 ? 's' : ''} recorded across {totalBlood} record{totalBlood !== 1 ? 's' : ''}.
+              </p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <h4 className="text-[10px] font-bold text-slate-600 mb-2">Pressure Injury Prevention</h4>
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                {resolvedInjuries} of {totalInjuries} cases resolved. Prevention compliance is {preventionCompliance}%.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subTab === 'blood' && (
+        <BloodTab
+          hospital={hospital}
+          bloodRecords={bloodRecords}
+          bloodSearch={bloodSearch}
+          setBloodSearch={setBloodSearch}
+          handleOpenBloodModal={handleOpenBloodModal}
+          handleDeleteBlood={handleDeleteBlood}
+        />
+      )}
+
+      {subTab === 'assessment' && (
+        <InitialAssessmentTab
+          hospital={hospital}
+          assessments={assessments}
+          searchQuery={assessmentSearch}
+          setSearchQuery={setAssessmentSearch}
+          handleOpenAssessmentModal={handleOpenAssessmentModal}
+          handleDeleteAssessment={handleDeleteAssessment}
+        />
+      )}
+
+      {subTab === 'injury' && (
+        <PressureInjuryTab
+          hospital={hospital}
+          injuries={injuries}
+          searchQuery={injurySearch}
+          setSearchQuery={setInjurySearch}
+          handleOpenInjuryModal={handleOpenInjuryModal}
+          handleDeleteInjury={handleDeleteInjury}
+        />
+      )}
+    </div>
+  );
+};
+
+/* ─── Reports & Analytics tab ─── */
 const PatientSafetyTab = ({
   hospital,
   patientSafetyRecords,
@@ -1087,6 +1256,26 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   const [patientSafetyForm, setPatientSafetyForm] = useState({ ...EMPTY_PATIENT_SAFETY_FORM });
   const [patientSafetySearch, setPatientSafetySearch] = useState('');
 
+  /* ── Initial Assessments state ── */
+  const [assessments, setAssessments] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INITIAL_ASSESSMENTS);
+    return saved ? JSON.parse(saved) : SAMPLE_INITIAL_ASSESSMENTS;
+  });
+  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
+  const [editingAssessmentId, setEditingAssessmentId] = useState(null);
+  const [assessmentForm, setAssessmentForm] = useState({ ...EMPTY_ASSESSMENT_FORM });
+  const [assessmentSearch, setAssessmentSearch] = useState('');
+
+  /* ── Pressure Injuries state ── */
+  const [injuries, setInjuries] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_PRESSURE_INJURIES);
+    return saved ? JSON.parse(saved) : SAMPLE_PRESSURE_INJURIES;
+  });
+  const [isInjuryModalOpen, setIsInjuryModalOpen] = useState(false);
+  const [editingInjuryId, setEditingInjuryId] = useState(null);
+  const [injuryForm, setInjuryForm] = useState({ ...EMPTY_PRESSURE_INJURY_FORM });
+  const [injurySearch, setInjurySearch] = useState('');
+
   /* ── Persist quality indicators ── */
   useEffect(() => {
     localStorage.setItem(LS_KEY_QUALITY, JSON.stringify(qualityIndicators));
@@ -1106,6 +1295,16 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   useEffect(() => {
     localStorage.setItem(LS_KEY_PATIENT_SAFETY, JSON.stringify(patientSafetyRecords));
   }, [patientSafetyRecords]);
+
+  /* ── Persist initial assessments ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_INITIAL_ASSESSMENTS, JSON.stringify(assessments));
+  }, [assessments]);
+
+  /* ── Persist pressure injuries ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_PRESSURE_INJURIES, JSON.stringify(injuries));
+  }, [injuries]);
 
   /* ── Quality Indicators handlers ── */
   const getNextQualityId = () => {
@@ -1267,6 +1466,86 @@ const DeluxeWardWorkspace = ({ onBack }) => {
     }
   };
 
+  /* ── Initial Assessments handlers ── */
+  const getNextAssessmentId = () => {
+    const maxNum = assessments.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwa-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenAssessmentModal = (record = null) => {
+    if (record) {
+      setAssessmentForm({ ...record });
+      setEditingAssessmentId(record.id);
+    } else {
+      setAssessmentForm({ ...EMPTY_ASSESSMENT_FORM, id: getNextAssessmentId() });
+      setEditingAssessmentId(null);
+    }
+    setIsAssessmentModalOpen(true);
+  };
+
+  const handleSaveAssessment = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingAssessmentId) {
+      setAssessments((prev) =>
+        prev.map((r) => (r.id === editingAssessmentId ? { ...assessmentForm, id: editingAssessmentId } : r))
+      );
+    } else {
+      setAssessments((prev) => [...prev, { ...assessmentForm }]);
+    }
+    setIsAssessmentModalOpen(false);
+    setEditingAssessmentId(null);
+  };
+
+  const handleDeleteAssessment = (id) => {
+    if (window.confirm('Delete this assessment record?')) {
+      setAssessments((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── Pressure Injuries handlers ── */
+  const getNextInjuryId = () => {
+    const maxNum = injuries.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwpi-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenInjuryModal = (record = null) => {
+    if (record) {
+      setInjuryForm({ ...record });
+      setEditingInjuryId(record.id);
+    } else {
+      setInjuryForm({ ...EMPTY_PRESSURE_INJURY_FORM, id: getNextInjuryId() });
+      setEditingInjuryId(null);
+    }
+    setIsInjuryModalOpen(true);
+  };
+
+  const handleSaveInjury = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingInjuryId) {
+      setInjuries((prev) =>
+        prev.map((r) => (r.id === editingInjuryId ? { ...injuryForm, id: editingInjuryId } : r))
+      );
+    } else {
+      setInjuries((prev) => [...prev, { ...injuryForm }]);
+    }
+    setIsInjuryModalOpen(false);
+    setEditingInjuryId(null);
+  };
+
+  const handleDeleteInjury = (id) => {
+    if (window.confirm('Delete this pressure injury record?')) {
+      setInjuries((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
   /* ── Tab renderer ── */
   const renderContent = () => {
     switch (activeTab) {
@@ -1283,15 +1562,25 @@ const DeluxeWardWorkspace = ({ onBack }) => {
             handleDeleteQuality={handleDeleteQuality}
           />
         );
-      case 'blood':
+      case 'patient_care':
         return (
-          <BloodTab
+          <PatientCareDashboard
             hospital={hospital}
+            assessments={assessments}
+            injuries={injuries}
             bloodRecords={bloodRecords}
             bloodSearch={bloodSearch}
             setBloodSearch={setBloodSearch}
             handleOpenBloodModal={handleOpenBloodModal}
             handleDeleteBlood={handleDeleteBlood}
+            assessmentSearch={assessmentSearch}
+            setAssessmentSearch={setAssessmentSearch}
+            handleOpenAssessmentModal={handleOpenAssessmentModal}
+            handleDeleteAssessment={handleDeleteAssessment}
+            injurySearch={injurySearch}
+            setInjurySearch={setInjurySearch}
+            handleOpenInjuryModal={handleOpenInjuryModal}
+            handleDeleteInjury={handleDeleteInjury}
           />
         );
       case 'infection':
@@ -1305,17 +1594,10 @@ const DeluxeWardWorkspace = ({ onBack }) => {
             handleDeleteInfection={handleDeleteInfection}
           />
         );
-      case 'patient-safety':
-        return (
-          <PatientSafetyTab
-            hospital={hospital}
-            patientSafetyRecords={patientSafetyRecords}
-            patientSafetySearch={patientSafetySearch}
-            setPatientSafetySearch={setPatientSafetySearch}
-            handleOpenPatientSafetyModal={handleOpenPatientSafetyModal}
-            handleDeletePatientSafety={handleDeletePatientSafety}
-          />
-        );
+      case 'clinical':
+        return <PlaceholderSection title="Clinical Monitoring" />;
+      case 'audit':
+        return <PlaceholderSection title="Internal Audit" />;
       case 'reports':
         return (
           <ReportsTab 
@@ -1821,8 +2103,309 @@ const DeluxeWardWorkspace = ({ onBack }) => {
           </div>
         </div>
       )}
+
+      {/* ── Initial Assessment Modal ── */}
+      {isAssessmentModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingAssessmentId ? 'Edit Assessment Record' : 'Add Initial Assessment'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Nurse &amp; Doctor Assessment</p>
+              </div>
+              <button
+                onClick={() => { setIsAssessmentModalOpen(false); setEditingAssessmentId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAssessment} className="space-y-5">
+              {/* Identifiers */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Patient &amp; Assessment Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessment ID *</label>
+                    <input
+                      type="text"
+                      value={assessmentForm.assessmentId}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, assessmentId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={assessmentForm.uhId}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={assessmentForm.patientName}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Timings */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Assessment Timings</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessment Date *</label>
+                    <input
+                      type="date"
+                      value={assessmentForm.assessmentDate}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, assessmentDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Nurse Assessment Time</label>
+                    <input
+                      type="time"
+                      value={assessmentForm.nurseAssessmentTime}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, nurseAssessmentTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Doctor Assessment Time</label>
+                    <input
+                      type="time"
+                      value={assessmentForm.doctorAssessmentTime}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, doctorAssessmentTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status & Remarks */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Status &amp; Remarks</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={assessmentForm.status}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Incomplete">Incomplete</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <input
+                      type="text"
+                      value={assessmentForm.remarks}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, remarks: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsAssessmentModalOpen(false); setEditingAssessmentId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingAssessmentId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Pressure Injury Modal ── */}
+      {isInjuryModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingInjuryId ? 'Edit Pressure Injury Record' : 'Add Pressure Injury Record'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Wound Care &amp; Risk Assessment</p>
+              </div>
+              <button
+                onClick={() => { setIsInjuryModalOpen(false); setEditingInjuryId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveInjury} className="space-y-5">
+              {/* Identifiers */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Patient &amp; Record Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Record ID *</label>
+                    <input
+                      type="text"
+                      value={injuryForm.recordId}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, recordId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={injuryForm.uhId}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={injuryForm.patientName}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Risk & Stage */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Risk Assessment</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Risk Level *</label>
+                    <select
+                      value={injuryForm.riskLevel}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, riskLevel: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Stage *</label>
+                    <select
+                      value={injuryForm.stage}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, stage: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Stage 1">Stage 1</option>
+                      <option value="Stage 2">Stage 2</option>
+                      <option value="Stage 3">Stage 3</option>
+                      <option value="Stage 4">Stage 4</option>
+                      <option value="Unstageable">Unstageable</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Assessment Date *</label>
+                    <input
+                      type="date"
+                      value={injuryForm.assessmentDate}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, assessmentDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Care & Status */}
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Care Plan &amp; Status</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Preventive Measures</label>
+                    <textarea
+                      value={injuryForm.preventiveMeasures}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, preventiveMeasures: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={injuryForm.status}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="UnderReview">Under Review</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <input
+                      type="text"
+                      value={injuryForm.remarks}
+                      onChange={(e) => setInjuryForm({ ...injuryForm, remarks: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsInjuryModalOpen(false); setEditingInjuryId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingInjuryId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const ClinicalTab = ({ hospital }) => (
+  <PlaceholderSection title="Clinical Monitoring" />
+);
+
+const AuditTab = ({ hospital }) => (
+  <PlaceholderSection title="Internal Audit" />
+);
 
 export default DeluxeWardWorkspace;

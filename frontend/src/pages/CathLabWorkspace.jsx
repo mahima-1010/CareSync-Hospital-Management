@@ -161,6 +161,33 @@ const NumField = ({ label, field, form, setForm, step = '1' }) => (
   </div>
 );
 
+const DashboardTab = ({ hospital }) => (
+  <div className="space-y-6">
+    <div className="flex items-center justify-between">
+      <div>
+        <h3 className="text-xs font-extrabold text-slate-800">CathLab Dashboard</h3>
+        <p className="text-[9px] text-slate-400 mt-0.5">Key performance metrics and department overview</p>
+      </div>
+    </div>
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {[
+        { label: 'Department Status', value: 'Active', color: 'text-emerald-600' },
+        { label: 'Quality Module', value: 'NABH', color: 'text-sky-600' },
+        { label: 'Accreditation', value: 'Valid', color: 'text-blue-600' },
+        { label: 'Last Audit', value: 'Jun 2025', color: 'text-violet-600' },
+      ].map((kpi) => (
+        <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+          <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+        </div>
+      ))}
+    </div>
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center">
+      <p className="text-[10px] text-slate-500 font-semibold">Select a tab from the sidebar to view detailed records, analytics, and reports.</p>
+    </div>
+  </div>
+);
+
 const QualityTab = ({
   hospital,
   qualityIndicators,

@@ -56,13 +56,93 @@ const ICON_MAP = {
 const Policies = () => {
   const { hospital, addDepartment, deleteDepartment, addPolicy, updatePolicy, deletePolicy } = useHospital();
   
+  const seedChecked = React.useRef(false);
+  React.useEffect(() => {
+    if (seedChecked.current || !hospital || !hospital.departments || !hospital.policies) return;
+    seedChecked.current = true;
+
+    const seedData = [
+      {
+        deptName: 'Operation Theatre',
+        policies: [
+          { title: 'OT Sterilization Protocol', code: 'POL-OT-101', content: 'Comprehensive guidelines for sterilizing the operation theatre between surgical cases. Includes UV sterilization, surface decontamination, and airflow management.', status: 'Published' },
+          { title: 'Surgical Safety Checklist', code: 'POL-OT-102', content: 'Mandatory WHO surgical safety checklist implementation policy. Covers Sign In, Time Out, and Sign Out procedures.', status: 'Published' },
+          { title: 'OT Equipment Maintenance', code: 'POL-OT-103', content: 'Routine maintenance and calibration schedules for anesthesia machines, monitors, and surgical lights.', status: 'Published' },
+          { title: 'Bio-Medical Waste Segregation (OT)', code: 'POL-OT-104', content: 'Specific waste segregation guidelines for the operation theatre including human tissue and sharps disposal.', status: 'Under Review' },
+          { title: 'Staff Scrubbing and Gowning', code: 'POL-OT-105', content: 'Standard operating procedure for surgical scrubbing, gowning, and gloving to maintain asepsis.', status: 'Published' }
+        ]
+      },
+      {
+        deptName: 'Cath Lab',
+        policies: [
+          { title: 'Radiation Safety Protocol', code: 'POL-CL-101', content: 'Mandatory use of lead aprons, thyroid shields, and dosimeters. Outlines maximum allowable radiation exposure limits.', status: 'Published' },
+          { title: 'Contrast Media Handling', code: 'POL-CL-102', content: 'Guidelines for the storage, preparation, and administration of contrast media, including emergency response to adverse reactions.', status: 'Published' },
+          { title: 'Cath Lab Infection Control', code: 'POL-CL-103', content: 'Infection prevention measures specific to cardiac catheterization procedures and arterial access.', status: 'Published' },
+          { title: 'Emergency Defibrillation', code: 'POL-CL-104', content: 'Protocol for crash cart readiness, defibrillator testing, and response to intra-procedural arrhythmias.', status: 'Published' },
+          { title: 'Patient Hemostasis Management', code: 'POL-CL-105', content: 'Post-procedure access site management, use of closure devices, and manual compression guidelines.', status: 'Under Review' }
+        ]
+      },
+      {
+        deptName: 'Nursing Operations',
+        policies: [
+          { title: 'Patient Handover Protocol (ISBAR)', code: 'POL-NO-101', content: 'Standardized nursing shift handover using the ISBAR (Identify, Situation, Background, Assessment, Recommendation) framework.', status: 'Published' },
+          { title: 'Medication Administration', code: 'POL-NO-102', content: 'The 5 Rights of medication administration (Right Patient, Drug, Dose, Route, Time) and documentation requirements.', status: 'Published' },
+          { title: 'Fall Prevention Strategy', code: 'POL-NO-103', content: 'Risk assessment using the Morse Fall Scale and implementation of universal and high-risk fall precautions.', status: 'Published' },
+          { title: 'Pressure Ulcer Prevention', code: 'POL-NO-104', content: 'Braden scale assessment on admission, repositioning schedules, and use of pressure-relieving devices.', status: 'Under Review' },
+          { title: 'Vital Signs Monitoring', code: 'POL-NO-105', content: 'Frequency of vital signs monitoring based on patient acuity and early warning score (EWS) escalation protocols.', status: 'Published' }
+        ]
+      },
+      {
+        deptName: 'Admission & Discharge',
+        policies: [
+          { title: 'Patient Identification Policy', code: 'POL-AD-101', content: 'Use of two patient identifiers (Name and MRN) and mandatory application of patient ID bands upon admission.', status: 'Published' },
+          { title: 'Discharge Planning Framework', code: 'POL-AD-102', content: 'Initiating discharge planning on admission, multidisciplinary involvement, and patient education requirements.', status: 'Published' },
+          { title: 'Leave Against Medical Advice (LAMA)', code: 'POL-AD-103', content: 'Procedure for managing patients who wish to leave AMA, including risk counseling and documentation.', status: 'Under Review' },
+          { title: 'Valuables Management', code: 'POL-AD-104', content: 'Handling, securing, and returning patient valuables and personal belongings during admission.', status: 'Published' },
+          { title: 'Bed Allocation Strategy', code: 'POL-AD-105', content: 'Prioritization of bed assignments based on clinical urgency, isolation requirements, and gender segregation.', status: 'Published' }
+        ]
+      },
+      {
+        deptName: 'Delux Ward',
+        policies: [
+          { title: 'VIP Patient Management', code: 'POL-DW-101', content: 'Enhanced privacy protocols, restricted access, and specialized concierge services for VIP and Deluxe Ward patients.', status: 'Published' },
+          { title: 'Premium Dietary Services', code: 'POL-DW-102', content: 'Customized menu planning, room service delivery standards, and dietary consultation protocols for deluxe rooms.', status: 'Published' },
+          { title: 'Visitor Policy (Deluxe)', code: 'POL-DW-103', content: 'Extended visiting hours, guest accommodation guidelines, and security access for the Deluxe Ward.', status: 'Published' },
+          { title: 'Deluxe Room Turnaround', code: 'POL-DW-104', content: 'Housekeeping standards for deep cleaning, amenity restocking, and inspection prior to new patient admission.', status: 'Under Review' },
+          { title: 'Personalized Nursing Care', code: 'POL-DW-105', content: 'Lower nurse-to-patient ratios, dedicated care coordinators, and enhanced rounding protocols.', status: 'Published' }
+        ]
+      }
+    ];
+
+    seedData.forEach(deptSeed => {
+      const dept = hospital.departments.find(d => d.name === deptSeed.deptName);
+      if (dept) {
+        const existingPolicies = hospital.policies.filter(p => p.deptId === dept.id);
+        if (existingPolicies.length === 0) {
+          deptSeed.policies.forEach(pol => {
+            addPolicy(dept.id, pol.title, pol.code, pol.content, pol.status);
+          });
+        }
+      }
+    });
+  }, [hospital, addPolicy]);
+
   // Navigation States
   const [selectedDeptId, setSelectedDeptId] = useState(null); // Tracks active department folder
   const [isEditing, setIsEditing] = useState(false); // Rich Text Canvas toggle
   const [editingPolicy, setEditingPolicy] = useState(null); // Active document for editing
 
   // Special workspace routing — dedicated pages for specific departments
-  const SPECIALIZED_DEPTS = ['radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 'female-ward', 'male-ward', 'deluxe-ward', 'emergency', 'micu', 'sicu', 'endoscopy', 'cathlab', 'operation-theatre', 'nursing-operations', 'admission-registration', 'fire-risk'];
+  const SPECIALIZED_DEPTS = [
+    'radiology', 'cssd', 'safety', 'feedback', 'pharmacy', 'lab', 
+    'female-ward', 'male-ward',
+    'emergency', 'micu', 'sicu', 'endoscopy', 
+    'cathlab', 'cath-lab', 
+    'operation-theatre', 'ot', 
+    'nursing-operations', 'nursing', 
+    'admission-registration', 'admission', 'admission-discharge', 'admission-&-discharge',
+    'fire-risk'
+  ];
   
   // Search queries
   const [searchQuery, setSearchQuery] = useState('');
@@ -164,15 +244,15 @@ const Policies = () => {
   if (selectedDeptId === 'lab') return <LaboratoryQualityWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'female-ward') return <FemaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'male-ward') return <MaleWardWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'deluxe-ward') return <DeluxeWardWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'deluxe-ward' || selectedDeptId === 'delux-ward' || selectedDeptId === 'deluxe') return <DeluxeWardWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'emergency') return <EmergencyWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'micu') return <MICUWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'sicu') return <SICUWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'operation-theatre') return <OperationTheatreWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'operation-theatre' || selectedDeptId === 'ot') return <OperationTheatreWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'endoscopy') return <EndoscopyWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'cathlab') return <CathLabWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'nursing-operations') return <NursingOperationsWorkspace onBack={() => setSelectedDeptId(null)} />;
-  if (selectedDeptId === 'admission-registration') return <AdmissionRegistrationWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'cathlab' || selectedDeptId === 'cath-lab') return <CathLabWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'nursing-operations' || selectedDeptId === 'nursing') return <NursingOperationsWorkspace onBack={() => setSelectedDeptId(null)} />;
+  if (selectedDeptId === 'admission-registration' || selectedDeptId === 'admission' || selectedDeptId === 'admission-discharge' || selectedDeptId === 'admission-&-discharge') return <AdmissionRegistrationWorkspace onBack={() => setSelectedDeptId(null)} />;
   if (selectedDeptId === 'fire-risk') return <FireRiskManagementWorkspace onBack={() => setSelectedDeptId(null)} />;
 
   return (
