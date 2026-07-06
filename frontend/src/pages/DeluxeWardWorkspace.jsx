@@ -17,7 +17,8 @@ import {
   Download,
   Printer,
   FileDown,
-  Flame
+  Flame,
+  Pill
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -30,6 +31,9 @@ const LS_KEY_PRESSURE_INJURIES = 'deluxe_pressure_injuries';
 const LS_KEY_INFECTION_PREVENTION = 'deluxe_infection_prevention';
 const LS_KEY_PATIENT_SAFETY_REGISTER = 'deluxe_patient_safety';
 const LS_KEY_FIRE_SAFETY = 'deluxe_fire_safety';
+const LS_KEY_MEDICATION_ADMINISTRATION = 'deluxe_medication_administration';
+const LS_KEY_NURSING_OBSERVATIONS = 'deluxe_nursing_observations';
+const LS_KEY_DISCHARGE_PLANNING = 'deluxe_discharge_planning';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -226,6 +230,72 @@ const SAMPLE_FIRE_SAFETY = [
   { id: 'dwfs-003', recordId: 'DWFS-2503', area: 'Emergency Dept', fireSafetyEquipmentChecked: 'No',  emergencyExitStatus: 'Blocked', ppeAvailability: 'Partial', hazardIdentified: 'Yes', correctiveAction: 'Clear exit route immediately', status: 'Non-Compliant', inspectionDate: '2025-02-06', remarks: 'Follow-up required' },
   { id: 'dwfs-004', recordId: 'DWFS-2504', area: 'Surgical Ward',  fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-02-21', remarks: 'Routine inspection passed' },
   { id: 'dwfs-005', recordId: 'DWFS-2505', area: 'Male Ward',      fireSafetyEquipmentChecked: 'Yes', emergencyExitStatus: 'Clear', ppeAvailability: 'Available', hazardIdentified: 'No',  correctiveAction: '', status: 'Active',   inspectionDate: '2025-03-09', remarks: 'Re-inspection due next month' },
+];
+
+const EMPTY_MEDICATION_FORM = {
+  id: '',
+  medicationId: '',
+  uhId: '',
+  patientName: '',
+  drugName: '',
+  dose: '',
+  route: 'Oral',
+  administrationTime: '',
+  administeredBy: '',
+  medicationError: 'No',
+  remarks: '',
+};
+
+const SAMPLE_MEDICATION_ADMINISTRATIONS = [
+  { id: 'dwma-001', medicationId: 'DWMA-2501', uhId: 'UH0001', patientName: 'Rahul Menon',    drugName: 'Amoxicillin 500mg', dose: '1 capsule', route: 'Oral', administrationTime: '08:00', administeredBy: 'Nurse Priya',   medicationError: 'No', remarks: 'Given with food' },
+  { id: 'dwma-002', medicationId: 'DWMA-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',    drugName: 'Metformin 850mg',  dose: '1 tablet',  route: 'Oral', administrationTime: '09:00', administeredBy: 'Nurse Rahul',   medicationError: 'No', remarks: 'Post-breakfast' },
+  { id: 'dwma-003', medicationId: 'DWMA-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  drugName: 'Insulin Glargine', dose: '20 units',  route: 'SC',   administrationTime: '22:00', administeredBy: 'Nurse Sneha',   medicationError: 'No', remarks: 'Bedtime dose' },
+  { id: 'dwma-004', medicationId: 'DWMA-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', drugName: 'Amlodipine 5mg',  dose: '1 tablet',  route: 'Oral', administrationTime: '08:00', administeredBy: 'Nurse Priya',   medicationError: 'Yes', remarks: 'Wrong time — documented' },
+  { id: 'dwma-005', medicationId: 'DWMA-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    drugName: 'Omeprazole 20mg', dose: '1 capsule', route: 'Oral', administrationTime: '07:30', administeredBy: 'Nurse Rahul',   medicationError: 'No', remarks: 'Pre-breakfast' },
+];
+
+const EMPTY_NURSING_OBSERVATION_FORM = {
+  id: '',
+  observationId: '',
+  uhId: '',
+  patientName: '',
+  observationDate: '2025-01-01',
+  vitalSignsStatus: 'Normal',
+  painAssessment: 'No pain',
+  consciousnessLevel: 'Alert',
+  escalationRequired: 'No',
+  status: 'Completed',
+  remarks: '',
+};
+
+const SAMPLE_NURSING_OBSERVATIONS = [
+  { id: 'dwno-001', observationId: 'DWNO-2501', uhId: 'UH0001', patientName: 'Rahul Menon',    observationDate: '2025-01-05', vitalSignsStatus: 'Normal',      painAssessment: 'No pain',       consciousnessLevel: 'Alert', escalationRequired: 'No',  status: 'Completed', remarks: 'Stable' },
+  { id: 'dwno-002', observationId: 'DWNO-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',    observationDate: '2025-01-08', vitalSignsStatus: 'Elevated BP', painAssessment: 'Mild',         consciousnessLevel: 'Alert', escalationRequired: 'No',  status: 'Completed', remarks: 'BP 142/92' },
+  { id: 'dwno-003', observationId: 'DWNO-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  observationDate: '2025-02-02', vitalSignsStatus: 'Normal',      painAssessment: 'Moderate',     consciousnessLevel: 'Drowsy', escalationRequired: 'Yes', status: 'Escalated', remarks: 'Doctor informed' },
+  { id: 'dwno-004', observationId: 'DWNO-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', observationDate: '2025-02-14', vitalSignsStatus: 'Low SpO2',   painAssessment: 'No pain',       consciousnessLevel: 'Alert', escalationRequired: 'Yes', status: 'Escalated', remarks: 'Oxygen started' },
+  { id: 'dwno-005', observationId: 'DWNO-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    observationDate: '2025-03-05', vitalSignsStatus: 'Normal',      painAssessment: 'No pain',       consciousnessLevel: 'Alert', escalationRequired: 'No',  status: 'Completed', remarks: 'Discharge planned' },
+];
+
+const EMPTY_DISCHARGE_FORM = {
+  id: '',
+  planningId: '',
+  uhId: '',
+  patientName: '',
+  plannedDischargeDate: '2025-01-01',
+  actualDischargeDate: '',
+  dischargeEducation: 'Yes',
+  followUpAdvice: '',
+  documentationComplete: 'No',
+  status: 'Pending',
+  remarks: '',
+};
+
+const SAMPLE_DISCHARGE_PLANNING = [
+  { id: 'dwdp-001', planningId: 'DWDP-2501', uhId: 'UH0001', patientName: 'Rahul Menon',    plannedDischargeDate: '2025-01-07', actualDischargeDate: '2025-01-07', dischargeEducation: 'Yes', followUpAdvice: 'OPD in 1 week', documentationComplete: 'Yes', status: 'Completed', remarks: 'All documents signed' },
+  { id: 'dwdp-002', planningId: 'DWDP-2502', uhId: 'UH0045', patientName: 'Sunita Iyer',    plannedDischargeDate: '2025-01-10', actualDischargeDate: '2025-01-11', dischargeEducation: 'Yes', followUpAdvice: 'Pharmacy review', documentationComplete: 'Yes', status: 'Completed', remarks: 'Delayed by 1 day' },
+  { id: 'dwdp-003', planningId: 'DWDP-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  plannedDischargeDate: '2025-02-05', actualDischargeDate: '',          dischargeEducation: 'No',  followUpAdvice: 'Dietitian consult', documentationComplete: 'No',  status: 'Pending',   remarks: 'Awaiting physician clearance' },
+  { id: 'dwdp-004', planningId: 'DWDP-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', plannedDischargeDate: '2025-02-16', actualDischargeDate: '2025-02-16', dischargeEducation: 'Yes', followUpAdvice: 'Vaccination due', documentationComplete: 'Partial', status: 'Completed', remarks: 'Counseling pending' },
+  { id: 'dwdp-005', planningId: 'DWDP-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    plannedDischargeDate: '2025-03-08', actualDischargeDate: '',          dischargeEducation: 'No',  followUpAdvice: 'Physiotherapy', documentationComplete: 'No',  status: 'Pending',   remarks: 'Wound care ongoing' },
 ];
 
 const TABS = [
@@ -1780,6 +1850,169 @@ const DeluxeWardWorkspace = ({ onBack }) => {
     }
   };
 
+  /* ── Clinical Monitoring state ── */
+  const [medicationRecords, setMedicationRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_MEDICATION_ADMINISTRATION);
+    return saved ? JSON.parse(saved) : SAMPLE_MEDICATION_ADMINISTRATIONS;
+  });
+  const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
+  const [editingMedicationId, setEditingMedicationId] = useState(null);
+  const [medicationForm, setMedicationForm] = useState({ ...EMPTY_MEDICATION_FORM });
+  const [medicationSearch, setMedicationSearch] = useState('');
+
+  const [observationRecords, setObservationRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_NURSING_OBSERVATIONS);
+    return saved ? JSON.parse(saved) : SAMPLE_NURSING_OBSERVATIONS;
+  });
+  const [isObservationModalOpen, setIsObservationModalOpen] = useState(false);
+  const [editingObservationId, setEditingObservationId] = useState(null);
+  const [observationForm, setObservationForm] = useState({ ...EMPTY_NURSING_OBSERVATION_FORM });
+  const [observationSearch, setObservationSearch] = useState('');
+
+  const [dischargeRecords, setDischargeRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_DISCHARGE_PLANNING);
+    return saved ? JSON.parse(saved) : SAMPLE_DISCHARGE_PLANNING;
+  });
+  const [isDischargeModalOpen, setIsDischargeModalOpen] = useState(false);
+  const [editingDischargeId, setEditingDischargeId] = useState(null);
+  const [dischargeForm, setDischargeForm] = useState({ ...EMPTY_DISCHARGE_FORM });
+  const [dischargeSearch, setDischargeSearch] = useState('');
+
+  /* ── Persist medication administration records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_MEDICATION_ADMINISTRATION, JSON.stringify(medicationRecords));
+  }, [medicationRecords]);
+
+  /* ── Persist nursing observation records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_NURSING_OBSERVATIONS, JSON.stringify(observationRecords));
+  }, [observationRecords]);
+
+  /* ── Persist discharge planning records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_DISCHARGE_PLANNING, JSON.stringify(dischargeRecords));
+  }, [dischargeRecords]);
+
+  /* ── Medication Administration handlers ── */
+  const getNextMedicationId = () => {
+    const maxNum = medicationRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwma-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenMedicationModal = (record = null) => {
+    if (record) {
+      setMedicationForm({ ...record });
+      setEditingMedicationId(record.id);
+    } else {
+      setMedicationForm({ ...EMPTY_MEDICATION_FORM, id: getNextMedicationId() });
+      setEditingMedicationId(null);
+    }
+    setIsMedicationModalOpen(true);
+  };
+
+  const handleSaveMedication = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingMedicationId) {
+      setMedicationRecords((prev) =>
+        prev.map((r) => (r.id === editingMedicationId ? { ...medicationForm, id: editingMedicationId } : r))
+      );
+    } else {
+      setMedicationRecords((prev) => [...prev, { ...medicationForm }]);
+    }
+    setIsMedicationModalOpen(false);
+    setEditingMedicationId(null);
+  };
+
+  const handleDeleteMedication = (id) => {
+    if (window.confirm('Delete this medication administration record?')) {
+      setMedicationRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── Nursing Observation handlers ── */
+  const getNextObservationId = () => {
+    const maxNum = observationRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwno-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenObservationModal = (record = null) => {
+    if (record) {
+      setObservationForm({ ...record });
+      setEditingObservationId(record.id);
+    } else {
+      setObservationForm({ ...EMPTY_NURSING_OBSERVATION_FORM, id: getNextObservationId() });
+      setEditingObservationId(null);
+    }
+    setIsObservationModalOpen(true);
+  };
+
+  const handleSaveObservation = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingObservationId) {
+      setObservationRecords((prev) =>
+        prev.map((r) => (r.id === editingObservationId ? { ...observationForm, id: editingObservationId } : r))
+      );
+    } else {
+      setObservationRecords((prev) => [...prev, { ...observationForm }]);
+    }
+    setIsObservationModalOpen(false);
+    setEditingObservationId(null);
+  };
+
+  const handleDeleteObservation = (id) => {
+    if (window.confirm('Delete this nursing observation record?')) {
+      setObservationRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── Discharge Planning handlers ── */
+  const getNextDischargeId = () => {
+    const maxNum = dischargeRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwdp-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenDischargeModal = (record = null) => {
+    if (record) {
+      setDischargeForm({ ...record });
+      setEditingDischargeId(record.id);
+    } else {
+      setDischargeForm({ ...EMPTY_DISCHARGE_FORM, id: getNextDischargeId() });
+      setEditingDischargeId(null);
+    }
+    setIsDischargeModalOpen(true);
+  };
+
+  const handleSaveDischarge = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingDischargeId) {
+      setDischargeRecords((prev) =>
+        prev.map((r) => (r.id === editingDischargeId ? { ...dischargeForm, id: editingDischargeId } : r))
+      );
+    } else {
+      setDischargeRecords((prev) => [...prev, { ...dischargeForm }]);
+    }
+    setIsDischargeModalOpen(false);
+    setEditingDischargeId(null);
+  };
+
+  const handleDeleteDischarge = (id) => {
+    if (window.confirm('Delete this discharge planning record?')) {
+      setDischargeRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
   /* ── Tab renderer ── */
   const renderContent = () => {
     switch (activeTab) {
@@ -1840,7 +2073,26 @@ const DeluxeWardWorkspace = ({ onBack }) => {
           />
         );
       case 'clinical':
-        return <PlaceholderSection title="Clinical Monitoring" />;
+        return (
+          <ClinicalMonitoringTab
+            hospital={hospital}
+            medicationRecords={medicationRecords}
+            medicationSearch={medicationSearch}
+            setMedicationSearch={setMedicationSearch}
+            handleOpenMedicationModal={handleOpenMedicationModal}
+            handleDeleteMedication={handleDeleteMedication}
+            observationRecords={observationRecords}
+            observationSearch={observationSearch}
+            setObservationSearch={setObservationSearch}
+            handleOpenObservationModal={handleOpenObservationModal}
+            handleDeleteObservation={handleDeleteObservation}
+            dischargeRecords={dischargeRecords}
+            dischargeSearch={dischargeSearch}
+            setDischargeSearch={setDischargeSearch}
+            handleOpenDischargeModal={handleOpenDischargeModal}
+            handleDeleteDischarge={handleDeleteDischarge}
+          />
+        );
       case 'audit':
         return <PlaceholderSection title="Internal Audit" />;
       case 'reports':
@@ -3113,6 +3365,486 @@ const DeluxeWardWorkspace = ({ onBack }) => {
           </div>
         </div>
       )}
+
+      {/* ── Medication Administration Modal ── */}
+      {isMedicationModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingMedicationId ? 'Edit Medication Record' : 'Add Medication Administration'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Medication Safety &amp; Administration</p>
+              </div>
+              <button
+                onClick={() => { setIsMedicationModalOpen(false); setEditingMedicationId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMedication} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Medication Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Medication ID *</label>
+                    <input
+                      type="text"
+                      value={medicationForm.medicationId}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, medicationId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={medicationForm.uhId}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={medicationForm.patientName}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Drug &amp; Administration</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Drug Name *</label>
+                    <input
+                      type="text"
+                      value={medicationForm.drugName}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, drugName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Dose</label>
+                    <input
+                      type="text"
+                      value={medicationForm.dose}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, dose: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Route *</label>
+                    <select
+                      value={medicationForm.route}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, route: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Oral">Oral</option>
+                      <option value="IV">IV</option>
+                      <option value="IM">IM</option>
+                      <option value="SC">SC</option>
+                      <option value="Topical">Topical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Administration Time *</label>
+                    <input
+                      type="time"
+                      value={medicationForm.administrationTime}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, administrationTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Administered By *</label>
+                    <input
+                      type="text"
+                      value={medicationForm.administeredBy}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, administeredBy: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Medication Error</label>
+                    <select
+                      value={medicationForm.medicationError}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, medicationError: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Notes</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <textarea
+                      value={medicationForm.remarks}
+                      onChange={(e) => setMedicationForm({ ...medicationForm, remarks: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsMedicationModalOpen(false); setEditingMedicationId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingMedicationId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Nursing Observation Modal ── */}
+      {isObservationModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingObservationId ? 'Edit Observation Record' : 'Add Nursing Observation'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Nursing Assessment &amp; Escalation</p>
+              </div>
+              <button
+                onClick={() => { setIsObservationModalOpen(false); setEditingObservationId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveObservation} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Record Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Observation ID *</label>
+                    <input
+                      type="text"
+                      value={observationForm.observationId}
+                      onChange={(e) => setObservationForm({ ...observationForm, observationId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={observationForm.uhId}
+                      onChange={(e) => setObservationForm({ ...observationForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={observationForm.patientName}
+                      onChange={(e) => setObservationForm({ ...observationForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Clinical Observations</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Observation Date *</label>
+                    <input
+                      type="date"
+                      value={observationForm.observationDate}
+                      onChange={(e) => setObservationForm({ ...observationForm, observationDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Vital Signs Status *</label>
+                    <select
+                      value={observationForm.vitalSignsStatus}
+                      onChange={(e) => setObservationForm({ ...observationForm, vitalSignsStatus: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Normal">Normal</option>
+                      <option value="Elevated BP">Elevated BP</option>
+                      <option value="Low SpO2">Low SpO2</option>
+                      <option value="Tachycardia">Tachycardia</option>
+                      <option value="Fever">Fever</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Pain Assessment *</label>
+                    <select
+                      value={observationForm.painAssessment}
+                      onChange={(e) => setObservationForm({ ...observationForm, painAssessment: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="No pain">No pain</option>
+                      <option value="Mild">Mild</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="Severe">Severe</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Consciousness Level *</label>
+                    <select
+                      value={observationForm.consciousnessLevel}
+                      onChange={(e) => setObservationForm({ ...observationForm, consciousnessLevel: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Alert">Alert</option>
+                      <option value="Drowsy">Drowsy</option>
+                      <option value="Confused">Confused</option>
+                      <option value="Unresponsive">Unresponsive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Escalation Required *</label>
+                    <select
+                      value={observationForm.escalationRequired}
+                      onChange={(e) => setObservationForm({ ...observationForm, escalationRequired: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={observationForm.status}
+                      onChange={(e) => setObservationForm({ ...observationForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Completed">Completed</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Escalated">Escalated</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Notes</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <textarea
+                      value={observationForm.remarks}
+                      onChange={(e) => setObservationForm({ ...observationForm, remarks: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsObservationModalOpen(false); setEditingObservationId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingObservationId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Discharge Planning Modal ── */}
+      {isDischargeModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800">
+                  {editingDischargeId ? 'Edit Discharge Record' : 'Add Discharge Planning'}
+                </h3>
+                <p className="text-[9px] text-slate-400 mt-0.5">Deluxe Ward — Discharge Coordination &amp; Documentation</p>
+              </div>
+              <button
+                onClick={() => { setIsDischargeModalOpen(false); setEditingDischargeId(null); }}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDischarge} className="space-y-5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Record Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Planning ID *</label>
+                    <input
+                      type="text"
+                      value={dischargeForm.planningId}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, planningId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">UHID *</label>
+                    <input
+                      type="text"
+                      value={dischargeForm.uhId}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, uhId: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={dischargeForm.patientName}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, patientName: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Discharge Planning</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Planned Discharge Date *</label>
+                    <input
+                      type="date"
+                      value={dischargeForm.plannedDischargeDate}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, plannedDischargeDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Actual Discharge Date</label>
+                    <input
+                      type="date"
+                      value={dischargeForm.actualDischargeDate}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, actualDischargeDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Discharge Education *</label>
+                    <select
+                      value={dischargeForm.dischargeEducation}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, dischargeEducation: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Follow-up Advice</label>
+                    <input
+                      type="text"
+                      value={dischargeForm.followUpAdvice}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, followUpAdvice: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Documentation Complete *</label>
+                    <select
+                      value={dischargeForm.documentationComplete}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, documentationComplete: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="Partial">Partial</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Status *</label>
+                    <select
+                      value={dischargeForm.status}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-1">Notes</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-medium text-slate-600 mb-1">Remarks</label>
+                    <textarea
+                      value={dischargeForm.remarks}
+                      onChange={(e) => setDischargeForm({ ...dischargeForm, remarks: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[10px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setIsDischargeModalOpen(false); setEditingDischargeId(null); }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-800 text-[10px] font-bold cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: hospital.themeColor }}
+                  className="px-5 py-2 rounded-xl text-white text-[10px] font-bold hover:brightness-95 transition-all cursor-pointer shadow-sm"
+                >
+                  {editingDischargeId ? 'Save Changes' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -3703,6 +4435,583 @@ const InfectionPreventionSafetyTab = ({
           setSearchQuery={setFireSafetySearch}
           handleOpenModal={handleOpenFireSafetyModal}
           handleDelete={handleDeleteFireSafety}
+        />
+      )}
+    </div>
+  );
+};
+
+/* ─── Medication Administration Register tab ─── */
+const MedicationAdministrationTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.medicationId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      r.drugName.toLowerCase().includes(q) ||
+      r.administrationTime.toLowerCase().includes(q) ||
+      r.medicationError.toLowerCase().includes(q)
+    );
+  });
+
+  const totalRecords = records.length;
+  const errors = records.filter((r) => r.medicationError === 'Yes').length;
+  const errorRate = totalRecords > 0 ? ((errors / totalRecords) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    Missed: 'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  const TH_COLS = [
+    'Medication ID', 'UHID', 'Patient Name', 'Drug Name', 'Dose', 'Route', 'Admin Time', 'Administered By', 'Error', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Medication Administration Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH medication safety &amp; administration tracking — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Administrations', value: totalRecords, color: 'text-blue-600' },
+          { label: 'Medication Errors',      value: errors,        color: 'text-rose-600' },
+          { label: 'Error Rate %',           value: `${errorRate}%`, color: 'text-orange-600' },
+          { label: 'Compliant %',            value: `${(100 - parseFloat(errorRate)).toFixed(1)}%`, color: 'text-emerald-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, UHID, name, drug, time, or error status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.medicationId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.drugName}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.dose}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.route}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.administrationTime}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.administeredBy}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.medicationError === 'Yes' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.medicationError}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No medication administration records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Nursing Observation Register tab ─── */
+const NursingObservationTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.observationId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      r.vitalSignsStatus.toLowerCase().includes(q) ||
+      r.consciousnessLevel.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
+
+  const totalRecords = records.length;
+  const completed = records.filter((r) => r.status === 'Completed').length;
+  const compliancePct = totalRecords > 0 ? ((completed / totalRecords) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    Escalated: 'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  const TH_COLS = [
+    'Observation ID', 'UHID', 'Patient Name', 'Observation Date', 'Vital Signs', 'Pain', 'Consciousness', 'Escalation', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Nursing Observation Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH nursing assessments &amp; escalation tracking — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Observations Completed', value: completed, color: 'text-emerald-600' },
+          { label: 'Compliance %',           value: `${compliancePct}%`, color: 'text-blue-600' },
+          { label: 'Escalations',            value: records.filter((r) => r.escalationRequired === 'Yes').length, color: 'text-rose-600' },
+          { label: 'Total Records',          value: totalRecords, color: 'text-slate-700' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, UHID, name, vitals, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.observationId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.observationDate}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.vitalSignsStatus}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.painAssessment}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.consciousnessLevel}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.escalationRequired === 'Yes' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.escalationRequired}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No nursing observation records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Discharge Planning Register tab ─── */
+const DischargePlanningTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.planningId.toLowerCase().includes(q) ||
+      r.uhId.toLowerCase().includes(q) ||
+      r.patientName.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q) ||
+      r.documentationComplete.toLowerCase().includes(q)
+    );
+  });
+
+  const totalRecords = records.length;
+  const completed = records.filter((r) => r.status === 'Completed').length;
+  const documented = records.filter((r) => r.documentationComplete === 'Yes').length;
+  const documentationPct = totalRecords > 0 ? ((documented / totalRecords) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    Cancelled: 'bg-slate-50 text-slate-500 border-slate-200',
+  };
+
+  const TH_COLS = [
+    'Planning ID', 'UHID', 'Patient Name', 'Planned Discharge', 'Actual Discharge', 'Education', 'Follow-up', 'Documentation', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Discharge Planning Register</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH discharge coordination &amp; documentation tracking — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Record
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Planned Discharges',    value: totalRecords, color: 'text-blue-600' },
+          { label: 'Completed Discharges',  value: completed,     color: 'text-emerald-600' },
+          { label: 'Documentation %',       value: `${documentationPct}%`, color: 'text-indigo-600' },
+          { label: 'Pending',               value: totalRecords - completed, color: 'text-amber-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, UHID, name, status, or documentation…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.planningId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.uhId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.patientName}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.plannedDischargeDate}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.actualDischargeDate || '—'}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.dischargeEducation === 'Yes' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                    }`}>
+                      {r.dischargeEducation}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.followUpAdvice}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.documentationComplete === 'Yes' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                    }`}>
+                      {r.documentationComplete}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Pending}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No discharge planning records yet. Click "Add Record" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Clinical Monitoring wrapper tab ─── */
+const ClinicalMonitoringTab = ({
+  hospital,
+  medicationRecords,
+  medicationSearch,
+  setMedicationSearch,
+  handleOpenMedicationModal,
+  handleDeleteMedication,
+  observationRecords,
+  observationSearch,
+  setObservationSearch,
+  handleOpenObservationModal,
+  handleDeleteObservation,
+  dischargeRecords,
+  dischargeSearch,
+  setDischargeSearch,
+  handleOpenDischargeModal,
+  handleDeleteDischarge,
+}) => {
+  const [subTab, setSubTab] = useState('medication');
+
+  const SUB_TABS = [
+    { id: 'medication', label: 'Medication', icon: Pill },
+    { id: 'observation', label: 'Observations', icon: ClipboardList },
+    { id: 'discharge', label: 'Discharge', icon: FileText },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Clinical Monitoring</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH-aligned medication safety, nursing observations, and discharge planning</p>
+        </div>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit">
+        {SUB_TABS.map(({ id, label, icon: Icon }) => {
+          const isActive = id === subTab;
+          return (
+            <button
+              key={id}
+              onClick={() => setSubTab(id)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 8 KPI Cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Medication Administrations', value: medicationRecords.length, color: 'text-blue-600' },
+          { label: 'Medication Error Rate', value: `${(() => { const t = medicationRecords.length; const e = medicationRecords.filter(r => r.medicationError === 'Yes').length; return t > 0 ? ((e / t) * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-orange-600' },
+          { label: 'Nursing Observations Completed', value: observationRecords.filter(r => r.status === 'Completed').length, color: 'text-emerald-600' },
+          { label: 'Observation Compliance %', value: `${(() => { const t = observationRecords.length; const c = observationRecords.filter(r => r.status === 'Completed').length; return t > 0 ? ((c / t) * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-indigo-600' },
+          { label: 'Planned Discharges', value: dischargeRecords.length, color: 'text-purple-600' },
+          { label: 'Completed Discharges', value: dischargeRecords.filter(r => r.status === 'Completed').length, color: 'text-teal-600' },
+          { label: 'Documentation Completion %', value: `${(() => { const t = dischargeRecords.length; const d = dischargeRecords.filter(r => r.documentationComplete === 'Yes').length; return t > 0 ? ((d / t) * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-amber-600' },
+          { label: 'Overall Clinical Monitoring Compliance %', value: `${(() => { const m = medicationRecords.length ? (medicationRecords.filter(r => r.medicationError === 'No').length / medicationRecords.length * 100) : 0; const o = observationRecords.length ? (observationRecords.filter(r => r.status === 'Completed').length / observationRecords.length * 100) : 0; const d = dischargeRecords.length ? (dischargeRecords.filter(r => r.documentationComplete === 'Yes').length / dischargeRecords.length * 100) : 0; const c = m + o + d; return c > 0 ? (c / 3).toFixed(1) : '0.0'; })()}%`, color: 'text-rose-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {subTab === 'medication' && (
+        <MedicationAdministrationTab
+          hospital={hospital}
+          records={medicationRecords}
+          searchQuery={medicationSearch}
+          setSearchQuery={setMedicationSearch}
+          handleOpenModal={handleOpenMedicationModal}
+          handleDelete={handleDeleteMedication}
+        />
+      )}
+
+      {subTab === 'observation' && (
+        <NursingObservationTab
+          hospital={hospital}
+          records={observationRecords}
+          searchQuery={observationSearch}
+          setSearchQuery={setObservationSearch}
+          handleOpenModal={handleOpenObservationModal}
+          handleDelete={handleDeleteObservation}
+        />
+      )}
+
+      {subTab === 'discharge' && (
+        <DischargePlanningTab
+          hospital={hospital}
+          records={dischargeRecords}
+          searchQuery={dischargeSearch}
+          setSearchQuery={setDischargeSearch}
+          handleOpenModal={handleOpenDischargeModal}
+          handleDelete={handleDeleteDischarge}
         />
       )}
     </div>
