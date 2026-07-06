@@ -34,6 +34,8 @@ const LS_KEY_FIRE_SAFETY = 'deluxe_fire_safety';
 const LS_KEY_MEDICATION_ADMINISTRATION = 'deluxe_medication_administration';
 const LS_KEY_NURSING_OBSERVATIONS = 'deluxe_nursing_observations';
 const LS_KEY_DISCHARGE_PLANNING = 'deluxe_discharge_planning';
+const LS_KEY_INTERNAL_AUDITS = 'deluxe_internal_audits';
+const LS_KEY_CAPA_RECORDS = 'deluxe_capa_records';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -296,6 +298,50 @@ const SAMPLE_DISCHARGE_PLANNING = [
   { id: 'dwdp-003', planningId: 'DWDP-2503', uhId: 'UH0112', patientName: 'Ajay Kulkarni',  plannedDischargeDate: '2025-02-05', actualDischargeDate: '',          dischargeEducation: 'No',  followUpAdvice: 'Dietitian consult', documentationComplete: 'No',  status: 'Pending',   remarks: 'Awaiting physician clearance' },
   { id: 'dwdp-004', planningId: 'DWDP-2504', uhId: 'UH0188', patientName: 'Meera Deshmukh', plannedDischargeDate: '2025-02-16', actualDischargeDate: '2025-02-16', dischargeEducation: 'Yes', followUpAdvice: 'Vaccination due', documentationComplete: 'Partial', status: 'Completed', remarks: 'Counseling pending' },
   { id: 'dwdp-005', planningId: 'DWDP-2505', uhId: 'UH0234', patientName: 'Karthik Rao',    plannedDischargeDate: '2025-03-08', actualDischargeDate: '',          dischargeEducation: 'No',  followUpAdvice: 'Physiotherapy', documentationComplete: 'No',  status: 'Pending',   remarks: 'Wound care ongoing' },
+];
+
+const EMPTY_INTERNAL_AUDIT_FORM = {
+  id: '',
+  auditId: '',
+  auditDate: '2025-01-01',
+  auditor: '',
+  auditArea: 'General Ward',
+  checklistSection: 'Infection Prevention & Control',
+  complianceStatus: 'Compliant',
+  observation: '',
+  riskLevel: 'Low',
+  correctiveActionRequired: 'No',
+  remarks: '',
+};
+
+const SAMPLE_INTERNAL_AUDITS = [
+  { id: 'dwiad-001', auditId: 'DWIAD-2501', auditDate: '2025-01-12', auditor: 'Dr. Sharma',      auditArea: 'General Ward', checklistSection: 'Infection Prevention & Control', complianceStatus: 'Compliant', observation: 'Hand hygiene observed', riskLevel: 'Low', correctiveActionRequired: 'No',  remarks: 'Routine audit' },
+  { id: 'dwiad-002', auditId: 'DWIAD-2502', auditDate: '2025-01-18', auditor: 'Dr. Sharma',      auditArea: 'ICU',           checklistSection: 'Medication Safety', complianceStatus: 'Partial', observation: 'One documentation gap', riskLevel: 'Medium', correctiveActionRequired: 'Yes', remarks: 'Re-audit scheduled' },
+  { id: 'dwiad-003', auditId: 'DWIAD-2503', auditDate: '2025-02-07', auditor: 'Dr. Mehta',       auditArea: 'Emergency Dept', checklistSection: 'Patient Safety', complianceStatus: 'Non-Compliant', observation: 'PPE non-compliance', riskLevel: 'High', correctiveActionRequired: 'Yes', remarks: 'Immediate action taken' },
+  { id: 'dwiad-004', auditId: 'DWIAD-2504', auditDate: '2025-02-22', auditor: 'Dr. Mehta',       auditArea: 'Surgical Ward', checklistSection: 'Documentation & Records', complianceStatus: 'Compliant', observation: 'All records up to date', riskLevel: 'Low', correctiveActionRequired: 'No', remarks: 'No findings' },
+  { id: 'dwiad-005', auditId: 'DWIAD-2505', auditDate: '2025-03-10', auditor: 'Audit Committee', auditArea: 'Male Ward',       checklistSection: 'Quality Indicators', complianceStatus: 'Compliant', observation: 'KPI within target', riskLevel: 'Low', correctiveActionRequired: 'No', remarks: 'Quarterly review' },
+];
+
+const EMPTY_CAPA_FORM = {
+  id: '',
+  capaId: '',
+  auditId: '',
+  finding: '',
+  rootCause: '',
+  correctiveAction: '',
+  responsiblePerson: '',
+  targetDate: '2025-01-01',
+  status: 'Open',
+  closureDate: '',
+  remarks: '',
+};
+
+const SAMPLE_CAPA_RECORDS = [
+  { id: 'dwca-001', capaId: 'DWCA-2501', auditId: 'DWIAD-2502', finding: 'Medication charting delay', rootCause: 'Staff shortage during peak hours', correctiveAction: 'Reassign duties and add float nurse', responsiblePerson: 'Nurse Manager', targetDate: '2025-02-15', status: 'Closed', closureDate: '2025-02-14', remarks: 'Resolved' },
+  { id: 'dwca-002', capaId: 'DWCA-2502', auditId: 'DWIAD-2503', finding: 'PPE non-compliance in triage', rootCause: 'Inadequate supervision and awareness', correctiveAction: 'Conduct training and post signage', responsiblePerson: 'Infection Control Nurse', targetDate: '2025-02-28', status: 'Open', closureDate: '', remarks: 'Training scheduled' },
+  { id: 'dwca-003', capaId: 'DWCA-2503', auditId: 'DWIAD-2504', finding: 'Missing discharge summary', rootCause: 'Doctor clearance delay', correctiveAction: 'Pre-populate checklist and SMS alerts', responsiblePerson: 'Medical Officer', targetDate: '2025-03-10', status: 'Open', closureDate: '', remarks: 'In progress' },
+  { id: 'dwca-004', capaId: 'DWCA-2504', auditId: 'DWIAD-2501', finding: 'Ward cleanliness gap', rootCause: 'Contractor oversight', correctiveAction: 'Add random inspections and logbook', responsiblePerson: 'Housekeeping Supervisor', targetDate: '2025-01-31', status: 'Closed', closureDate: '2025-01-30', remarks: 'Action verified' },
+  { id: 'dwca-005', capaId: 'DWCA-2505', auditId: 'DWIAD-2505', finding: 'KPI data entry backlog', rootCause: 'Late submissions from departments', correctiveAction: 'Automate monthly reminders', responsiblePerson: 'Quality Coordinator', targetDate: '2025-03-20', status: 'Open', closureDate: '', remarks: 'Follow-up pending' },
 ];
 
 const TABS = [
@@ -1878,6 +1924,25 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   const [dischargeForm, setDischargeForm] = useState({ ...EMPTY_DISCHARGE_FORM });
   const [dischargeSearch, setDischargeSearch] = useState('');
 
+  /* ── Internal Audit state ── */
+  const [auditRecords, setAuditRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_INTERNAL_AUDITS);
+    return saved ? JSON.parse(saved) : SAMPLE_INTERNAL_AUDITS;
+  });
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [editingAuditId, setEditingAuditId] = useState(null);
+  const [auditForm, setAuditForm] = useState({ ...EMPTY_INTERNAL_AUDIT_FORM });
+  const [auditSearch, setAuditSearch] = useState('');
+
+  const [capaRecords, setCapaRecords] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_CAPA_RECORDS);
+    return saved ? JSON.parse(saved) : SAMPLE_CAPA_RECORDS;
+  });
+  const [isCapaModalOpen, setIsCapaModalOpen] = useState(false);
+  const [editingCapaId, setEditingCapaId] = useState(null);
+  const [capaForm, setCapaForm] = useState({ ...EMPTY_CAPA_FORM });
+  const [capaSearch, setCapaSearch] = useState('');
+
   /* ── Persist medication administration records ── */
   useEffect(() => {
     localStorage.setItem(LS_KEY_MEDICATION_ADMINISTRATION, JSON.stringify(medicationRecords));
@@ -1892,6 +1957,16 @@ const DeluxeWardWorkspace = ({ onBack }) => {
   useEffect(() => {
     localStorage.setItem(LS_KEY_DISCHARGE_PLANNING, JSON.stringify(dischargeRecords));
   }, [dischargeRecords]);
+
+  /* ── Persist internal audit records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_INTERNAL_AUDITS, JSON.stringify(auditRecords));
+  }, [auditRecords]);
+
+  /* ── Persist CAPA records ── */
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_CAPA_RECORDS, JSON.stringify(capaRecords));
+  }, [capaRecords]);
 
   /* ── Medication Administration handlers ── */
   const getNextMedicationId = () => {
@@ -2013,6 +2088,86 @@ const DeluxeWardWorkspace = ({ onBack }) => {
     }
   };
 
+  /* ── Internal Audit handlers ── */
+  const getNextAuditId = () => {
+    const maxNum = auditRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwiad-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenAuditModal = (record = null) => {
+    if (record) {
+      setAuditForm({ ...record });
+      setEditingAuditId(record.id);
+    } else {
+      setAuditForm({ ...EMPTY_INTERNAL_AUDIT_FORM, id: getNextAuditId() });
+      setEditingAuditId(null);
+    }
+    setIsAuditModalOpen(true);
+  };
+
+  const handleSaveAudit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingAuditId) {
+      setAuditRecords((prev) =>
+        prev.map((r) => (r.id === editingAuditId ? { ...auditForm, id: editingAuditId } : r))
+      );
+    } else {
+      setAuditRecords((prev) => [...prev, { ...auditForm }]);
+    }
+    setIsAuditModalOpen(false);
+    setEditingAuditId(null);
+  };
+
+  const handleDeleteAudit = (id) => {
+    if (window.confirm('Delete this internal audit record?')) {
+      setAuditRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  /* ── CAPA handlers ── */
+  const getNextCapaId = () => {
+    const maxNum = capaRecords.reduce((max, r) => {
+      const parts = r.id.split('-');
+      const num = parseInt(parts[parts.length - 1], 10);
+      return num > max ? num : max;
+    }, 0);
+    return `dwca-${String(maxNum + 1).padStart(3, '0')}`;
+  };
+
+  const handleOpenCapaModal = (record = null) => {
+    if (record) {
+      setCapaForm({ ...record });
+      setEditingCapaId(record.id);
+    } else {
+      setCapaForm({ ...EMPTY_CAPA_FORM, id: getNextCapaId() });
+      setEditingCapaId(null);
+    }
+    setIsCapaModalOpen(true);
+  };
+
+  const handleSaveCapa = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (editingCapaId) {
+      setCapaRecords((prev) =>
+        prev.map((r) => (r.id === editingCapaId ? { ...capaForm, id: editingCapaId } : r))
+      );
+    } else {
+      setCapaRecords((prev) => [...prev, { ...capaForm }]);
+    }
+    setIsCapaModalOpen(false);
+    setEditingCapaId(null);
+  };
+
+  const handleDeleteCapa = (id) => {
+    if (window.confirm('Delete this CAPA record?')) {
+      setCapaRecords((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
   /* ── Tab renderer ── */
   const renderContent = () => {
     switch (activeTab) {
@@ -2094,7 +2249,21 @@ const DeluxeWardWorkspace = ({ onBack }) => {
           />
         );
       case 'audit':
-        return <PlaceholderSection title="Internal Audit" />;
+        return (
+          <InternalAuditTab
+            hospital={hospital}
+            auditRecords={auditRecords}
+            auditSearch={auditSearch}
+            setAuditSearch={setAuditSearch}
+            handleOpenAuditModal={handleOpenAuditModal}
+            handleDeleteAudit={handleDeleteAudit}
+            capaRecords={capaRecords}
+            capaSearch={capaSearch}
+            setCapaSearch={setCapaSearch}
+            handleOpenCapaModal={handleOpenCapaModal}
+            handleDeleteCapa={handleDeleteCapa}
+          />
+        );
       case 'reports':
         return (
           <ReportsTab 
@@ -5021,6 +5190,406 @@ const ClinicalMonitoringTab = ({
 const ClinicalTab = ({ hospital }) => (
   <PlaceholderSection title="Clinical Monitoring" />
 );
+
+/* ─── Internal Audit Register tab ─── */
+const InternalAuditRegisterTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.auditId.toLowerCase().includes(q) ||
+      r.auditor.toLowerCase().includes(q) ||
+      r.auditArea.toLowerCase().includes(q) ||
+      r.checklistSection.toLowerCase().includes(q) ||
+      r.complianceStatus.toLowerCase().includes(q) ||
+      r.riskLevel.toLowerCase().includes(q)
+    );
+  });
+
+  const totalAudits = records.length;
+  const completedAudits = records.filter((r) => r.complianceStatus === 'Compliant').length;
+  const partialAudits = records.filter((r) => r.complianceStatus === 'Partial').length;
+  const nonCompliantAudits = records.filter((r) => r.complianceStatus === 'Non-Compliant').length;
+  const compliancePct = totalAudits > 0 ? ((completedAudits / totalAudits) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Compliant: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Partial: 'bg-amber-50 text-amber-700 border-amber-200',
+    'Non-Compliant': 'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  const TH_COLS = [
+    'Audit ID', 'Audit Date', 'Auditor', 'Area', 'Checklist Section', 'Compliance', 'Observation', 'Risk', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Deluxe Ward Internal Audit</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH-style audit checklist — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Audit
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Audits',            value: totalAudits,            color: 'text-blue-600' },
+          { label: 'Compliant',               value: completedAudits,        color: 'text-emerald-600' },
+          { label: 'Partial / Non-Compliant', value: partialAudits + nonCompliantAudits, color: 'text-amber-600' },
+          { label: 'Compliance %',            value: `${compliancePct}%`,    color: 'text-indigo-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, auditor, area, checklist, or compliance…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.auditId}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.auditDate}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.auditor}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.auditArea}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.checklistSection}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.complianceStatus] || STATUS_BADGE.Pending}`}>
+                      {r.complianceStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-slate-600">{r.observation}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                      r.riskLevel === 'High' ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : r.riskLevel === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {r.riskLevel}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No internal audit records yet. Click "Add Audit" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── CAPA Tracker tab ─── */
+const CAPATrackerTab = ({
+  hospital,
+  records,
+  searchQuery,
+  setSearchQuery,
+  handleOpenModal,
+  handleDelete,
+}) => {
+  const filtered = records.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.capaId.toLowerCase().includes(q) ||
+      r.auditId.toLowerCase().includes(q) ||
+      r.finding.toLowerCase().includes(q) ||
+      r.responsiblePerson.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
+
+  const totalCapas = records.length;
+  const openCapas = records.filter((r) => r.status === 'Open').length;
+  const closedCapas = records.filter((r) => r.status === 'Closed').length;
+  const followUpCompliance = totalCapas > 0 ? ((closedCapas / totalCapas) * 100).toFixed(1) : '0.0';
+
+  const STATUS_BADGE = {
+    Open: 'bg-amber-50 text-amber-700 border-amber-200',
+    Closed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Overdue: 'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  const TH_COLS = [
+    'CAPA ID', 'Audit ID', 'Finding', 'Root Cause', 'Corrective Action', 'Responsible Person', 'Target Date', 'Status', 'Actions',
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">CAPA Tracker</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">Corrective &amp; Preventive Action tracking — Deluxe Ward</p>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          style={{ backgroundColor: hospital.themeColor }}
+          className="px-4 py-2 rounded-xl text-white text-[10px] font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add CAPA
+        </button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Open CAPAs',          value: openCapas,          color: 'text-amber-600' },
+          { label: 'Closed CAPAs',        value: closedCapas,        color: 'text-emerald-600' },
+          { label: 'Follow-up Compliance %', value: `${followUpCompliance}%`, color: 'text-indigo-600' },
+          { label: 'Total CAPAs',         value: totalCapas,         color: 'text-blue-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, audit, finding, person, or status…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                {TH_COLS.map((h) => (
+                  <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.capaId}</td>
+                  <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.auditId}</td>
+                  <td className="px-3 py-3 font-semibold text-slate-700">{r.finding}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.rootCause}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.correctiveAction}</td>
+                  <td className="px-3 py-3 text-slate-600">{r.responsiblePerson}</td>
+                  <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{r.targetDate}</td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border ${STATUS_BADGE[r.status] || STATUS_BADGE.Open}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(r)}
+                        className="px-2 py-1 rounded border border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700 cursor-pointer transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        className="px-2 py-1 rounded border border-slate-200 text-rose-500 hover:border-rose-300 hover:text-rose-700 cursor-pointer transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={TH_COLS.length} className="px-3 py-10 text-center text-[10px] text-slate-400">
+                    {searchQuery ? 'No records match your search.' : 'No CAPA records yet. Click "Add CAPA" to begin.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
+          <span className="text-[9px] text-slate-400 font-medium">
+            Showing {filtered.length} of {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Internal Audit wrapper tab ─── */
+const InternalAuditTab = ({
+  hospital,
+  auditRecords,
+  auditSearch,
+  setAuditSearch,
+  handleOpenAuditModal,
+  handleDeleteAudit,
+  capaRecords,
+  capaSearch,
+  setCapaSearch,
+  handleOpenCapaModal,
+  handleDeleteCapa,
+}) => {
+  const [subTab, setSubTab] = useState('audit');
+
+  const SUB_TABS = [
+    { id: 'audit', label: 'Audit Register', icon: CheckSquare },
+    { id: 'capa',  label: 'CAPA Tracker',   icon: FileText },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-extrabold text-slate-800">Internal Audit</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">NABH-aligned internal audits and corrective/preventive action tracking</p>
+        </div>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit">
+        {SUB_TABS.map(({ id, label, icon: Icon }) => {
+          const isActive = id === subTab;
+          return (
+            <button
+              key={id}
+              onClick={() => setSubTab(id)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 8 KPI Cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Total Audits', value: auditRecords.length, color: 'text-blue-600' },
+          { label: 'Completed Audits', value: auditRecords.filter(r => r.complianceStatus === 'Compliant').length, color: 'text-emerald-600' },
+          { label: 'Pending Audits', value: auditRecords.filter(r => r.complianceStatus === 'Partial' || r.complianceStatus === 'Non-Compliant').length, color: 'text-amber-600' },
+          { label: 'Average Audit Compliance %', value: `${(() => { const t = auditRecords.length; const c = auditRecords.filter(r => r.complianceStatus === 'Compliant').length; return t > 0 ? ((c / t) * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-indigo-600' },
+          { label: 'Open CAPAs', value: capaRecords.filter(r => r.status === 'Open').length, color: 'text-orange-600' },
+          { label: 'Closed CAPAs', value: capaRecords.filter(r => r.status === 'Closed').length, color: 'text-emerald-600' },
+          { label: 'Follow-up Compliance %', value: `${(() => { const t = capaRecords.length; const c = capaRecords.filter(r => r.status === 'Closed').length; return t > 0 ? ((c / t) * 100).toFixed(1) : '0.0'; })()}%`, color: 'text-purple-600' },
+          { label: 'Overall Deluxe Ward Audit Score', value: `${(() => { const a = auditRecords.length ? (auditRecords.filter(r => r.complianceStatus === 'Compliant').length / auditRecords.length * 100) : 0; const c = capaRecords.length ? (capaRecords.filter(r => r.status === 'Closed').length / capaRecords.length * 100) : 0; const t = a + c; return t > 0 ? (t / 2).toFixed(1) : '0.0'; })()}%`, color: 'text-rose-600' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {subTab === 'audit' && (
+        <InternalAuditRegisterTab
+          hospital={hospital}
+          records={auditRecords}
+          searchQuery={auditSearch}
+          setSearchQuery={setAuditSearch}
+          handleOpenModal={handleOpenAuditModal}
+          handleDelete={handleDeleteAudit}
+        />
+      )}
+
+      {subTab === 'capa' && (
+        <CAPATrackerTab
+          hospital={hospital}
+          records={capaRecords}
+          searchQuery={capaSearch}
+          setSearchQuery={setCapaSearch}
+          handleOpenModal={handleOpenCapaModal}
+          handleDelete={handleDeleteCapa}
+        />
+      )}
+    </div>
+  );
+};
 
 const AuditTab = ({ hospital }) => (
   <PlaceholderSection title="Internal Audit" />
