@@ -11,6 +11,7 @@ import FeedbackWorkspace from './pages/FeedbackWorkspace';
 import PharmacyWorkspace from './pages/PharmacyWorkspace';
 import LaboratoryQualityWorkspace from './pages/LaboratoryQualityWorkspace';
 import FemaleWardWorkspace from './pages/FemaleWardWorkspace';
+import CommitteeMOMWorkspace from './pages/CommitteeMOMWorkspace';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="policies" element={<Policies />} />
             <Route path="emergency" element={<EmergencyWorkspace onBack={() => window.history.back()} />} />
+            <Route path="committee-mom" element={<CommitteeMOMWorkspace onBack={() => window.history.back()} />} />
           </Route>
 
           {/* Fallback Catch-All */}
