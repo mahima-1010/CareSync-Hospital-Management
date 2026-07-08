@@ -322,7 +322,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     const compliance = totalAssessments ? Math.round((completedActions / totalAssessments) * 100) : 0;
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xs font-extrabold text-slate-800">Laboratory Risk Assessment Register</h3>
@@ -341,7 +341,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Risk Assessments', value: totalAssessments, color: 'text-blue-600' },
             { label: 'High Risk Areas', value: highRisk, color: 'text-rose-600' },
@@ -354,7 +354,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
@@ -366,7 +366,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
             placeholder="Search assessments..."
             value={riskSearch}
             onChange={(e) => setRiskSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+            className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
           />
         </div>
 
@@ -376,21 +376,21 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['Risk ID', 'Area', 'Hazard', 'Score', 'Level', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filtered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
-                    <td className="px-3 py-3 font-semibold text-slate-700">{r.laboratoryArea}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{r.laboratoryArea}</td>
+                    <td className="px-4 py-3">
                       <p className="font-semibold text-slate-700">{r.hazardCategory}</p>
                       <p className="text-slate-500 truncate max-w-[150px]" title={r.hazardDescription}>{r.hazardDescription}</p>
                     </td>
-                    <td className="px-3 py-3 font-medium text-slate-700">{r.riskScore}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3 font-medium text-slate-700">{r.riskScore}</td>
+                    <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-[9px] font-bold ${
                         r.riskLevel === 'High' ? 'bg-rose-50 text-rose-700' :
                         r.riskLevel === 'Medium' ? 'bg-amber-50 text-amber-700' :
@@ -399,7 +399,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
                         {r.riskLevel}
                       </span>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-[9px] font-bold ${
                         r.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
                         'bg-rose-50 text-rose-700'
@@ -407,7 +407,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => { setRiskForm(r); setEditingRiskId(r.id); setIsRiskModalOpen(true); }}
@@ -458,8 +458,8 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     const overallSafety = Math.round((calibCompliance + msdsCompliance + safeDisposal) / 3) || 0;
 
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Equipment', value: totalEq, color: 'text-blue-600' },
             { label: 'Equipment Inspected', value: eqInspected, color: 'text-emerald-600' },
@@ -472,7 +472,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
@@ -510,18 +510,18 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Name', 'Department', 'Inspection', 'Next Insp.', 'Calibration', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {eqFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
-                    <td className="px-3 py-2 font-semibold text-slate-700">{r.equipmentName}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.department}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.inspectionDate}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.nextInspectionDate}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-semibold text-slate-700">{r.equipmentName}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.department}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.inspectionDate}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.nextInspectionDate}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.calibrationStatus === 'Valid' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{r.calibrationStatus}</span>
                     </td>
@@ -571,19 +571,19 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Chemical', 'Storage', 'Hazard', 'Qty', 'Expiry', 'MSDS', 'Compliance', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {chFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
-                    <td className="px-3 py-2 font-semibold text-slate-700">{r.chemicalName}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.storageLocation}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.hazardClass}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.quantity}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.expiryDate}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-semibold text-slate-700">{r.chemicalName}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.storageLocation}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.hazardClass}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.quantity}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.expiryDate}</td>
                     <td className="px-3 py-2 font-bold text-slate-600">{r.msdsAvailable}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.storageCompliance === 'Compliant' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{r.storageCompliance}</span>
@@ -633,19 +633,19 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Category', 'Date', 'Method', 'Qty', 'Staff', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {wsFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
                     <td className="px-3 py-2 font-semibold text-slate-700">{r.wasteCategory}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.collectionDate}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.disposalMethod}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.quantity}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.responsibleStaff}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.collectionDate}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.disposalMethod}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.quantity}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.responsibleStaff}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.disposalStatus === 'Completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{r.disposalStatus}</span>
                     </td>
@@ -683,7 +683,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     const overallScore = Math.round((avgCompliance + (followUpCompliance || avgCompliance)) / 2);
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xs font-extrabold text-slate-800">Laboratory Internal Audit & CAPA</h3>
@@ -691,7 +691,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Audits', value: totalAudits, color: 'text-blue-600' },
             { label: 'Completed Audits', value: completedAudits, color: 'text-emerald-600' },
@@ -704,7 +704,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
@@ -742,18 +742,18 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['Audit ID', 'Date', 'Area', 'Type', 'Auditor', 'Score', 'Status', 'Follow-up Date', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {aFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.auditDate}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.auditDate}</td>
                     <td className="px-3 py-2 font-semibold text-slate-700">{r.laboratoryArea}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.auditType}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.auditor}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.auditType}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.auditor}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.complianceScore >= 90 ? 'bg-emerald-50 text-emerald-700' : r.complianceScore >= 75 ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'}`}>
                         {r.complianceScore}%
@@ -808,19 +808,19 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['CAPA ID', 'Source ID', 'Observation', 'Responsible', 'Target Date', 'Completion Date', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {cFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.auditId}</td>
-                    <td className="px-3 py-2 text-slate-700 truncate max-w-[150px]" title={r.observation}>{r.observation}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.auditId}</td>
+                    <td className="px-4 py-2 text-slate-700 truncate max-w-[150px]" title={r.observation}>{r.observation}</td>
                     <td className="px-3 py-2 text-slate-600">{r.responsiblePerson}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.targetDate}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.completionDate}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.targetDate}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.completionDate}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.status === 'Closed' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{r.status}</span>
                     </td>
@@ -857,7 +857,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     const closureRate = totalIncidents ? Math.round((closedIncidents / totalIncidents) * 100) : 0;
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xs font-extrabold text-slate-800">Incident & Emergency Management Register</h3>
@@ -877,7 +877,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Incidents', value: totalIncidents, color: 'text-blue-600' },
             { label: 'Open Incidents', value: openIncidents, color: 'text-rose-600' },
@@ -890,7 +890,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
@@ -902,7 +902,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
             placeholder="Search incidents by type, location, severity, or status..."
             value={incidentSearch}
             onChange={(e) => setIncidentSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+            className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-[10px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
           />
         </div>
 
@@ -912,17 +912,17 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['Incident ID', 'Date', 'Type', 'Severity', 'Location', 'Description', 'Responsible', 'Follow-Up', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filtered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-3 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
-                    <td className="px-3 py-3 text-slate-600">{r.incidentDate}</td>
-                    <td className="px-3 py-3 font-semibold text-slate-700">{r.incidentType}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3 font-mono text-[9px] text-slate-500">{r.id}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.incidentDate}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{r.incidentType}</td>
+                    <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-[9px] font-bold ${
                         r.severity === 'Critical' ? 'bg-red-100 text-red-800' :
                         r.severity === 'High' ? 'bg-orange-50 text-orange-700' :
@@ -932,13 +932,13 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
                         {r.severity}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-slate-600">{r.location}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3 text-slate-600">{r.location}</td>
+                    <td className="px-4 py-3">
                       <p className="text-slate-500 truncate max-w-[150px]" title={r.description}>{r.description}</p>
                     </td>
-                    <td className="px-3 py-3 text-slate-600">{r.responsibleStaff}</td>
-                    <td className="px-3 py-3 text-slate-600">{r.followUpDate}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3 text-slate-600">{r.responsibleStaff}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.followUpDate}</td>
+                    <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-[9px] font-bold ${
                         r.followUpStatus === 'Closed' ? 'bg-emerald-50 text-emerald-700' :
                         'bg-rose-50 text-rose-700'
@@ -946,7 +946,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
                         {r.followUpStatus}
                       </span>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => { setIncidentForm(r); setEditingIncidentId(r.id); setIsIncidentModalOpen(true); }}
@@ -998,8 +998,8 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     const overallCompliance = Math.round((spAcceptance + ppeCompliance + compCompliance) / 3) || 0;
 
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Specimens', value: totalSp, color: 'text-blue-600' },
             { label: 'Properly Handled', value: acceptedSp, color: 'text-emerald-600' },
@@ -1012,7 +1012,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
@@ -1050,14 +1050,14 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Patient', 'Type', 'Area', 'Collected', 'Transport', 'Received By', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {spFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
                     <td className="px-3 py-2 font-semibold text-slate-700">{r.patientId}</td>
                     <td className="px-3 py-2 text-slate-600">{r.specimenType}</td>
                     <td className="px-3 py-2 text-slate-600">{r.collectionArea}</td>
@@ -1112,22 +1112,22 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Employee Name', 'Department', 'PPE Type', 'Compliance', 'Date', 'Inspector', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {ppeFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
                     <td className="px-3 py-2 font-semibold text-slate-700">{r.employeeName}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.department}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.department}</td>
                     <td className="px-3 py-2 text-slate-600">{r.ppeType}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-0.5 rounded-full font-bold ${r.complianceStatus === 'Compliant' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{r.complianceStatus}</span>
                     </td>
-                    <td className="px-3 py-2 text-slate-600">{r.inspectionDate}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.inspector}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.inspectionDate}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.inspector}</td>
                     <td className="px-3 py-2 flex gap-2">
                       <button onClick={() => { setPpeForm(r); setEditingPpeId(r.id); setIsPpeModalOpen(true); }} className="text-slate-400 hover:text-sky-600"><Edit3 className="w-3.5 h-3.5" /></button>
                       <button onClick={() => { if(window.confirm('Delete?')) setPpeRecords(prev => prev.filter(x => x.id !== r.id)) }} className="text-slate-400 hover:text-rose-600"><Trash2 className="w-3.5 h-3.5" /></button>
@@ -1173,16 +1173,16 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['ID', 'Employee', 'Department', 'Topic', 'Trainer', 'Date', 'Valid Until', 'Competency', 'Actions'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {trFiltered.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/60">
-                    <td className="px-3 py-2 font-mono text-slate-500">{r.id}</td>
+                    <td className="px-4 py-2 font-mono text-slate-500">{r.id}</td>
                     <td className="px-3 py-2 font-semibold text-slate-700">{r.employeeName}</td>
-                    <td className="px-3 py-2 text-slate-600">{r.department}</td>
+                    <td className="px-4 py-2 text-slate-600">{r.department}</td>
                     <td className="px-3 py-2 text-slate-600">{r.trainingTopic}</td>
                     <td className="px-3 py-2 text-slate-600">{r.trainer}</td>
                     <td className="px-3 py-2 text-slate-600">{r.trainingDate}</td>
@@ -1206,8 +1206,8 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
   };
 
   const renderDashboard = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { title: 'Total Risk Assessments', value: '145', color: 'text-blue-600' },
           { title: 'Equipment Compliance %', value: '94%', color: 'text-emerald-600' },
@@ -1219,14 +1219,14 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           { title: 'Overall Laboratory Safety %', value: '93%', color: 'text-emerald-600' },
         ].map((kpi, idx) => (
           <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.title}</p>
-            <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.title}</p>
+            <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Monthly Safety Compliance Trend</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1241,7 +1241,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Risk Category Distribution</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1258,7 +1258,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Equipment Status</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1275,7 +1275,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Training Compliance</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1290,7 +1290,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Incident Trend</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1305,7 +1305,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 className="text-xs font-bold text-slate-800 mb-4">Audit Compliance Trend</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -1404,7 +1404,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
     }));
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xs font-extrabold text-slate-800">Reports & Analytics</h3>
@@ -1417,7 +1417,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Risk Assessments', value: totalRiskAssessments, color: 'text-blue-600' },
             { label: 'Equip. Compliance %', value: `${equipComp}%`, color: 'text-emerald-600' },
@@ -1430,12 +1430,12 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
           ].map((kpi, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
+              <p className={`text-xl font-extrabold mt-1 ${kpi.color}`}>{kpi.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h4 className="text-[10px] font-bold text-slate-700 mb-4">1. Monthly Safety Trend</h4>
             <div className="h-48">
@@ -1533,7 +1533,7 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   {['Month', 'Risk Assessments', 'Equipment Compliance %', 'Training Compliance %', 'Incidents', 'Audit Compliance %', 'Overall Performance %'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-4 py-2 text-left font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -1558,68 +1558,77 @@ const LaboratorySafetyWorkspace = ({ onBack }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-50 flex flex-col z-50 overflow-hidden">
-      <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+    <div className="flex gap-0 -m-6 min-h-[calc(100vh-4rem)]">
+      {/* ── Left Rail ── */}
+      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col">
+        <div className="p-4 border-b border-slate-100">
           <button
             onClick={onBack}
-            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"
+            className="flex items-center gap-2 text-[10px] font-bold text-slate-500 hover:text-slate-800 uppercase tracking-wider cursor-pointer transition-colors group"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            Policies Directory
           </button>
-          <div>
-            <h1 className="text-sm font-extrabold text-slate-800">Laboratory Safety Workspace</h1>
-            <p className="text-[10px] text-slate-500 font-medium">Laboratory Safety Management System</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
-          <div className="p-3">
-            <div className="space-y-1">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] font-bold transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'bg-sky-50 text-sky-700'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
-                  }`}
-                >
-                  <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-sky-600' : 'text-slate-400'}`} />
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-xs font-extrabold text-slate-900 mt-2">Laboratory Safety</h2>
+          <p className="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest font-bold">
+            Safety Management Module
+          </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
-          <div className="max-w-7xl mx-auto">
-            {activeTab === 'dashboard' ? (
-              renderDashboard()
-            ) : activeTab === 'risk_assessment' ? (
-              renderRiskAssessment()
-            ) : activeTab === 'equipment_chemical' ? (
-              renderEquipmentChemical()
-            ) : activeTab === 'specimen_training' ? (
-              renderSpecimenTraining()
-            ) : activeTab === 'incident_emergency' ? (
-              renderIncidentManagement()
-            ) : activeTab === 'internal_audit' ? (
-              renderInternalAudit()
-            ) : activeTab === 'reports' ? (
-              renderReportsAnalytics()
-            ) : (
-              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
-                <p className="text-sm font-medium text-slate-500">Phase will be implemented in the next step.</p>
-              </div>
-            )}
-          </div>
+        <nav className="flex-1 overflow-y-auto custom-scroll py-3 px-2 space-y-0.5">
+          {TABS.map(({ id, label, icon: Icon }) => {
+            const isActive = id === activeTab;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                style={
+                  isActive
+                    ? { backgroundColor: `${hospital.themeColor}0d`, borderColor: `${hospital.themeColor}22`, color: hospital.themeColor }
+                    : {}
+                }
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-left transition-all cursor-pointer ${
+                  isActive
+                    ? 'border-sky-500/20 font-bold'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-[10px] font-semibold truncate">{label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="p-3 border-t border-slate-100">
+          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">
+            Laboratory Safety — Module
+          </p>
         </div>
-      </div>
+      </aside>
+
+      {/* ── Main Content ── */}
+      <main className="flex-1 overflow-y-auto custom-scroll bg-slate-50/40 p-6">
+        {activeTab === 'dashboard' ? (
+          renderDashboard()
+        ) : activeTab === 'risk_assessment' ? (
+          renderRiskAssessment()
+        ) : activeTab === 'equipment_chemical' ? (
+          renderEquipmentChemical()
+        ) : activeTab === 'specimen_training' ? (
+          renderSpecimenTraining()
+        ) : activeTab === 'incident_emergency' ? (
+          renderIncidentManagement()
+        ) : activeTab === 'internal_audit' ? (
+          renderInternalAudit()
+        ) : activeTab === 'reports' ? (
+          renderReportsAnalytics()
+        ) : (
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+            <p className="text-sm font-medium text-slate-500">Phase will be implemented in the next step.</p>
+          </div>
+        )}
+      </main>
 
       {isRiskModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
