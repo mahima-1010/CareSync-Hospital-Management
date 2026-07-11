@@ -10,7 +10,7 @@ axios.defaults.headers.common['Content-Type'] = 'application/json';
 const defaultModules = [
   { id: 'policies', label: 'Policies', desc: 'SOPs, clinical guidelines, and documentation audits.', iconName: 'BookOpen', to: '/policies', isCustom: false },
   { id: 'committee', label: 'Committee MOM', desc: 'Minutes of meetings, agenda items, and action registers.', iconName: 'Award', to: '/committee-mom', isCustom: false },
-  { id: 'hr', label: 'HR Records', desc: 'Credential files, training matrices, and staffing plans.', iconName: 'Users', to: '/policies', isCustom: false },
+  { id: 'hr', label: 'HR Records', desc: 'Credential files, training matrices, and staffing plans.', iconName: 'Users', to: '/hr-records', isCustom: false },
   { id: 'licenses', label: 'Licenses Registry', desc: 'NOC documents, state registrations, and renewal logs.', iconName: 'Shield', to: '/policies', isCustom: false },
   { id: 'permissions', label: 'Clinical Permissions', desc: 'Audit clearance levels and department sign-off controls.', iconName: 'Activity', to: '/policies', isCustom: false }
 ];
