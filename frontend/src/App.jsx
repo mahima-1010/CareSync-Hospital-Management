@@ -14,6 +14,7 @@ import FemaleWardWorkspace from './pages/FemaleWardWorkspace';
 import CommitteeMOMWorkspace from './pages/CommitteeMOMWorkspace';
 import HRRecordsWorkspace from './pages/HRRecordsWorkspace';
 import LicensesRegistryWorkspace from './pages/LicensesRegistryWorkspace';
+import MedicalRecordsWorkspace from './pages/MedicalRecordsWorkspace';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="committee-mom" element={<CommitteeMOMWorkspace onBack={() => window.history.back()} />} />
             <Route path="hr-records" element={<HRRecordsWorkspace onBack={() => window.history.back()} />} />
             <Route path="licenses-registry" element={<LicensesRegistryWorkspace onBack={() => window.history.back()} />} />
+            <Route path="medical-records" element={<MedicalRecordsWorkspace onBack={() => window.history.back()} />} />
           </Route>
 
           {/* Fallback Catch-All */}
