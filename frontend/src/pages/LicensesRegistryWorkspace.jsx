@@ -3783,8 +3783,8 @@ const ReportsTab = ({ hospital }) => {
   );
 };
 
-export default function LicensesRegistryWorkspace() {
-  const { hospital, navigateTo } = useHospital();
+export default function LicensesRegistryWorkspace({ onBack }) {
+  const { hospital } = useHospital();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const renderTab = () => {
@@ -3804,10 +3804,10 @@ export default function LicensesRegistryWorkspace() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
         <button
-          onClick={() => navigateTo && navigateTo('home')}
-          className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+          onClick={onBack}
+          className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors group"
         >
-          <ChevronLeft size={14} />
+          <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
           Back
         </button>
         <span className="text-slate-300">|</span>
